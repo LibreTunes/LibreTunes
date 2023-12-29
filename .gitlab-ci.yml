@@ -1,0 +1,17 @@
+stages:
+  - build
+  - test
+
+# Build the project
+build:
+  stage: build
+  image: registry.mregirouard.com/libretunes/ops/docker-leptos:slim
+  script:
+    - cargo-leptos build
+
+# Run unit tests
+test:
+  stage: test
+  image: registry.mregirouard.com/libretunes/ops/docker-leptos:slim
+  script:
+    - cargo-leptos test
