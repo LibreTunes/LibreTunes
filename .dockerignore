@@ -1,0 +1,9 @@
+# Ignore everything
+*
+
+# Except:
+!/assets
+!/src
+!/style
+!/Cargo.lock
+!/Cargo.toml
