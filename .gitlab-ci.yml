@@ -26,3 +26,13 @@ test:
   image: registry.mregirouard.com/libretunes/ops/docker-leptos:slim
   script:
     - cargo-leptos test
+
+# Generate docs
+cargo-doc:
+  needs: []
+  image: rust:slim
+  script:
+    - cargo doc --no-deps
+  artifacts:
+    paths:
+      - target/doc
