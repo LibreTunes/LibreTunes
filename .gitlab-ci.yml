@@ -1,17 +1,13 @@
-stages:
-  - build
-  - test
-
 # Build the project
 build:
-  stage: build
+  needs: []
   image: registry.mregirouard.com/libretunes/ops/docker-leptos:slim
   script:
     - cargo-leptos build
 
 # Build the docker image and push it to the registry
 docker-build:
-  stage: build
+  needs: ["build"]
   image: docker:latest
   script:
     - /usr/local/bin/dockerd-entrypoint.sh &
@@ -26,7 +22,7 @@ docker-build:
 
 # Run unit tests
 test:
-  stage: test
+  needs: ["build"]
   image: registry.mregirouard.com/libretunes/ops/docker-leptos:slim
   script:
     - cargo-leptos test
