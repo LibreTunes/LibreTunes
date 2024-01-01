@@ -1,24 +1,18 @@
-FROM rust:slim AS builder
+FROM registry.mregirouard.com/libretunes/ops/docker-leptos:latest as builder
 
 WORKDIR /app
 
-# Select the nightly toolchain and add needed targets
-RUN rustup toolchain install nightly
-RUN rustup default nightly
-RUN rustup target add wasm32-unknown-unknown
+# Add target for static linking
 RUN rustup target add x86_64-unknown-linux-musl
 
 # Install a few dependencies
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-		libssl-dev \
-		pkg-config \
 		npm \
 		musl-tools; \
 	rm -rf /var/lib/apt/lists/*
 
-RUN cargo install cargo-leptos
 RUN npm install tailwindcss -g
 
 # Copy project dependency manifests
