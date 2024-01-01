@@ -60,7 +60,7 @@ library manager built for collaborative listening."
 
 # Copy the binary and the compressed assets to the "site root"
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/libretunes /libretunes
-COPY --from=builder /app/target/site /target/site
+COPY --from=builder /app/target/site /site
 
 # Configure Leptos settings
 ENV LEPTOS_SITE_ADDR=0.0.0.0:3000
