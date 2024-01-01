@@ -11,3 +11,16 @@ node_modules/
 test-results/
 end2end/playwright-report/
 playwright/.cache/
+
+# Audio files
+*.mp3
+*.wav
+*.ogg
+*.flac
+*.acc
+
+# Image files
+*.jpg
+*.jpeg
+*.png
+*.gif
