@@ -1,4 +1,9 @@
+@import 'theme.scss';
+
 body {
 	font-family: sans-serif;
-	text-align: center;
+	background-color: $background-color;
+	color: $text-controls-color;
+	margin: 0;
+	padding: 0;
 }
