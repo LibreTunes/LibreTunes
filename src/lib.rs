@@ -1,6 +1,7 @@
 pub mod app;
 pub mod songdata;
 pub mod playstatus;
+pub mod playbar;
 use cfg_if::cfg_if;
 
 cfg_if! {
