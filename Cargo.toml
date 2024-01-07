@@ -24,6 +24,7 @@ leptos_icons = { version = "0.1.0", default_features = false, features = [
   "BsSkipEndFill"
 ] }
 dotenv = { version = "0.15.0", optional = true }
+diesel = { version = "2.1.4", features = ["postgres", "r2d2"], optional = true }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -36,6 +37,7 @@ ssr = [
   "leptos_meta/ssr",
   "leptos_router/ssr",
   "dotenv",
+  "diesel",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
