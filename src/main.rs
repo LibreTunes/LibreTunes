@@ -1,6 +1,9 @@
 #[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    use dotenv::dotenv;
+    dotenv().ok();
+
     use actix_files::Files;
     use actix_web::*;
     use leptos::*;
