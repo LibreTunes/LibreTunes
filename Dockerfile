@@ -10,7 +10,8 @@ RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
 		npm \
-		musl-tools; \
+		musl-tools \
+		libpq5; \
 	rm -rf /var/lib/apt/lists/*
 
 RUN npm install tailwindcss -g
