@@ -27,6 +27,7 @@ dotenv = { version = "0.15.0", optional = true }
 diesel = { version = "2.1.4", features = ["postgres", "r2d2"], optional = true }
 lazy_static = { version = "1.4.0", optional = true }
 serde = { versions = "1.0.195", features = ["derive"], optional = true }
+openssl = { version = "0.10.63", optional = true }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -42,6 +43,7 @@ ssr = [
   "diesel",
   "lazy_static",
   "serde",
+  "openssl",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
