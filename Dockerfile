@@ -24,7 +24,7 @@ RUN echo 'bin-target-triple = "x86_64-unknown-linux-musl"' >> Cargo.toml
 
 # Create dummy files to force cargo to build the dependencies
 RUN mkdir /app/src && mkdir /app/style && mkdir /app/assets && \
-		echo "fn main() {}" > /app/src/main.rs && \
+		echo "fn main() {}" | tee /app/src/build.rs > /app/src/main.rs && \
 		touch /app/src/lib.rs && \
 		touch /app/style/main.scss
 
@@ -41,7 +41,7 @@ COPY assets /app/assets
 COPY src /app/src
 
 # Touch files to force rebuild
-RUN touch /app/src/main.rs && touch /app/src/lib.rs
+RUN touch /app/src/main.rs && touch /app/src/lib.rs && touch /app/src/build.rs
 
 # Actually build the binary
 RUN cargo-leptos build --release --precompress
