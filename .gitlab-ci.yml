@@ -1,7 +1,7 @@
 # Build the project
 build:
   needs: []
-  image: registry.mregirouard.com/libretunes/ops/docker-leptos:slim
+  image: registry.mregirouard.com/libretunes/ops/docker-leptos:latest
   script:
     - cargo-leptos build
 
@@ -23,7 +23,7 @@ docker-build:
 # Run unit tests
 test:
   needs: ["build"]
-  image: registry.mregirouard.com/libretunes/ops/docker-leptos:slim
+  image: registry.mregirouard.com/libretunes/ops/docker-leptos:latest
   script:
     - cargo-leptos test
 
