@@ -2,16 +2,11 @@ FROM registry.mregirouard.com/libretunes/ops/docker-leptos:latest as builder
 
 WORKDIR /app
 
-# Add target for static linking
-RUN rustup target add x86_64-unknown-linux-musl
-
 # Install a few dependencies
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-		npm \
-		musl-tools \
-		libpq5; \
+		npm; \
 	rm -rf /var/lib/apt/lists/*
 
 RUN npm install tailwindcss -g
