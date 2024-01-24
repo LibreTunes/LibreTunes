@@ -9,7 +9,7 @@ RUN set -eux; \
 		npm; \
 	rm -rf /var/lib/apt/lists/*
 
-RUN npm install tailwindcss -g
+RUN npm install tailwindcss@3.1.8 -g
 
 # Copy project dependency manifests
 COPY Cargo.toml Cargo.lock /app/
