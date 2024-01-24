@@ -19,9 +19,6 @@ const MIN_SKIP_BACK_TIME: f64 = 5.0;
 /// How many seconds to skip forward/backward when the user presses the arrow keys
 const ARROW_KEY_SKIP_TIME: f64 = 5.0;
 
-/// How often to update the progress bar and song time
-const PROGRESS_UPDATE_TIME: Duration = Duration::from_millis(200);
-
 // TODO Handle errors better, when getting audio HTML element and when playing/pausing audio
 
 /// Get the current time and duration of the current song, if available
@@ -386,69 +383,75 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
                 log!("Queue is empty, no first song to play");
             }
         });
-
-		// We need this handle to update certain audio things
-		// This is because the audio element doesn't use Leptos' reactive system,
-		// but rather updates transparently without notifying subscribers
-		// TODO Use Audio's `set_on****` methods instead of this -- if possible
-        let progress_update_handle = set_interval_with_handle(move || {
-                if let Some(audio) = audio_ref.get() {
-                    set_elapsed_secs(audio.current_time() as i64);
-                    set_total_secs(audio.duration() as i64);
-
-                    if elapsed_secs.get_untracked() > 0 {
-                        set_percentage(elapsed_secs.get_untracked() as f64 / total_secs.get_untracked() as f64 * 100.0);
-                    } else {
-                        set_percentage(0.0);
-                    }
-
-                    // If the song has ended, move to the next song
-                    if elapsed_secs.get_untracked() >= total_secs.get_untracked() && total_secs.get_untracked() > 0 {
-                        log!("Song ended, moving to next song");
-
-                        // Move the now-finshed song to the history
-                        // TODO Somehow make sure next song starts playing before repeatedly jumping to next
-                        status.update(|status| {
-                            let prev_song = status.queue.pop_front();
-
-                            if let Some(prev_song) = prev_song {
-                                log!("Adding song to history: {}", prev_song.name);
-                                status.history.push_back(prev_song);
-                            } else {
-                                log!("Queue empty, no previous song to add to history");
-                            }
-                        });
-
-                        // Get the next song to play, if available
-                        let next_src = status.with_untracked(|status| {
-                            status.queue.front().map(|song| song.song_path.clone())
-                        });
-
-                        if let Some(next_src) = next_src {
-                            log!("Playing next song: {}", next_src);
-                            audio.set_src(&next_src);
-      
-                            if let Err(e) = audio.play() {
-                                error!("Error playing audio after song change: {:?}", e);
-                            } else {
-                                log!("Audio playing after song change");
-                            }
-                        }
-                    }
-                }
-            }, PROGRESS_UPDATE_TIME);
-
-        match progress_update_handle {
-            Ok(handle) => {
-                log!("Progress update interval started");
-                status.update(|status| status.progress_update_handle = Some(handle));
-            }
-            Err(e) => error!("Error starting progress update interval: {:?}", e),
-        }
     });
 
+    let on_play = move |_| {
+        log!("Audio playing");
+        status.update(|status| status.playing = true);
+    };
+
+    let on_pause = move |_| {
+        log!("Audio paused");
+        status.update(|status| status.playing = false);
+    };
+
+    let on_time_update = move |_| {
+        status.update(|status| {
+            if let Some(audio) = status.get_audio() {
+                set_elapsed_secs(audio.current_time() as i64);
+                set_total_secs(audio.duration() as i64);
+
+                if elapsed_secs.get_untracked() > 0 {
+                    set_percentage(elapsed_secs.get_untracked() as f64 / total_secs.get_untracked() as f64 * 100.0);
+                } else {
+                    set_percentage(0.0);
+                }
+            } else {
+                error!("Unable to update time: Audio element not available");
+            }
+        });
+    };
+
+    let on_end = move |_| {
+        log!("Song ended");
+
+        // Move the now-finshed song to the history
+        // TODO Somehow make sure next song starts playing before repeatedly jumping to next
+        status.update(|status| {
+            let prev_song = status.queue.pop_front();
+
+            if let Some(prev_song) = prev_song {
+                log!("Adding song to history: {}", prev_song.name);
+                status.history.push_back(prev_song);
+            } else {
+                log!("Queue empty, no previous song to add to history");
+            }
+        });
+
+        // Get the next song to play, if available
+        let next_src = status.with_untracked(|status| {
+            status.queue.front().map(|song| song.song_path.clone())
+        });
+
+        if let Some(audio) = audio_ref.get() {
+            if let Some(next_src) = next_src {
+                log!("Playing next song: {}", next_src);
+                audio.set_src(&next_src);
+
+                if let Err(e) = audio.play() {
+                    error!("Error playing audio after song change: {:?}", e);
+                } else {
+                    log!("Audio playing after song change");
+                }
+            }
+        } else {
+            error!("Unable to play next song: Audio element not available");
+        }
+    };
+
     view! {
-        <audio _ref=audio_ref type="audio/mpeg" />
+        <audio _ref=audio_ref on:play=on_play on:pause=on_pause
+            on:timeupdate=on_time_update on:ended=on_end type="audio/mpeg" />
         <div class="playbar">
         <ProgressBar percentage=percentage.into() status=status />
         <MediaInfo status=status />

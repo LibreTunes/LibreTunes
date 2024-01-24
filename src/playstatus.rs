@@ -1,7 +1,6 @@
 use leptos::HtmlElement;
 use leptos::NodeRef;
 use leptos::html::Audio;
-use leptos::leptos_dom::helpers::IntervalHandle;
 use std::collections::VecDeque;
 
 use crate::songdata::SongData;
@@ -12,8 +11,6 @@ pub struct PlayStatus {
     pub playing: bool,
 	/// A reference to the HTML audio element
     pub audio_player: Option<NodeRef<Audio>>,
-	/// A handle to the interval that updates the progress bar
-    pub progress_update_handle: Option<IntervalHandle>,
 	/// A queue of songs that have been played, ordered from oldest to newest
     pub history: VecDeque<SongData>,
 	/// A queue of songs that have yet to be played, ordered from next up to last
@@ -57,7 +54,6 @@ impl Default for PlayStatus {
         Self {
             playing: false,
             audio_player: None,
-            progress_update_handle: None,
             history: VecDeque::new(),
             queue: VecDeque::new(),
         }
