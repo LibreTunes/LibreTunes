@@ -1,4 +1,4 @@
-FROM registry.mregirouard.com/libretunes/ops/docker-leptos:latest as builder
+FROM registry.mregirouard.com/libretunes/ops/docker-leptos/musl:latest as builder
 
 WORKDIR /app
 
