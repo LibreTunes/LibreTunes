@@ -36,3 +36,36 @@ cargo-doc:
   artifacts:
     paths:
       - target/doc
+
+.argocd:
+  image: argoproj/argocd:v2.6.15
+  before_script:
+    - argocd login ${ARGOCD_SERVER} --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD} --grpc-web
+
+# Start the review environment
+start-review:
+  extends: .argocd
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+  script:
+    - argocd app sync argocd/libretunes-review-${CI_COMMIT_SHORT_SHA}
+    - argocd app wait argocd/libretunes-review-${CI_COMMIT_SHORT_SHA}
+  environment:
+    name: review/$CI_COMMIT_SHORT_SHA
+    url: https://review-$CI_COMMIT_SHORT_SHA.libretunes.mregirouard.com
+    on_stop: stop-review
+
+# Stop the review environment
+stop-review:
+  needs: ["start-review"]
+  extends: .argocd
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+  allow_failure: true
+  script:
+    - argocd app delete argocd/libretunes-review-${CI_COMMIT_SHORT_SHA} --cascade
+  environment:
+    name: review/$CI_COMMIT_SHORT_SHA
+    action: stop
