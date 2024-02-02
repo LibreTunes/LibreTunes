@@ -6,12 +6,16 @@ use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::BsIcon::*;
+use leptos_icons::RiIcon::*;
 use leptos_icons::*;
 
 /// Width and height of the forward/backward skip buttons
 const SKIP_BTN_SIZE: &str = "3.5em";
 /// Width and height of the play/pause button
 const PLAY_BTN_SIZE: &str = "5em";
+
+// Width and height of the queue button
+const QUEUE_BTN_SIZE: &str = "3.5em";
 
 /// Threshold in seconds for skipping to the previous song instead of skipping to the start of the current song
 const MIN_SKIP_BACK_TIME: f64 = 5.0;
@@ -99,6 +103,14 @@ fn set_playing(status: impl SignalUpdate<Value = PlayStatus>, play: bool) {
             error!("Unable to play/pause audio: Audio element not available");
         }
     });
+}
+
+fn toggle_queue(status: impl SignalUpdate<Value = PlayStatus>) {
+	status.update(|status| {
+		status.queue_open = !status.queue_open;
+	});
+
+	
 }
 
 /// Set the source of the audio player
@@ -309,6 +321,30 @@ fn ProgressBar(percentage: MaybeSignal<f64>, status: RwSignal<PlayStatus>) -> im
     }
 }
 
+#[component]
+fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
+
+    let update_queue = move |_| {
+        toggle_queue(status);
+		log!("queue button pressed, queue status: {:?}", status.with(|status| status.queue_open));
+    };
+
+	// We use this to prevent the buttons from being focused when clicked
+    // If buttons were focused on clicks, then pressing space bar to play/pause would "click" the button
+    // and trigger unwanted behavior
+    let prevent_focus = move |e: MouseEvent| {
+        e.prevent_default();
+    };
+
+    view! {
+        <div class="queue-toggle">
+        <button on:click=update_queue on:mousedown=prevent_focus>
+        <Icon class="controlbtn" width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon=Icon::from(RiPlayListMediaFill) />
+        </button>
+        </div>
+    }
+}
+
 /// The main play bar component, containing the progress bar, media info, play controls, and play duration
 #[component]
 pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
@@ -457,6 +493,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         <MediaInfo status=status />
         <PlayControls status=status />
         <PlayDuration elapsed_secs=elapsed_secs.into() total_secs=total_secs.into() />
+        <QueueToggle status=status />
         </div>
     }
 }
