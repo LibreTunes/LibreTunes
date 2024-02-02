@@ -1,0 +1,48 @@
+@import 'theme.scss';
+
+.queue {
+	position: fixed;
+	top: 0;
+	right: 0; 
+	width: 300px; 
+	height: 55.3rem;
+	background-color: $queue-background-color; /* Queue background color */
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+  
+	.queue-header {
+	  background-color: #333; /* Header background color */
+	  color: #fff; /* Header text color */
+	  padding: 10px;
+	  text-align: center;
+	}
+  
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	
+		.queue-song {
+		  display: flex;
+		  align-items: center;
+		  padding: 10px;
+		  border-bottom: 1px solid #ccc; /* Separator line color */
+	
+		  img {
+			max-width: 50px; /* Adjust maximum width for images */
+			margin-right: 10px; /* Add spacing between image and text */
+		  }
+	
+		  .queue-song-info {
+			h3 {
+			  margin: 0; /* Remove default margin for heading */
+			}
+	
+			p {
+			  margin: 0; /* Remove default margin for paragraph */
+			  color: #888; /* Adjust text color for artist */
+			}
+		  }
+		}
+	}
+}
+  
