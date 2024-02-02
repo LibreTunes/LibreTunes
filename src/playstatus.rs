@@ -9,6 +9,8 @@ use crate::songdata::SongData;
 pub struct PlayStatus {
 	/// Whether or not the audio player is currently playing
     pub playing: bool,
+	/// Whether or not the queue is open
+	pub queue_open: bool,
 	/// A reference to the HTML audio element
     pub audio_player: Option<NodeRef<Audio>>,
 	/// A queue of songs that have been played, ordered from oldest to newest
@@ -53,6 +55,7 @@ impl Default for PlayStatus {
     fn default() -> Self {
         Self {
             playing: false,
+			queue_open: false,
             audio_player: None,
             history: VecDeque::new(),
             queue: VecDeque::new(),
