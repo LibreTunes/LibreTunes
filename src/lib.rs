@@ -3,6 +3,7 @@ pub mod songdata;
 pub mod playstatus;
 pub mod playbar;
 pub mod database;
+pub mod queue;
 use cfg_if::cfg_if;
 
 cfg_if! {
