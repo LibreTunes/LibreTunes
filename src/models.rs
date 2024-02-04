@@ -44,6 +44,17 @@ pub struct NewUser {
 	pub password: String,
 }
 
+/// Convert a User into a NewUser, omitting the id and created_at fields
+impl From<User> for NewUser {
+	fn from(user: User) -> NewUser {
+		NewUser {
+			username: user.username,
+			email: user.email,
+			password: user.password,
+		}
+	}
+}
+
 /// Model for a "Public User", used for returning user data to the client
 /// This model omits the password field, so that the hashed password is not sent to the client
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable))]
@@ -59,4 +70,16 @@ pub struct PublicUser {
 	pub email: String,
 	/// The time the user was created
 	pub created_at: SystemTime,
+}
+
+/// Convert a User into a PublicUser, omitting the password field
+impl From<User> for PublicUser {
+	fn from(user: User) -> PublicUser {
+		PublicUser {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			created_at: user.created_at,
+		}
+	}
 }
