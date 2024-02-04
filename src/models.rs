@@ -43,3 +43,20 @@ pub struct NewUser {
 	/// The user's password, stored as a hash
 	pub password: String,
 }
+
+/// Model for a "Public User", used for returning user data to the client
+/// This model omits the password field, so that the hashed password is not sent to the client
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable))]
+#[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::users))]
+#[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+#[derive(Serialize, Deserialize)]
+pub struct PublicUser {
+	/// A unique id for the user
+	pub id: i32,
+	/// The user's username
+	pub username: String,
+	/// The user's email
+	pub email: String,
+	/// The time the user was created
+	pub created_at: SystemTime,
+}
