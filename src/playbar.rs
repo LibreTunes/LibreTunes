@@ -432,7 +432,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
     };
 
     let on_time_update = move |_| {
-        status.update(|status| {
+        status.with_untracked(|status| {
             if let Some(audio) = status.get_audio() {
                 set_elapsed_secs(audio.current_time() as i64);
                 set_total_secs(audio.duration() as i64);
