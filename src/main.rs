@@ -9,10 +9,16 @@ extern crate openssl;
 extern crate diesel;
 
 #[cfg(feature = "ssr")]
+extern crate diesel_migrations;
+
+#[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     use dotenv::dotenv;
     dotenv().ok();
+
+    // Bring the database up to date
+    libretunes::database::migrate();
 
     use actix_files::Files;
     use actix_web::*;
