@@ -20,12 +20,19 @@ docker-build:
         $CI_REGISTRY_IMAGE:latest; fi
     - docker push $CI_REGISTRY_IMAGE --all-tags
 
-# Run unit tests
-test:
+# Run leptos tests
+leptos-tests:
   needs: ["build"]
   image: $CI_REGISTRY/libretunes/ops/docker-leptos:latest
   script:
     - cargo-leptos test
+
+# Run all tests
+tests:
+  needs: ["build"]
+  image: $CI_REGISTRY/libretunes/ops/docker-leptos:latest
+  script:
+    - cargo test --all-targets --all-features
 
 # Generate docs
 cargo-doc:
