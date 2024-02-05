@@ -12,6 +12,12 @@ use diesel::{
     r2d2::Pool,
 };
 
+use diesel_migrations::{
+    embed_migrations,
+    EmbeddedMigrations,
+    MigrationHarness,
+};
+
 // See https://leward.eu/notes-on-diesel-a-rust-orm/
 
 // Define some types to make it easier to work with Diesel
@@ -45,6 +51,16 @@ fn init_db_pool() -> PgPool {
 /// A pooled connection to the database
 pub fn get_db_conn() -> PgPooledConn {
     DB_POOL.get().expect("Failed to get a database connection from the pool.")
+}
+
+/// Embedded database migrations into the binary
+const DB_MIGRATIONS: EmbeddedMigrations =  embed_migrations!();
+
+/// Run any pending migrations in the database
+/// Always safe to call, as it will only run migrations that have not already been run
+pub fn migrate() {
+    let db_con = &mut get_db_conn();
+    db_con.run_pending_migrations(DB_MIGRATIONS).expect("Could not run database migrations");
 }
 
 }
