@@ -34,6 +34,7 @@ RUN npx tailwindcss -i /app/style/main.scss -o /app/style/main.scss --minify
 
 COPY assets /app/assets
 COPY src /app/src
+COPY migrations /app/migrations
 
 # Touch files to force rebuild
 RUN touch /app/src/main.rs && touch /app/src/lib.rs && touch /app/src/build.rs
