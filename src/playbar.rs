@@ -36,7 +36,7 @@ const ARROW_KEY_SKIP_TIME: f64 = 5.0;
 /// * `None` if the audio element is not available
 /// * `Some((current_time, duration))` if the audio element is available
 /// 
-fn get_song_time_duration(status: impl SignalWithUntracked<Value = PlayStatus>) -> Option<(f64, f64)> {
+pub fn get_song_time_duration(status: impl SignalWithUntracked<Value = PlayStatus>) -> Option<(f64, f64)> {
 	status.with_untracked(|status| {
 		if let Some(audio) = status.get_audio() {
 			Some((audio.current_time(), audio.duration()))
@@ -57,7 +57,7 @@ fn get_song_time_duration(status: impl SignalWithUntracked<Value = PlayStatus>) 
 /// * `status` - The `PlayStatus` to get the audio element from, as a signal
 /// * `time` - The time to skip to, in seconds
 /// 
-fn skip_to(status: impl SignalUpdate<Value = PlayStatus>, time: f64) {
+pub fn skip_to(status: impl SignalUpdate<Value = PlayStatus>, time: f64) {
     if time.is_infinite() || time.is_nan() {
         error!("Unable to skip to non-finite time: {}", time);
         return
@@ -81,7 +81,7 @@ fn skip_to(status: impl SignalUpdate<Value = PlayStatus>, time: f64) {
 /// * `status` - The `PlayStatus` to get the audio element from, as a signal
 /// * `play` - `true` to play the song, `false` to pause it
 /// 
-fn set_playing(status: impl SignalUpdate<Value = PlayStatus>, play: bool) {
+pub fn set_playing(status: impl SignalUpdate<Value = PlayStatus>, play: bool) {
     status.update(|status| {
         if let Some(audio) = status.get_audio() {
             if play {
