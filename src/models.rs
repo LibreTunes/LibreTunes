@@ -71,3 +71,26 @@ pub struct Album {
 	pub release_date: Option<Date>,
 }
 
+/// Model for a song
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::songs))]
+#[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+pub struct Song {
+	/// A unique id for the song
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
+	pub id: Option<i32>,
+	/// The song's title
+	pub title: String,
+	/// The album the song is from
+	pub album_id: Option<i32>,
+	/// The track number of the song on the album
+	pub track: Option<i32>,
+	/// The duration of the song in seconds
+	pub duration: i32,
+	/// The song's release date
+	pub release_date: Option<Date>,
+	/// The path to the song's audio file
+	pub storage_path: String,
+	/// The path to the song's image file
+	pub image_path: Option<String>,
+}
