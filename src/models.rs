@@ -1,4 +1,5 @@
 use std::time::SystemTime;
+use time::Date;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "ssr")]
@@ -54,5 +55,19 @@ pub struct Artist {
 	pub id: Option<i32>,
 	/// The artist's name
 	pub name: String,
+}
+
+/// Model for an album
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::albums))]
+#[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+pub struct Album {
+	/// A unique id for the album
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
+	pub id: Option<i32>,
+	/// The album's title
+	pub title: String,
+	/// The album's release date
+	pub release_date: Option<Date>,
 }
 
