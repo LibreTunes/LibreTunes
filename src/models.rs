@@ -43,3 +43,16 @@ pub struct NewUser {
 	/// The user's password, stored as a hash
 	pub password: String,
 }
+
+/// Model for an artist
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::artists))]
+#[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+pub struct Artist {
+	/// A unique id for the artist
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
+	pub id: Option<i32>,
+	/// The artist's name
+	pub name: String,
+}
+
