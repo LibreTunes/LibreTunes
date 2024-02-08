@@ -1,16 +1,22 @@
 use leptos::*;
-use crate::models::NewUser;
+use crate::models::User;
 
 /// Create a new user and log them in
 /// Takes in a NewUser struct, with the password in plaintext
 /// Returns a Result with the error message if the user could not be created
 #[server(endpoint = "signup")]
-pub async fn signup(new_user: NewUser) -> Result<(), ServerFnError> {
+pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 	use crate::users::create_user;
 
 	use leptos_actix::extract;
 	use actix_web::{HttpMessage, HttpRequest};
 	use actix_identity::Identity;
+
+	// Ensure the user has no id
+	let new_user = User {
+		id: None,
+		..new_user
+	};
 
 	create_user(&new_user).await
 		.map_err(|e| ServerFnError::ServerError(format!("Error creating user: {}", e)))?;

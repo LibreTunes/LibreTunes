@@ -14,7 +14,7 @@ cfg_if::cfg_if! {
 }
 
 use leptos::*;
-use crate::models::{NewUser, PublicUser, User};
+use crate::models::User;
 
 /// Get a user from the database by username or email
 /// Returns a Result with the user if found, None if not found, or an error if there was a problem
@@ -34,17 +34,19 @@ pub async fn find_user(username_or_email: String) -> Result<Option<User>, Server
 /// Create a new user in the database
 /// Returns an empty Result if successful, or an error if there was a problem
 #[cfg(feature = "ssr")]
-pub async fn create_user(new_user: &NewUser) -> Result<(), ServerFnError> {
+pub async fn create_user(new_user: &User) -> Result<(), ServerFnError> {
 	use crate::schema::users::dsl::*;
 
+	let new_password = new_user.password.clone()
+		.ok_or(ServerFnError::ServerError(format!("No password provided for user {}", new_user.username)))?;
+
 	let salt = SaltString::generate(&mut OsRng);
-	let password_hash = Pbkdf2.hash_password(new_user.password.as_bytes(), &salt)
+	let password_hash = Pbkdf2.hash_password(new_password.as_bytes(), &salt)
 		.map_err(|_| ServerFnError::ServerError("Error hashing password".to_string()))?.to_string();
 	
-	let new_user = NewUser {
-		username: new_user.username.clone(),
-		email: new_user.email.clone(),
-		password: password_hash,
+	let new_user = User {
+		password: Some(password_hash),
+		..new_user.clone()
 	};
 	
 	let db_con = &mut get_db_conn();
@@ -68,7 +70,10 @@ pub async fn validate_user(username_or_email: String, password: String) -> Resul
 		None => return Ok(None)
 	};
 
-	let password_hash = PasswordHash::new(&db_user.password)
+	let db_password = db_user.password.clone()
+		.ok_or(ServerFnError::ServerError(format!("No password found for user {}", db_user.username)))?;
+
+	let password_hash = PasswordHash::new(&db_password)
 		.map_err(|e| ServerFnError::ServerError(format!("Error hashing supplied password: {}", e)))?;
 
 	match Pbkdf2.verify_password(password.as_bytes(), &password_hash) {
@@ -87,7 +92,13 @@ pub async fn validate_user(username_or_email: String, password: String) -> Resul
 /// Get a user from the database by username or email
 /// Returns a Result with the user if found, None if not found, or an error if there was a problem
 #[server(endpoint = "get_user")]
-pub async fn get_user(username_or_email: String) -> Result<Option<PublicUser>, ServerFnError> {
-	let user = find_user(username_or_email).await?;
-	Ok(user.map(|u| u.into()))
+pub async fn get_user(username_or_email: String) -> Result<Option<User>, ServerFnError> {
+	let mut user = find_user(username_or_email).await?;
+
+	// Remove the password hash before returning the user
+	if let Some(user) = user.as_mut() {
+		user.password = None;
+	}
+
+	Ok(user)
 }
