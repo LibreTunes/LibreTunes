@@ -1,7 +1,7 @@
-use leptos::ev;
 use leptos::leptos_dom::*;
 use leptos::*;
-use leptos_router::*;
+use leptos_icons::IoIcon::*;
+use leptos_icons::*;
 
 #[component]
 pub fn Login() -> impl IntoView {
@@ -11,9 +11,10 @@ pub fn Login() -> impl IntoView {
     view! {
         <div class="page-container">
             <div class="login-container">
-            <div class="header">
-                <h1>LibreTunes</h1>
-            </div>
+                <a class="return" href="/"><Icon icon=Icon::from(IoReturnUpBackSharp) /></a>
+                <div class="header">
+                    <h1>LibreTunes</h1>
+                </div>
                 <form class="login-form" action="POST">
                     <div class="input-box">
                         <input class="login-info" type="text" required
@@ -36,11 +37,11 @@ pub fn Login() -> impl IntoView {
                         <span>Password</span>
                         <i></i>
                     </div>
-                    <p class="forgot-pw">Forgot Password?</p>
+                    <a href="" class="forgot-pw">Forgot Password?</a>
                     <input type="submit" value="Login" />
-                    <p class="go-to-signup">
-                        New here? <span>Create an Account</span>
-                    </p>
+                    <span class="go-to-signup">
+                        New here? <a href="/signup">Create an Account</a>
+                    </span>
                 </form>
             </div>
         </div>
