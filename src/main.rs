@@ -14,11 +14,25 @@ extern crate diesel_migrations;
 #[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    use actix_identity::IdentityMiddleware;
+    use actix_session::storage::RedisSessionStore;
+    use actix_session::SessionMiddleware;
+    use actix_web::cookie::Key;
+
     use dotenv::dotenv;
     dotenv().ok();
 
     // Bring the database up to date
     libretunes::database::migrate();
+    
+    let session_secret_key = if let Ok(key) = std::env::var("SESSION_SECRET_KEY") {
+        Key::from(key.as_bytes())
+    } else {
+        Key::generate()
+    };
+
+    let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
+    let redis_store = RedisSessionStore::new(redis_url).await.unwrap();
 
     use actix_files::Files;
     use actix_web::*;
@@ -46,6 +60,8 @@ async fn main() -> std::io::Result<()> {
             .service(favicon)
             .leptos_routes(leptos_options.to_owned(), routes.to_owned(), App)
             .app_data(web::Data::new(leptos_options.to_owned()))
+            .wrap(IdentityMiddleware::default())
+            .wrap(SessionMiddleware::new(redis_store.clone(), session_secret_key.clone()))
         //.wrap(middleware::Compress::default())
     })
     .bind(&addr)?
