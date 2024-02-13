@@ -1,10 +1,12 @@
 pub mod app;
+pub mod auth;
 pub mod songdata;
 pub mod playstatus;
 pub mod playbar;
 pub mod database;
 pub mod models;
 pub mod pages;
+pub mod users;
 use cfg_if::cfg_if;
 
 cfg_if! {
