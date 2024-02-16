@@ -30,6 +30,10 @@ lazy_static = { version = "1.4.0", optional = true }
 serde = { versions = "1.0.195", features = ["derive"] }
 openssl = { version = "0.10.63", optional = true }
 time = "0.3.34"
+diesel_migrations = { version = "2.1.0", optional = true }
+actix-identity = { version = "0.7.0", optional = true }
+actix-session = { version = "0.9.0", features = ["redis-rs-session"], optional = true }
+pbkdf2 = { version = "0.12.2", features = ["simple"], optional = true }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -45,6 +49,10 @@ ssr = [
   "diesel",
   "lazy_static",
   "openssl",
+  "diesel_migrations",
+  "actix-identity",
+  "actix-session",
+  "pbkdf2",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
