@@ -1701,6 +1701,7 @@ dependencies = [
  "diesel",
  "diesel_migrations",
  "dotenv",
+ "futures",
  "http",
  "lazy_static",
  "leptos",
