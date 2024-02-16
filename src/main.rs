@@ -9,6 +9,9 @@ extern crate openssl;
 extern crate diesel;
 
 #[cfg(feature = "ssr")]
+extern crate diesel_migrations;
+
+#[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     use actix_identity::IdentityMiddleware;
@@ -19,6 +22,9 @@ async fn main() -> std::io::Result<()> {
     use dotenv::dotenv;
     dotenv().ok();
 
+    // Bring the database up to date
+    libretunes::database::migrate();
+    
     let session_secret_key = if let Ok(key) = std::env::var("SESSION_SECRET_KEY") {
         Key::from(key.as_bytes())
     } else {
