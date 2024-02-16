@@ -1,7 +1,4 @@
 use crate::playstatus::PlayStatus;
-use crate::playbar::skip_to;
-use crate::playbar::get_song_time_duration;
-use crate::playbar::set_playing;
 use leptos::ev::MouseEvent;
 use leptos::leptos_dom::*;
 use leptos::*;
@@ -10,24 +7,11 @@ use leptos_icons::BsIcon::*;
 
 const RM_BTN_SIZE: &str = "2rem";
 
-fn skip_to_next(status: RwSignal<PlayStatus>) {
-	
-	if let Some(duration) = get_song_time_duration(status) {
-		skip_to(status, duration.1);
-		set_playing(status, true);
-	} else {
-		error!("Unable to skip forward: Unable to get current duration");
-	}
-}
-
 fn remove_song_fn(index: usize, status: RwSignal<PlayStatus>) {
-	// handle the case when index is 0 (i.e. the first song in the queue is removed)
-	// if the song is currently playing, skip to the next song
 	if index == 0 {
-		log!("Remove Song from Queue: Song is currently playing, skipping to next song and adding to history");
-		skip_to_next(status);
+		log!("Error: Trying to remove currently playing song (index 0) from queue");
 	} else {
-		log!("Remove Song from Queue: Song is not currently playing, no need to skip to next song, instead deleting song from queue and not adding to history");
+		log!("Remove Song from Queue: Song is not currently playing, deleting song from queue and not adding to history");
 		status.update(|status| {
 			status.queue.remove(index);
 		});
@@ -74,9 +58,15 @@ pub fn Queue(status: RwSignal<PlayStatus>) -> impl IntoView {
 							.map(|(index, song)| view! {
 								<div class="queue-item">
 									<Song song_image_path=song.image_path.clone() song_title=song.name.clone() song_artist=song.artist.clone() />
-									<button on:click=move |_| remove_song(index) on:mousedown=prevent_focus>
-									<Icon class="remove-song" width=RM_BTN_SIZE height=RM_BTN_SIZE icon=Icon::from(BsTrashFill) />
-									</button>
+									<Show
+										when=move || index != 0
+										fallback=|| view!{
+											<p>Playing</p>
+										}>
+										<button on:click=move |_| remove_song(index) on:mousedown=prevent_focus>
+											<Icon class="remove-song" width=RM_BTN_SIZE height=RM_BTN_SIZE icon=Icon::from(BsTrashFill) />
+										</button>
+									</Show>
 								</div>
 							})
 							.collect::<Vec<_>>())
