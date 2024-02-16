@@ -40,21 +40,30 @@
 			
 				.queue-song-info {
 					h3 {
-					margin: 0; /* Remove default margin for heading */
+						margin: 0; /* Remove default margin for heading */
+						color: #333; /* Adjust text color for song */
 					}
 			
 					p {
-					margin: 0; /* Remove default margin for paragraph */
-					color: #888; /* Adjust text color for artist */
+						margin: 0; /* Remove default margin for paragraph */
+						color: #888; /* Adjust text color for artist */
 					}
 				}
 			}
 
 			button {
 				background: none;
-        		border: none;
-        		cursor: pointer;
-        		margin-left: auto;
+				border: none;
+				cursor: pointer;
+				margin-left: auto;
+			}
+
+			p {
+				color: #333;
+				font-weight: bold;
+				margin-left: auto;
+				background: none;
+				border: none;
 			}
 		}
 	}
