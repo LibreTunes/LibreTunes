@@ -4,11 +4,11 @@
 	position: fixed;
 	top: 0;
 	right: 0; 
-	width: 300px; 
-	height: 45rem;
-	overflow: hidden;
+	width: 400px; 
+	height: calc(100% - 78.9px); /* Adjust height to fit the queue */
 	background-color: white;/*$queue-background-color; Queue background color */
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+	overflow-y: auto; /* Add scroll bar when queue is too long */
   
 	.queue-header {
 	  background-color: #333; /* Header background color */
