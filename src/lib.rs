@@ -6,6 +6,7 @@ pub mod playbar;
 pub mod database;
 pub mod models;
 pub mod users;
+pub mod search;
 use cfg_if::cfg_if;
 
 cfg_if! {

@@ -47,6 +47,7 @@ pub struct User {
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::artists))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+#[derive(Serialize, Deserialize)]
 pub struct Artist {
 	/// A unique id for the artist
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
@@ -167,6 +168,7 @@ impl Artist {
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::albums))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+#[derive(Serialize, Deserialize)]
 pub struct Album {
 	/// A unique id for the album
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
@@ -237,6 +239,7 @@ impl Album {
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::songs))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+#[derive(Serialize, Deserialize)]
 pub struct Song {
 	/// A unique id for the song
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
