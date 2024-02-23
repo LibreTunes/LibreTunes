@@ -1,8 +1,8 @@
+use crate::auth::login;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::IoIcon::*;
 use leptos_icons::*;
-use crate::auth::login;
 
 #[component]
 pub fn Login() -> impl IntoView {
@@ -12,13 +12,19 @@ pub fn Login() -> impl IntoView {
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
 
+        let username_or_email1 = username_or_email.get();
+        let password1 = password.get();
+
         spawn_local(async move {
-            if let Err(err) = login(username_or_email.get(), password.get()).await {
+            let login_result = login(username_or_email1, password1).await;
+            if let Err(err) = login_result {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error logging in: {:?}", err);
-            } else {
+            } else if let Ok(true) = login_result {
                 // Redirect to the login page
                 log!("Logged in Successfully!");
+            } else if let Ok(false) = login_result {
+                log!("Invalid username or password");
             }
         });
     };

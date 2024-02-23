@@ -21,7 +21,7 @@ pub fn Signup() -> impl IntoView {
             password: Some(password.get()),
             created_at: None,
         };
-
+        log!("new user: {:?}", new_user);
         spawn_local(async move {
             if let Err(err) = signup(new_user).await {
                 // Handle the error here, e.g., log it or display to the user
