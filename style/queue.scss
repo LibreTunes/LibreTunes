@@ -6,7 +6,7 @@
 	right: 0; 
 	width: 400px; 
 	height: calc(100% - 78.9px); /* Adjust height to fit the queue */
-	background-color: white;/*$queue-background-color; Queue background color */
+	background-color: #424242; /* Queue background color */
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
 	overflow-y: auto; /* Add scroll bar when queue is too long */
   
@@ -25,7 +25,10 @@
 		.queue-item {
 			display: flex;
 			align-items: center;
-			padding: 10px;
+			padding-left: 10px;
+			padding-right: 10px;
+			padding-top: 5px;
+			padding-bottom: 5px;
 			
 			.queue-song {
 				display: flex;
@@ -36,17 +39,18 @@
 				img {
 					max-width: 50px; /* Adjust maximum width for images */
 					margin-right: 10px; /* Add spacing between image and text */
+					border-radius: 5px; /* Add border radius to image */
 				}
 			
 				.queue-song-info {
 					h3 {
 						margin: 0; /* Remove default margin for heading */
-						color: #333; /* Adjust text color for song */
+						color: #fff; /* Adjust text color for song */
 					}
 			
 					p {
 						margin: 0; /* Remove default margin for paragraph */
-						color: #888; /* Adjust text color for artist */
+						color: #aaa; /* Adjust text color for artist */
 					}
 				}
 			}
@@ -54,12 +58,13 @@
 			button {
 				background: none;
 				border: none;
+				color: #fff;
 				cursor: pointer;
 				margin-left: auto;
 			}
 
 			p {
-				color: #333;
+				color: #fff;
 				font-weight: bold;
 				margin-left: auto;
 				background: none;
