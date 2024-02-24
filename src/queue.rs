@@ -3,9 +3,9 @@ use leptos::ev::MouseEvent;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use leptos_icons::BsIcon::*;
+use leptos_icons::CgIcon::*;
 
-const RM_BTN_SIZE: &str = "2rem";
+const RM_BTN_SIZE: &str = "2.5rem";
 
 fn remove_song_fn(index: usize, status: RwSignal<PlayStatus>) {
 	if index == 0 {
@@ -64,7 +64,7 @@ pub fn Queue(status: RwSignal<PlayStatus>) -> impl IntoView {
 											<p>Playing</p>
 										}>
 										<button on:click=move |_| remove_song(index) on:mousedown=prevent_focus>
-											<Icon class="remove-song" width=RM_BTN_SIZE height=RM_BTN_SIZE icon=Icon::from(BsTrashFill) />
+											<Icon class="remove-song" width=RM_BTN_SIZE height=RM_BTN_SIZE icon=Icon::from(CgTrash) />
 										</button>
 									</Show>
 								</div>
