@@ -1296,9 +1296,19 @@ version = "0.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f41f2deec9249d16ef6b1a8442fbe16013f67053797052aa0b7d2f5ebd0f0098"
 dependencies = [
+ "icondata_ai",
  "icondata_bs",
  "icondata_core",
  "icondata_io",
+]
+
+[[package]]
+name = "icondata_ai"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c8fe5fa2eed7715d5388e046d97f09d3baddd155b487454eb9cda3168c79d4b"
+dependencies = [
+ "icondata_core",
 ]
 
 [[package]]
