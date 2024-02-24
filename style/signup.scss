@@ -28,7 +28,7 @@
   margin-top: 3rem;
 }
 .signup-form .input-box:first-child {
-  margin-top: 1rem;
+  margin-top: 0.7rem;
 }
 .signup-form .input-box input {
   position: relative;
@@ -126,7 +126,6 @@
 .signup-container .return:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
-
 .password-visibility {
   position: absolute;
   font-size: 1.7rem;
@@ -137,4 +136,7 @@
   border: none;
   background-color: transparent;
   color: white;
+}
+.pw-requirements {
+  font-size: 0.7rem;
 }

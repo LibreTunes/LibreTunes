@@ -2,12 +2,20 @@ use crate::auth::login;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::IoIcon::*;
+use leptos_icons::AiIcon::*;
 use leptos_icons::*;
 
 #[component]
 pub fn Login() -> impl IntoView {
     let (username_or_email, set_username_or_email) = create_signal("".to_string());
     let (password, set_password) = create_signal("".to_string());
+
+    let (show_password, set_show_password) = create_signal(false);
+
+    let toggle_password = move |_| {
+        set_show_password.update(|show_password| *show_password = !*show_password);
+        log!("showing password");
+    };
 
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
@@ -49,7 +57,7 @@ pub fn Login() -> impl IntoView {
                         <i></i>
                     </div>
                     <div class="input-box">
-                        <input class="login-password" type="text" required
+                        <input class="login-password"  type={move || if show_password() { "text" } else { "password"} } required
                         on:input = move |ev| {
                             set_password(event_target_value(&ev));
                             log!("password changed to: {}", password.get());
@@ -57,6 +65,17 @@ pub fn Login() -> impl IntoView {
                         />
                         <span>Password</span>
                         <i></i>
+                        <Show
+                            when=move || {show_password() == false}
+                            fallback=move || view!{ <button on:click=toggle_password class="login-password-visibility">
+                                                  <Icon icon=Icon::from(AiEyeInvisibleFilled) />
+                                               </button> /> }
+                        >
+                            <button on:click=toggle_password class="login-password-visibility">
+                                <Icon icon=Icon::from(AiEyeFilled) />
+                            </button>
+
+                        </Show>
                     </div>
                     <a href="" class="forgot-pw">Forgot Password?</a>
                     <input type="submit" value="Login" />

@@ -92,6 +92,7 @@ pub fn Signup() -> impl IntoView {
                         </Show>
 
                     </div>
+                    
                     <input type="submit" value="Sign Up"  />
                     <span class="go-to-login">
                         Already Have an Account? <a href="/login">Go to Login</a>
