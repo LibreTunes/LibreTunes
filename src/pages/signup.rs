@@ -15,6 +15,8 @@ pub fn Signup() -> impl IntoView {
 
     let (show_password, set_show_password) = create_signal(false);
 
+    let navigate = leptos_router::use_navigate();
+
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);
         log!("showing password");
@@ -29,6 +31,9 @@ pub fn Signup() -> impl IntoView {
             password: Some(password.get()),
             created_at: None,
         };
+
+        let mut success: bool = false;
+
         log!("new user: {:?}", new_user);
         spawn_local(async move {
             if let Err(err) = signup(new_user).await {
@@ -37,8 +42,13 @@ pub fn Signup() -> impl IntoView {
             } else {
                 // Redirect to the login page
                 log!("Signed up successfully!");
+                success = true;
             }
         });
+        if success {
+            navigate("/", Default::default());
+            log!("navigated to home after signup");
+        }
     };
 
     view! {
@@ -81,18 +91,13 @@ pub fn Signup() -> impl IntoView {
                         <i></i>
                         <Show
                             when=move || {show_password() == false}
-                            fallback=move || view!{ <button on:click=toggle_password class="password-visibility">
-                                                  <Icon icon=Icon::from(AiEyeInvisibleFilled) />
-                                               </button> /> }
+                            fallback=move || view!{ <button on:click=toggle_password class="password-visibility"> <Icon icon=Icon::from(AiEyeInvisibleFilled) /></button> /> }
                         >
                             <button on:click=toggle_password class="password-visibility">
                                 <Icon icon=Icon::from(AiEyeFilled) />
                             </button>
-
                         </Show>
-
                     </div>
-                    
                     <input type="submit" value="Sign Up"  />
                     <span class="go-to-login">
                         Already Have an Account? <a href="/login">Go to Login</a>
