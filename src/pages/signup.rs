@@ -31,10 +31,8 @@ pub fn Signup() -> impl IntoView {
             password: Some(password.get()),
             created_at: None,
         };
-
-        let mut success: bool = false;
-
         log!("new user: {:?}", new_user);
+
         spawn_local(async move {
             if let Err(err) = signup(new_user).await {
                 // Handle the error here, e.g., log it or display to the user
@@ -42,13 +40,10 @@ pub fn Signup() -> impl IntoView {
             } else {
                 // Redirect to the login page
                 log!("Signed up successfully!");
-                success = true;
+                leptos_router::use_navigate()("/", Default::default());
+                log!("Navigated to home page after signup")
             }
         });
-        if success {
-            navigate("/", Default::default());
-            log!("navigated to home after signup");
-        }
     };
 
     view! {
@@ -100,7 +95,7 @@ pub fn Signup() -> impl IntoView {
                     </div>
                     <input type="submit" value="Sign Up"  />
                     <span class="go-to-login">
-                        Already Have an Account? <a href="/login">Go to Login</a>
+                        Already Have an Account? <a href="/login" class="link" >Go to Login</a>
                     </span>
                 </form>
             </div>

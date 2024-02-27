@@ -4,7 +4,6 @@ use leptos::*;
 use leptos_icons::AiIcon::*;
 use leptos_icons::IoIcon::*;
 use leptos_icons::*;
-use leptos_router::*;
 
 #[component]
 pub fn Login() -> impl IntoView {
@@ -18,15 +17,11 @@ pub fn Login() -> impl IntoView {
         log!("showing password");
     };
 
-    let navigate = leptos_router::use_navigate();
-
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
 
         let username_or_email1 = username_or_email.get();
         let password1 = password.get();
-
-        let mut success: bool = false;
 
         spawn_local(async move {
             let login_result = login(username_or_email1, password1).await;
@@ -36,15 +31,12 @@ pub fn Login() -> impl IntoView {
             } else if let Ok(true) = login_result {
                 // Redirect to the login page
                 log!("Logged in Successfully!");
-                success = true;
+                leptos_router::use_navigate()("/", Default::default());
+                log!("Navigated to home page after login");
             } else if let Ok(false) = login_result {
                 log!("Invalid username or password");
             }
         });
-        if success {
-            navigate("/", Default::default());
-            log!("navigated to home after login");
-        }
     };
 
     view! {
