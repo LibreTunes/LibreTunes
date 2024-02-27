@@ -40,7 +40,7 @@ pub fn Login() -> impl IntoView {
     };
 
     view! {
-        <div class="page-container">
+        <div class="auth-page-container">
             <div class="login-container">
                 <a class="return" href="/"><Icon icon=Icon::from(IoReturnUpBackSharp) /></a>
                 <div class="header">
