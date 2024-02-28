@@ -1,3 +1,6 @@
+use crate::playbar::PlayBar;
+use crate::playstatus::PlayStatus;
+use crate::queue::Queue;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
@@ -30,7 +33,13 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
-    view! {}
+    let mut play_status = PlayStatus::default();
+    let play_status = create_rw_signal(play_status);
+
+    view! {
+        <PlayBar status=play_status/>
+        <Queue status=play_status/>
+    }
 }
 
 /// 404 - Not Found
