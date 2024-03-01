@@ -23,6 +23,8 @@ leptos_icons = { version = "0.1.0", default_features = false, features = [
   "BsPauseFill",
   "BsSkipStartFill",
   "BsSkipEndFill",
+  "RiPlayListMediaFill",
+  "CgTrash",
   "IoReturnUpBackSharp",
   "AiEyeFilled",
   "AiEyeInvisibleFilled"

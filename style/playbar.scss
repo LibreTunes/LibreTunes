@@ -88,4 +88,28 @@
 		right: 10px;
 		top: 13px;
 	}
+
+	.queue-toggle {
+		position: absolute;
+		bottom: 13px;
+		top: 13px;
+		right: 90px;
+
+		button {
+			.controlbtn {
+				color: $text-controls-color;
+			}
+
+			.controlbtn:hover {
+				color: $controls-hover-color;
+			}
+
+			.controlbtn:active {
+				color: $controls-click-color;
+			}
+	
+			background-color: transparent;
+			border: transparent;
+		}
+	}
 }

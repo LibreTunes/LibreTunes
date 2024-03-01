@@ -1,5 +1,5 @@
 /// Holds information about a song
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SongData {
 	/// Song name
 	pub name: String,

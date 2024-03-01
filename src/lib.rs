@@ -4,6 +4,8 @@ pub mod songdata;
 pub mod playstatus;
 pub mod playbar;
 pub mod database;
+pub mod queue;
+pub mod song;
 pub mod models;
 pub mod pages;
 pub mod users;
