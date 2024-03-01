@@ -6,6 +6,7 @@ use leptos_meta::*;
 use leptos_router::*;
 use crate::pages::login::*;
 use crate::pages::signup::*;
+use crate::error_template::{AppError, ErrorTemplate};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -21,11 +22,17 @@ pub fn App() -> impl IntoView {
         <Title text="LibreTunes"/>
 
         // content for this welcome page
-        <Router>
+        <Router fallback=|| {
+            let mut outside_errors = Errors::default();
+            outside_errors.insert_with_default_key(AppError::NotFound);
+            view! {
+                <ErrorTemplate outside_errors/>
+            }
+            .into_view()
+        }>
             <main>
                 <Routes>
                     <Route path="" view=HomePage/>
-                    <Route path="/*any" view=NotFound/>
                     <Route path="/login" view=Login />
                     <Route path="/signup" view=Signup />
                 </Routes>
