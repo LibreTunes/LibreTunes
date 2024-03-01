@@ -4,6 +4,7 @@ pub mod playstatus;
 pub mod playbar;
 pub mod database;
 pub mod queue;
+pub mod song;
 use cfg_if::cfg_if;
 
 cfg_if! {

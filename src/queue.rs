@@ -1,4 +1,5 @@
 use crate::playstatus::PlayStatus;
+use crate::song::Song;
 use leptos::ev::MouseEvent;
 use leptos::leptos_dom::*;
 use leptos::*;
@@ -16,19 +17,6 @@ fn remove_song_fn(index: usize, status: RwSignal<PlayStatus>) {
 		status.update(|status| {
 			status.queue.remove(index);
 		});
-	}
-}
-
-#[component]
-fn Song(song_image_path: String, song_title: String, song_artist: String) -> impl IntoView {
-	view!{
-		<div class="queue-song">
-			<img src={song_image_path} alt={song_title.clone()} />
-			<div class="queue-song-info">
-				<h3>{song_title}</h3>
-				<p>{song_artist}</p>
-			</div>
-		</div>
 	}
 }
 
