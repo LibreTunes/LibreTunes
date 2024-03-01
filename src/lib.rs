@@ -10,6 +10,7 @@ pub mod models;
 pub mod pages;
 pub mod users;
 pub mod search;
+pub mod fileserv;
 use cfg_if::cfg_if;
 
 cfg_if! {
