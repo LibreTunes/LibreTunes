@@ -326,7 +326,7 @@ fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
 
     let update_queue = move |_| {
         toggle_queue(status);
-		log!("queue button pressed, queue status: {:?}", status.with(|status| status.queue_open));
+		log!("queue button pressed, queue status: {:?}", status.with_untracked(|status| status.queue_open));
     };
 
 	// We use this to prevent the buttons from being focused when clicked
