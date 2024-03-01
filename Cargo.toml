@@ -43,6 +43,7 @@ pbkdf2 = { version = "0.12.2", features = ["simple"], optional = true }
 futures = { version = "0.3.30", default-features = false, optional = true }
 tokio = { version = "1", optional = true }
 axum = { version = "0.6.4", optional = true }
+tower = { veresion = "0.4.13", optional = true }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -66,6 +67,7 @@ ssr = [
   "futures",
   "tokio",
   "axum",
+  "tower",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
