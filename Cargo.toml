@@ -46,6 +46,7 @@ axum = { version = "0.6.4", optional = true }
 tower = { veresion = "0.4.13", optional = true }
 tower-http = { version = "0.4", optional = true, features = ["fs"] }
 thiserror = "1.0.57"
+tower-sessions = { version = "0.10.4", default-features = false }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
