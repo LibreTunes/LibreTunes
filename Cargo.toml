@@ -45,6 +45,7 @@ tokio = { version = "1", optional = true }
 axum = { version = "0.6.4", optional = true }
 tower = { veresion = "0.4.13", optional = true }
 tower-http = { version = "0.4", optional = true, features = ["fs"] }
+thiserror = "1.0.57"
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
