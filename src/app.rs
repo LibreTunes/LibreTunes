@@ -4,6 +4,8 @@ use crate::queue::Queue;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
+use crate::pages::login::*;
+use crate::pages::signup::*;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -24,6 +26,8 @@ pub fn App() -> impl IntoView {
                 <Routes>
                     <Route path="" view=HomePage/>
                     <Route path="/*any" view=NotFound/>
+                    <Route path="/login" view=Login />
+                    <Route path="/signup" view=Signup />
                 </Routes>
             </main>
         </Router>

@@ -1,11 +1,22 @@
 pub mod app;
+pub mod auth;
 pub mod songdata;
 pub mod playstatus;
 pub mod playbar;
 pub mod database;
 pub mod queue;
 pub mod song;
+pub mod models;
+pub mod pages;
+pub mod users;
+pub mod search;
 use cfg_if::cfg_if;
+
+cfg_if! {
+	if #[cfg(feature = "ssr")] {
+    pub mod schema;
+  }
+}
 
 cfg_if! {
 if #[cfg(feature = "hydrate")] {

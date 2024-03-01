@@ -6,4 +6,6 @@ fn main() {
         "cargo:rustc-cfg=target=\"{}\"",
         std::env::var("TARGET").unwrap()
     );
+
+    println!("cargo:rerun-if-changed=migrations");
 }

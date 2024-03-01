@@ -25,12 +25,21 @@ leptos_icons = { version = "0.1.0", default_features = false, features = [
   "BsSkipEndFill",
   "RiPlayListMediaFill",
   "CgTrash",
+  "IoReturnUpBackSharp",
+  "AiEyeFilled",
+  "AiEyeInvisibleFilled"
 ] }
 dotenv = { version = "0.15.0", optional = true }
-diesel = { version = "2.1.4", features = ["postgres", "r2d2"], optional = true }
+diesel = { version = "2.1.4", features = ["postgres", "r2d2", "time"], optional = true }
 lazy_static = { version = "1.4.0", optional = true }
-serde = { versions = "1.0.195", features = ["derive"], optional = true }
+serde = { versions = "1.0.195", features = ["derive"] }
 openssl = { version = "0.10.63", optional = true }
+time = { version = "0.3.34", features = ["serde"] }
+diesel_migrations = { version = "2.1.0", optional = true }
+actix-identity = { version = "0.7.0", optional = true }
+actix-session = { version = "0.9.0", features = ["redis-rs-session"], optional = true }
+pbkdf2 = { version = "0.12.2", features = ["simple"], optional = true }
+futures = { version = "0.3.30", default-features = false, optional = true }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -45,8 +54,12 @@ ssr = [
   "dotenv",
   "diesel",
   "lazy_static",
-  "serde",
   "openssl",
+  "diesel_migrations",
+  "actix-identity",
+  "actix-session",
+  "pbkdf2",
+  "futures",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode

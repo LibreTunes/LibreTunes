@@ -27,3 +27,6 @@ playwright/.cache/
 
 # Environment variables
 .env
+
+# Sass cache
+.sass-cache

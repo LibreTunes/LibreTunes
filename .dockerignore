@@ -3,6 +3,7 @@
 
 # Except:
 !/assets
+!/migrations
 !/src
 !/style
 !/Cargo.lock
