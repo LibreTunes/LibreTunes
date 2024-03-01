@@ -12,61 +12,37 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 #[cfg(feature = "ssr")]
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    use actix_identity::IdentityMiddleware;
-    use actix_session::storage::RedisSessionStore;
-    use actix_session::SessionMiddleware;
-    use actix_web::cookie::Key;
+#[tokio::main]
+async fn main() {
+    use axum::Router;
+    use leptos::*;
+    use leptos_axum::{generate_route_list, LeptosRoutes};
+    use libretunes::app::*;
 
     use dotenv::dotenv;
     dotenv().ok();
 
     // Bring the database up to date
     libretunes::database::migrate();
-    
-    let session_secret_key = if let Ok(key) = std::env::var("SESSION_SECRET_KEY") {
-        Key::from(key.as_bytes())
-    } else {
-        Key::generate()
-    };
 
     let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
-    let redis_store = RedisSessionStore::new(redis_url).await.unwrap();
-
-    use actix_files::Files;
-    use actix_web::*;
-    use leptos::*;
-    use leptos_actix::{generate_route_list, LeptosRoutes};
-    use libretunes::app::*;
 
     let conf = get_configuration(None).await.unwrap();
-    let addr = conf.leptos_options.site_addr;
+    let leptos_options = conf.leptos_options;
+    let addr = leptos_options.site_addr;
     // Generate the list of routes in your Leptos App
     let routes = generate_route_list(App);
+
+    let app = Router::new()
+        .leptos_routes(&leptos_options, routes, App)
+        .with_state(leptos_options);
+
     println!("listening on http://{}", &addr);
 
-    HttpServer::new(move || {
-        let leptos_options = &conf.leptos_options;
-        let site_root = &leptos_options.site_root;
-
-        App::new()
-            .route("/api/{tail:.*}", leptos_actix::handle_server_fns())
-            // serve JS/WASM/CSS from `pkg`
-            .service(Files::new("/pkg", format!("{site_root}/pkg")))
-            // serve other assets from the `assets` directory
-            .service(Files::new("/assets", site_root))
-            // serve the favicon from /favicon.ico
-            .service(favicon)
-            .leptos_routes(leptos_options.to_owned(), routes.to_owned(), App)
-            .app_data(web::Data::new(leptos_options.to_owned()))
-            .wrap(IdentityMiddleware::default())
-            .wrap(SessionMiddleware::new(redis_store.clone(), session_secret_key.clone()))
-        //.wrap(middleware::Compress::default())
-    })
-    .bind(&addr)?
-    .run()
-    .await
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
 
 #[cfg(feature = "ssr")]
