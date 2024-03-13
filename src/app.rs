@@ -6,6 +6,8 @@ use leptos_meta::*;
 use leptos_router::*;
 use crate::pages::login::*;
 use crate::pages::signup::*;
+use crate::components::sidebar::*;
+use crate::components::dashboard::*;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -41,8 +43,12 @@ fn HomePage() -> impl IntoView {
     let play_status = create_rw_signal(play_status);
 
     view! {
-        <PlayBar status=play_status/>
-        <Queue status=play_status/>
+        <div class="home-container">
+            <Sidebar />
+            <Dashboard />
+            <PlayBar status=play_status/>
+            <Queue status=play_status/>
+        </div>
     }
 }
 

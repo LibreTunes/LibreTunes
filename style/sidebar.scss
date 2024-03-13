@@ -1,0 +1,14 @@
+@import "theme.scss";
+
+.sidebar-container {
+  background-color: red;
+  width: 27%;
+  height: calc(100% - 75px);
+}
+
+.sidebar-top-container {
+  border-radius: 1rem;
+  background-color: yellow;
+  height: 20%;
+  margin: 5px;
+}

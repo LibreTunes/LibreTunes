@@ -1,13 +1,16 @@
-@import 'playbar.scss';
-@import 'theme.scss';
-@import 'queue.scss';
-@import 'login.scss';
-@import 'signup.scss';
+@import "playbar.scss";
+@import "theme.scss";
+@import "queue.scss";
+@import "login.scss";
+@import "signup.scss";
+@import "sidebar.scss";
+@import "dashboard.scss";
+@import 'home.scss';
 
 body {
-	font-family: sans-serif;
-	background-color: $background-color;
-	color: $text-controls-color;
-	margin: 0;
-	padding: 0;
+  font-family: sans-serif;
+  background-color: $background-color;
+  color: $text-controls-color;
+  margin: 0;
+  padding: 0;
 }
