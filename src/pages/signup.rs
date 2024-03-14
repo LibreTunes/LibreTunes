@@ -1,6 +1,5 @@
 use crate::auth::signup;
 use crate::models::User;
-use leptos::ev::input;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::AiIcon::*;

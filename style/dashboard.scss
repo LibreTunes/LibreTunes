@@ -1,7 +1,7 @@
-@import 'theme.scss';
+@import "theme.scss";
 
 .dashboard-container {
-    width: 73%;
-    background: green;
-    height: 100vh;
+  width: calc(100% - 22rem);
+  background: green;
+  height: 100vh;
 }

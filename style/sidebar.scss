@@ -2,13 +2,40 @@
 
 .sidebar-container {
   background-color: red;
-  width: 27%;
+  width: 22rem;
   height: calc(100% - 75px);
 }
 
 .sidebar-top-container {
   border-radius: 1rem;
-  background-color: yellow;
-  height: 20%;
+  background-color: darkblue;
+  height: 10rem;
   margin: 5px;
+  padding: 0.2rem 1rem 1rem 1rem;
+}
+
+.sidebar-top-container .header {
+  font-size: 1.4rem;
+}
+.sidebar-top-container .buttons {
+  display: flex;
+  flex-direction: row;
+  font-size: 2rem;
+  align-items: center;
+  transition: all 0.5s;
+  cursor: pointer;
+  color: grey;
+}
+.sidebar-top-container .buttons:hover {
+  color: white;
+}
+
+.sidebar-top-container .buttons:last-child {
+  margin-left: 0.02rem;
+}
+
+.sidebar-top-container h1 {
+  font-size: 1.1rem;
+  margin-left: 0.8rem;
+  font-weight: 200;
 }
