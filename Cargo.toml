@@ -27,7 +27,8 @@ leptos_icons = { version = "0.1.0", default_features = false, features = [
   "CgTrash",
   "IoReturnUpBackSharp",
   "AiEyeFilled",
-  "AiEyeInvisibleFilled"
+  "AiEyeInvisibleFilled",
+  "BsThreeDotsVertical",
 ] }
 dotenv = { version = "0.15.0", optional = true }
 diesel = { version = "2.1.4", features = ["postgres", "r2d2", "time"], optional = true }
