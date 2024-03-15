@@ -39,10 +39,11 @@ if #[cfg(feature = "ssr")] {
 /// # Returns
 /// A Result containing a vector of albums if the search was successful, or an error if the search failed
 #[server(endpoint = "search_albums")]
-pub async fn search_albums(query: String, limit: i64) -> Result<Vec<Album>, ServerFnError> {
+pub async fn search_albums(query: String, limit: i64) -> Result<Vec<(Album, f32)>, ServerFnError> {
 	use crate::schema::albums::dsl::*;
 
 	Ok(albums
+		.select((albums::all_columns(), trgm_distance(title, query.clone())))
 		.filter(trgm_similar(title, query.clone()))
 		.order_by(trgm_distance(title, query))
 		.limit(limit)
@@ -58,10 +59,11 @@ pub async fn search_albums(query: String, limit: i64) -> Result<Vec<Album>, Serv
 /// # Returns
 /// A Result containing a vector of artists if the search was successful, or an error if the search failed
 #[server(endpoint = "search_artists")]
-pub async fn search_artists(query: String, limit: i64) -> Result<Vec<Artist>, ServerFnError> {
+pub async fn search_artists(query: String, limit: i64) -> Result<Vec<(Artist, f32)>, ServerFnError> {
 	use crate::schema::artists::dsl::*;
 
 	Ok(artists
+		.select((artists::all_columns(), trgm_distance(name, query.clone())))
 		.filter(trgm_similar(name, query.clone()))
 		.order_by(trgm_distance(name, query))
 		.limit(limit)
@@ -77,10 +79,11 @@ pub async fn search_artists(query: String, limit: i64) -> Result<Vec<Artist>, Se
 /// # Returns
 /// A Result containing a vector of songs if the search was successful, or an error if the search failed
 #[server(endpoint = "search_songs")]
-pub async fn search_songs(query: String, limit: i64) -> Result<Vec<Song>, ServerFnError> {
+pub async fn search_songs(query: String, limit: i64) -> Result<Vec<(Song, f32)>, ServerFnError> {
 	use crate::schema::songs::dsl::*;
 
 	Ok(songs
+		.select((songs::all_columns(), trgm_distance(title, query.clone())))
 		.filter(trgm_similar(title, query.clone()))
 		.order_by(trgm_distance(title, query))
 		.limit(limit)
@@ -95,9 +98,10 @@ pub async fn search_songs(query: String, limit: i64) -> Result<Vec<Song>, Server
 /// `limit` - The maximum number of results to return for each type
 /// 
 /// # Returns
-/// A Result containing a tuple of vectors of albums, artists, and songs if the search was successful,
+/// A Result containing a tuple of vectors of albums, artists, and songs, 
+/// along with respective similarity scores, if the search was successful.
 #[server(endpoint = "search")]
-pub async fn search(query: String, limit: i64) -> Result<(Vec<Album>, Vec<Artist>, Vec<Song>), ServerFnError> {
+pub async fn search(query: String, limit: i64) -> Result<(Vec<(Album, f32)>, Vec<(Artist, f32)>, Vec<(Song, f32)>), ServerFnError> {
 	let albums = search_albums(query.clone(), limit);
 	let artists = search_artists(query.clone(), limit);
 	let songs = search_songs(query.clone(), limit);
