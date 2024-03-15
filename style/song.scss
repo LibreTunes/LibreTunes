@@ -1,0 +1,22 @@
+.song {
+	display: flex;
+	align-items: center;
+
+	img {
+		max-width: 50px; /* Adjust maximum width for images */
+		margin-right: 10px; /* Add spacing between image and text */
+		border-radius: 5px; /* Add border radius to image */
+	}
+
+	.song-info {
+		h3 {
+			margin: 0; 
+			color: #fff; /* Adjust text color for song */
+		}
+
+		p {
+			margin: 0; 
+			color: #aaa; /* Adjust text color for artist */
+		}
+	}
+}
