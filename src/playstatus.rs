@@ -11,6 +11,8 @@ pub struct PlayStatus {
     pub playing: bool,
 	/// Whether or not the queue is open
 	pub queue_open: bool,
+	/// Whether or not the search bar is active (useful for knowing when spacebar to play/pause, etc should be disabled)
+	pub search_active: bool,
 	/// A reference to the HTML audio element
     pub audio_player: Option<NodeRef<Audio>>,
 	/// A queue of songs that have been played, ordered from oldest to newest
@@ -56,6 +58,7 @@ impl Default for PlayStatus {
         Self {
             playing: false,
 			queue_open: false,
+			search_active: false,
             audio_player: None,
             history: VecDeque::new(),
             queue: VecDeque::new(),
