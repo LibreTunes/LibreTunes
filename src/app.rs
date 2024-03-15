@@ -1,6 +1,7 @@
 use crate::playbar::PlayBar;
 use crate::playstatus::PlayStatus;
 use crate::queue::Queue;
+use crate::searchbar::SearchBar;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
@@ -41,8 +42,11 @@ fn HomePage() -> impl IntoView {
     let play_status = create_rw_signal(play_status);
 
     view! {
-        <PlayBar status=play_status/>
-        <Queue status=play_status/>
+		<div class="home">
+        	<PlayBar status=play_status/>
+        	<Queue status=play_status/>
+			<SearchBar status=play_status/>
+		</div>
     }
 }
 
