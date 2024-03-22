@@ -9,9 +9,11 @@ build:
 docker-build:
   needs: ["build"]
   image: docker:latest
+  services:
+    - docker:dind
+  tags:
+    - docker
   script:
-    - /usr/local/bin/dockerd-entrypoint.sh &
-    - while ! docker info; do echo "Waiting for Docker to become available..."; sleep 1; done
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA .
       # If running on the default branch, tag as latest
