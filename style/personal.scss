@@ -1,0 +1,38 @@
+@import "theme.scss";
+
+.personal-container {
+  width: 16rem;
+  background: #1c1c1c;
+  height: 100vh;
+  margin: 2px;
+  border-radius: 0.5rem;
+
+  .profile-container {
+    display: flex;
+    border-radius: 0.4rem;
+    margin: 0.3rem;
+    min-height: 6rem;
+    border: 2px solid rgba(89, 89, 89, 0.199);
+    padding: 0.5rem;
+
+    .profile-icon {
+      display: inline-flex;
+      padding: 0.2rem;
+      cursor: pointer;
+      font-size: 2rem;
+      border-radius: 50%;
+      transition: all 0.3s;
+      height: max-content;
+      margin-left: auto;
+    }
+
+    .profile-icon:hover {
+      transform: scale(1.1);
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-icon:active {
+      transform: scale(0.8);
+    }
+  }
+}

@@ -38,6 +38,7 @@ pub fn App() -> impl IntoView {
 use crate::components::sidebar::*;
 use crate::components::dashboard::*;
 use crate::components::search::*;
+use crate::components::personal::*;
 
 /// Renders the home page of your application.
 #[component]
@@ -49,13 +50,14 @@ fn HomePage() -> impl IntoView {
 
     view! {
         <div class="home-container">
-            <Sidebar setter=set_dashboard_open />
+            <Sidebar setter=set_dashboard_open active=dashboard_open />
             <Show 
                 when=move || {dashboard_open() == true}
                 fallback=move || view! { <Search /> }
             >
                 <Dashboard />
             </Show>
+            <Personal />
             <PlayBar status=play_status/>
             <Queue status=play_status/>
         </div>

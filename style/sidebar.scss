@@ -1,26 +1,26 @@
 @import "theme.scss";
 
 .sidebar-container {
-  background-color: red;
+  background-color: transparent;
   width: 22rem;
   height: calc(100% - 75px);
 }
 
 .sidebar-top-container {
   border-radius: 1rem;
-  background-color: darkblue;
-  height: 10rem;
-  margin: 5px;
-  padding: 0.2rem 1rem 1rem 1rem;
+  background-color: #1c1c1c;
+  height: 9rem;
+  margin: 3px;
+  padding: 0.1rem 1rem 1rem 1rem;
 }
 
 .sidebar-top-container .header {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 }
 .sidebar-top-container .buttons {
   display: flex;
   flex-direction: row;
-  font-size: 2rem;
+  font-size: 1.8rem;
   align-items: center;
   transition: all 0.5s;
   cursor: pointer;
@@ -32,10 +32,22 @@
 
 .sidebar-top-container .buttons:last-child {
   margin-left: 0.02rem;
+  margin-top: 0.5rem;
 }
 
 .sidebar-top-container h1 {
-  font-size: 1.1rem;
-  margin-left: 0.8rem;
-  font-weight: 200;
+  font-size: 0.95rem;
+  margin-left: 0.9rem;
+  font-weight: 400;
+  font-style: $standard-font;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-bottom-container {
+  border-radius: 1rem;
+  background-color: #1c1c1c;
+  margin: 3px;
+  margin-top: 6px;
+  padding: 0.2rem 1rem 1rem 1rem;
+  height: calc(100% - 9rem);
 }
