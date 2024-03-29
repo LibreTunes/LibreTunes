@@ -62,13 +62,13 @@ start-review:
     - echo "$CLOUDFLARE_TUNNEL_AUTH_JSON" > tunnel-auth.json
     - ./add-dns.sh $CLOUDFLARE_ZONE_ID review-$CI_COMMIT_SHORT_SHA libretunes-auto-review $CLOUDFLARE_API_TOKEN $CLOUDFLARE_TUNNEL_ID
     - ./create-tunnel-config.sh http://libretunes:3000 review-$CI_COMMIT_SHORT_SHA.libretunes.xyz $CLOUDFLARE_TUNNEL_ID
-    - COMPOSE_PROJECT_NAME=review-$CI_COMMIT_SHORT_SHA
-    - POSTGRES_PASSWORD=$(openssl rand -base64 32)
-    - LIBRETUNES_VERSION=$CI_COMMIT_SHORT_SHA
+    - export COMPOSE_PROJECT_NAME=review-$CI_COMMIT_SHORT_SHA
+    - export POSTGRES_PASSWORD=$(openssl rand -base64 32)
+    - export LIBRETUNES_VERSION=$CI_COMMIT_SHORT_SHA
     - docker compose --file docker-compose-cicd.yml pull
     - docker compose --file docker-compose-cicd.yml create
-    - CONFIG_VOL_NAME=review-${CI_COMMIT_SHORT_SHA}_cloudflared-config
-    - TMP_CONTAINER_NAME=$(docker run --rm -d -v $CONFIG_VOL_NAME:/data busybox sh -c "sleep infinity")
+    - export CONFIG_VOL_NAME=review-${CI_COMMIT_SHORT_SHA}_cloudflared-config
+    - export TMP_CONTAINER_NAME=$(docker run --rm -d -v $CONFIG_VOL_NAME:/data busybox sh -c "sleep infinity")
     - docker cp tunnel-auth.json $TMP_CONTAINER_NAME:/data/auth.json
     - docker cp cloudflared-tunnel-config.yml $TMP_CONTAINER_NAME:/data/config.yml
     - docker stop $TMP_CONTAINER_NAME
@@ -90,8 +90,8 @@ stop-review:
   script:
     - apk add jq curl
     - ./cicd/remove-dns.sh $CLOUDFLARE_ZONE_ID review-$CI_COMMIT_SHORT_SHA.libretunes.xyz libretunes-auto-review $CLOUDFLARE_API_TOKEN
-    - COMPOSE_PROJECT_NAME=review-$CI_COMMIT_SHORT_SHA
-    - LIBRETUNES_VERSION=$CI_COMMIT_SHORT_SHA
+    - export COMPOSE_PROJECT_NAME=review-$CI_COMMIT_SHORT_SHA
+    - export LIBRETUNES_VERSION=$CI_COMMIT_SHORT_SHA
     - docker compose --file cicd/docker-compose-cicd.yml down
     - docker compose --file cicd/docker-compose-cicd.yml rm -f -v
   environment:
