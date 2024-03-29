@@ -63,7 +63,7 @@ start-review:
     - ./add-dns.sh $CLOUDFLARE_ZONE_ID review-$CI_COMMIT_SHORT_SHA libretunes-auto-review $CLOUDFLARE_API_TOKEN $CLOUDFLARE_TUNNEL_ID
     - ./create-tunnel-config.sh http://libretunes:3000 review-$CI_COMMIT_SHORT_SHA.libretunes.xyz $CLOUDFLARE_TUNNEL_ID
     - export COMPOSE_PROJECT_NAME=review-$CI_COMMIT_SHORT_SHA
-    - export POSTGRES_PASSWORD=$(openssl rand -base64 32)
+    - export POSTGRES_PASSWORD=$(openssl rand -hex 16)
     - export LIBRETUNES_VERSION=$CI_COMMIT_SHORT_SHA
     - docker compose --file docker-compose-cicd.yml pull
     - docker compose --file docker-compose-cicd.yml create
