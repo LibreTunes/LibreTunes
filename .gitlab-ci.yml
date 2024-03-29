@@ -75,7 +75,7 @@ start-review:
     - docker compose --file docker-compose-cicd.yml up -d
   environment:
     name: review/$CI_COMMIT_SHORT_SHA
-    url: https://review-$CI_COMMIT_SHORT_SHA.libretunes.mregirouard.com
+    url: https://review-$CI_COMMIT_SHORT_SHA.libretunes.xyz
     on_stop: stop-review
     auto_stop_in: 1 week
 
