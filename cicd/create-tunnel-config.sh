@@ -2,9 +2,9 @@
 
 set -e
 
-TUNNEL_ID=$1
+SERVICE=$1
 HOSTNAME=$2
-SERVICE=$3
+TUNNEL_ID=$3
 
 echo "Creating tunnel config for $HOSTNAME"
 
