@@ -1,8 +1,8 @@
 use cfg_if::cfg_if;
-use leptos::logging::log;
 
 cfg_if! {
 if #[cfg(feature = "ssr")] {
+use leptos::logging::log;
 
 use lazy_static::lazy_static;
 use std::env;

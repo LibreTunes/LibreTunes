@@ -1,6 +1,5 @@
 use crate::auth::signup;
 use crate::models::User;
-use leptos::ev::input;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::AiIcon::*;
@@ -14,8 +13,6 @@ pub fn Signup() -> impl IntoView {
     let (password, set_password) = create_signal("".to_string());
 
     let (show_password, set_show_password) = create_signal(false);
-
-    let navigate = leptos_router::use_navigate();
 
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);
