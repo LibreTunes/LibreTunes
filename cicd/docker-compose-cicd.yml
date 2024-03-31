@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    volumes:
+      - cloudflared-config:/etc/cloudflared:ro
+
+  libretunes:
+    image: registry.mregirouard.com/libretunes/libretunes:${LIBRETUNES_VERSION}
+    environment:
+      REDIS_URL: redis://redis:6379
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: libretunes
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: libretunes
+    volumes:
+      - libretunes-audio:/site/audio
+    depends_on:
+      - redis
+      - postgres
+    restart: always
+
+  redis:
+    image: redis:latest
+    volumes:
+      - libretunes-redis:/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: libretunes
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: libretunes
+    volumes:
+      - libretunes-postgres:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U libretunes"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  cloudflared-config:
+  libretunes-audio:
+  libretunes-redis:
+  libretunes-postgres:

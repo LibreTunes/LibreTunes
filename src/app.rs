@@ -16,7 +16,7 @@ pub fn App() -> impl IntoView {
     view! {
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href="/pkg/leptos_start.css"/>
+        <Stylesheet id="leptos" href="/pkg/libretunes.css"/>
 
         // sets the document title
         <Title text="LibreTunes"/>
@@ -44,7 +44,7 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
-    let mut play_status = PlayStatus::default();
+    let play_status = PlayStatus::default();
     let play_status = create_rw_signal(play_status);
 
     view! {

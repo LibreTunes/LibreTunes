@@ -1,11 +1,9 @@
 use crate::auth::signup;
 use crate::models::User;
-use leptos::ev::input;
 use leptos::leptos_dom::*;
 use leptos::*;
-use leptos_icons::AiIcon::*;
-use leptos_icons::IoIcon::*;
 use leptos_icons::*;
+use icondata;
 
 #[component]
 pub fn Signup() -> impl IntoView {
@@ -14,8 +12,6 @@ pub fn Signup() -> impl IntoView {
     let (password, set_password) = create_signal("".to_string());
 
     let (show_password, set_show_password) = create_signal(false);
-
-    let navigate = leptos_router::use_navigate();
 
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);
@@ -49,7 +45,7 @@ pub fn Signup() -> impl IntoView {
     view! {
         <div class="auth-page-container">
             <div class="signup-container">
-                <a class="return" href="/"><Icon icon=Icon::from(IoReturnUpBackSharp) /></a>
+                <a class="return" href="/"><Icon icon=icondata::IoReturnUpBackSharp /></a>
                 <div class="header">
                     <h1>LibreTunes</h1>
                 </div>
@@ -86,10 +82,10 @@ pub fn Signup() -> impl IntoView {
                         <i></i>
                         <Show
                             when=move || {show_password() == false}
-                            fallback=move || view!{ <button on:click=toggle_password class="password-visibility"> <Icon icon=Icon::from(AiEyeInvisibleFilled) /></button> /> }
+                            fallback=move || view!{ <button on:click=toggle_password class="password-visibility"> <Icon icon=icondata::AiEyeInvisibleFilled /></button> /> }
                         >
                             <button on:click=toggle_password class="password-visibility">
-                                <Icon icon=Icon::from(AiEyeFilled) />
+                                <Icon icon=icondata::AiEyeFilled />
                             </button>
                         </Show>
                     </div>

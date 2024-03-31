@@ -1,4 +1,5 @@
 use leptos::*;
+
 use crate::models::User;
 
 /// Create a new user and log them in
@@ -11,6 +12,7 @@ pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 	use leptos_actix::extract;
 	use actix_web::{HttpMessage, HttpRequest};
 	use actix_identity::Identity;
+	use leptos::server_fn::error::NoCustomError;
 
 	// Ensure the user has no id
 	let new_user = User {
@@ -19,13 +21,17 @@ pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 	};
 
 	create_user(&new_user).await
-		.map_err(|e| ServerFnError::ServerError(format!("Error creating user: {}", e)))?;
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error creating user: {}", e)))?;
 
-	extract(|request: HttpRequest| async move {
-		Identity::login(&request.extensions(), new_user.username.clone())
-	}).await??;
-
-	Ok(())
+	match extract::<HttpRequest>().await {
+		Ok(request) => {
+			match Identity::login(&request.extensions(), new_user.username.clone()) {
+				Ok(_) => Ok(()),
+				Err(e) => Err(ServerFnError::<NoCustomError>::ServerError(format!("Error logging in user: {}", e))),
+			}
+		},
+		Err(e) => Err(ServerFnError::<NoCustomError>::ServerError(format!("Error getting request: {}", e))),
+	}
 }
 
 /// Log a user in
@@ -37,20 +43,25 @@ pub async fn login(username_or_email: String, password: String) -> Result<bool, 
 	use actix_web::{HttpMessage, HttpRequest};
 	use actix_identity::Identity;
 	use leptos_actix::extract;
+	use leptos::server_fn::error::NoCustomError;
 
 	let possible_user = validate_user(username_or_email, password).await
-		.map_err(|e| ServerFnError::ServerError(format!("Error validating user: {}", e)))?;
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error validating user: {}", e)))?;
 
 	let user = match possible_user {
 		Some(user) => user,
 		None => return Ok(false)
 	};
 
-	extract(|request: HttpRequest| async move {
-		Identity::login(&request.extensions(), user.username.clone())
-	}).await??;
-	
-	Ok(true)
+	match extract::<HttpRequest>().await {
+		Ok(request) => {
+			match Identity::login(&request.extensions(), user.username.clone()) {
+				Ok(_) => Ok(true),
+				Err(e) => Err(ServerFnError::<NoCustomError>::ServerError(format!("Error logging in user: {}", e))),
+			}
+		}
+		Err(e) => Err(ServerFnError::<NoCustomError>::ServerError(format!("Error getting request: {}", e))),
+	}
 }
 
 /// Log a user out
@@ -59,12 +70,13 @@ pub async fn login(username_or_email: String, password: String) -> Result<bool, 
 pub async fn logout() -> Result<(), ServerFnError> {
 	use leptos_actix::extract;
 	use actix_identity::Identity;
+	use leptos::server_fn::error::NoCustomError;
 
-	extract(|user: Option<Identity>| async move {
-		if let Some(user) = user {
-			user.logout();
-		}
-	}).await?;
+	match extract::<Option<Identity>>().await {
+		Ok(Some(user)) => user.logout(),
+		Ok(None) => {},
+		Err(e) => return Err(ServerFnError::<NoCustomError>::ServerError(format!("Error getting user: {}", e))),
+	};
 
 	Ok(())
 }

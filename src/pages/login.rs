@@ -1,9 +1,8 @@
 use crate::auth::login;
 use leptos::leptos_dom::*;
 use leptos::*;
-use leptos_icons::AiIcon::*;
-use leptos_icons::IoIcon::*;
 use leptos_icons::*;
+use icondata;
 
 #[component]
 pub fn Login() -> impl IntoView {
@@ -42,7 +41,7 @@ pub fn Login() -> impl IntoView {
     view! {
         <div class="auth-page-container">
             <div class="login-container">
-                <a class="return" href="/"><Icon icon=Icon::from(IoReturnUpBackSharp) /></a>
+                <a class="return" href="/"><Icon icon=icondata::IoReturnUpBackSharp /></a>
                 <div class="header">
                     <h1>LibreTunes</h1>
                 </div>
@@ -70,11 +69,11 @@ pub fn Login() -> impl IntoView {
                         <Show
                             when=move || {show_password() == false}
                             fallback=move || view!{ <button on:click=toggle_password class="login-password-visibility">
-                                                  <Icon icon=Icon::from(AiEyeInvisibleFilled) />
+                                                  <Icon icon=icondata::AiEyeInvisibleFilled />
                                                </button> /> }
                         >
                             <button on:click=toggle_password class="login-password-visibility">
-                                <Icon icon=Icon::from(AiEyeFilled) />
+                                <Icon icon=icondata::AiEyeFilled />
                             </button>
 
                         </Show>

@@ -1,5 +1,4 @@
 use std::time::SystemTime;
-use std::error::Error;
 use time::Date;
 use serde::{Deserialize, Serialize};
 
@@ -9,6 +8,7 @@ cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use diesel::prelude::*;
 		use crate::database::PgPooledConn;
+		use std::error::Error;
 	}
 }
 

@@ -4,7 +4,6 @@ use leptos::ev::MouseEvent;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use leptos_icons::CgIcon::*;
 use leptos::ev::DragEvent;
 
 const RM_BTN_SIZE: &str = "2.5rem";
@@ -106,7 +105,7 @@ pub fn Queue(status: RwSignal<PlayStatus>) -> impl IntoView {
 											<p>Playing</p>
 										}>
 										<button on:click=move |_| remove_song(index) on:mousedown=prevent_focus>
-											<Icon class="remove-song" width=RM_BTN_SIZE height=RM_BTN_SIZE icon=Icon::from(CgTrash) />
+											<Icon class="remove-song" width=RM_BTN_SIZE height=RM_BTN_SIZE icon=icondata::CgTrash />
 										</button>
 									</Show>
 								</div>
