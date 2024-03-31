@@ -14,11 +14,11 @@ extern crate diesel_migrations;
 #[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
-    use axum::{routing::post, Router};
+    use axum::{routing::{post, get}, Router};
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use libretunes::app::*;
-    use libretunes::fileserv::file_and_error_handler;
+    use libretunes::fileserv::{file_and_error_handler, get_static_file};
 
     use dotenv::dotenv;
     dotenv().ok();
@@ -37,6 +37,7 @@ async fn main() {
     let app = Router::new()
         .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         .leptos_routes(&leptos_options, routes, App)
+        .route("/assets/*uri", get(|uri| get_static_file(uri, "")))
         .fallback(file_and_error_handler)
         .with_state(leptos_options);
 
