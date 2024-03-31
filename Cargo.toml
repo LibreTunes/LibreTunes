@@ -12,7 +12,7 @@ actix-files = { version = "0.6", optional = true }
 actix-web = { version = "4", optional = true, features = ["macros"] }
 console_error_panic_hook = "0.1"
 cfg-if = "1"
-http = "0.2"
+http = "1.0"
 leptos = { version = "0.6", features = ["nightly"] }
 leptos_meta = { version = "0.6", features = ["nightly"] }
 leptos_actix = { version = "0.6", optional = true }
@@ -37,7 +37,10 @@ axum = { version = "0.7.5", optional = true }
 tower = { veresion = "0.4.13", optional = true }
 tower-http = { version = "0.4", optional = true, features = ["fs"] }
 thiserror = "1.0.57"
-tower-sessions = { version = "0.10.4", default-features = false }
+tower-sessions = { version = "0.12", default-features = false }
+
+[patch.crates-io]
+gloo-net = { git = "https://github.com/rustwasm/gloo.git", rev = "a823fab7ecc4068e9a28bd669da5eaf3f0a56380" }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]

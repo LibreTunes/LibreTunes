@@ -500,6 +500,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
+name = "base64"
+version = "0.22.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9475866fec1451be56a3c2400fd081ff546538961565ccb5b7142cbd22bc7a51"
+
+[[package]]
 name = "base64ct"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1215,14 +1221,13 @@ dependencies = [
 [[package]]
 name = "gloo-net"
 version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43aaa242d1239a8822c15c645f02166398da4f8b5c4bae795c1f5b44e9eee173"
+source = "git+https://github.com/rustwasm/gloo.git?rev=a823fab7ecc4068e9a28bd669da5eaf3f0a56380#a823fab7ecc4068e9a28bd669da5eaf3f0a56380"
 dependencies = [
  "futures-channel",
  "futures-core",
  "futures-sink",
  "gloo-utils 0.2.0",
- "http 0.2.11",
+ "http 1.0.0",
  "js-sys",
  "pin-project",
  "serde",
@@ -1249,8 +1254,7 @@ dependencies = [
 [[package]]
 name = "gloo-utils"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b5555354113b18c547c1d3a98fbf7fb32a9ff4f6fa112ce823a21641a0ba3aa"
+source = "git+https://github.com/rustwasm/gloo.git?rev=a823fab7ecc4068e9a28bd669da5eaf3f0a56380#a823fab7ecc4068e9a28bd669da5eaf3f0a56380"
 dependencies = [
  "js-sys",
  "serde",
@@ -2037,7 +2041,7 @@ dependencies = [
  "diesel_migrations",
  "dotenv",
  "futures",
- "http 0.2.11",
+ "http 1.0.0",
  "icondata",
  "lazy_static",
  "leptos",
@@ -3353,9 +3357,9 @@ checksum = "b6bc1c9ce2b5135ac7f93c72918fc37feb872bdc6a5533a8b85eb4b86bfdae52"
 
 [[package]]
 name = "tower-sessions"
-version = "0.10.4"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5dfd131ee564762468250d3dbb8a04f3bc933bcc9bd4f0958ce8acbfb578b73"
+checksum = "32b7b53dbe4dc5cf64382fcbd1e8b8ca222949d757fcabec1bcc8de751bb611b"
 dependencies = [
  "async-trait",
  "http 1.0.0",
@@ -3370,12 +3374,12 @@ dependencies = [
 
 [[package]]
 name = "tower-sessions-core"
-version = "0.10.4"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bed2607e4db384eed7a932a53c10f64202e73e9a970b6a7410bcbc018fd7c689"
+checksum = "cec154be845cc7482fa002282813881732bdf17c75a8e85ff1bddaf387b668c5"
 dependencies = [
  "async-trait",
- "base64 0.21.7",
+ "base64 0.22.0",
  "futures",
  "http 1.0.0",
  "parking_lot",
