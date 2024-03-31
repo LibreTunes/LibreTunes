@@ -1,5 +1,5 @@
 use leptos::*;
-use leptos::server_fn::error::NoCustomError;
+
 use crate::models::User;
 
 /// Create a new user and log them in
@@ -12,6 +12,7 @@ pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 	use leptos_actix::extract;
 	use actix_web::{HttpMessage, HttpRequest};
 	use actix_identity::Identity;
+	use leptos::server_fn::error::NoCustomError;
 
 	// Ensure the user has no id
 	let new_user = User {
@@ -42,6 +43,7 @@ pub async fn login(username_or_email: String, password: String) -> Result<bool, 
 	use actix_web::{HttpMessage, HttpRequest};
 	use actix_identity::Identity;
 	use leptos_actix::extract;
+	use leptos::server_fn::error::NoCustomError;
 
 	let possible_user = validate_user(username_or_email, password).await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error validating user: {}", e)))?;
@@ -68,6 +70,7 @@ pub async fn login(username_or_email: String, password: String) -> Result<bool, 
 pub async fn logout() -> Result<(), ServerFnError> {
 	use leptos_actix::extract;
 	use actix_identity::Identity;
+	use leptos::server_fn::error::NoCustomError;
 
 	match extract::<Option<Identity>>().await {
 		Ok(Some(user)) => user.logout(),

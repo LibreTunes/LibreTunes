@@ -14,7 +14,6 @@ cfg_if::cfg_if! {
 }
 
 use leptos::*;
-use leptos::server_fn::error::NoCustomError;
 use crate::models::User;
 
 /// Get a user from the database by username or email
@@ -22,6 +21,7 @@ use crate::models::User;
 #[cfg(feature = "ssr")]
 pub async fn find_user(username_or_email: String) -> Result<Option<User>, ServerFnError> {
 	use crate::schema::users::dsl::*;
+	use leptos::server_fn::error::NoCustomError;
 
 	// Look for either a username or email that matches the input, and return an option with None if no user is found
 	let db_con = &mut get_db_conn();
@@ -37,6 +37,7 @@ pub async fn find_user(username_or_email: String) -> Result<Option<User>, Server
 #[cfg(feature = "ssr")]
 pub async fn create_user(new_user: &User) -> Result<(), ServerFnError> {
 	use crate::schema::users::dsl::*;
+	use leptos::server_fn::error::NoCustomError;
 
 	let new_password = new_user.password.clone()
 		.ok_or(ServerFnError::<NoCustomError>::ServerError(format!("No password provided for user {}", new_user.username)))?;
@@ -62,6 +63,8 @@ pub async fn create_user(new_user: &User) -> Result<(), ServerFnError> {
 /// Returns a Result with the user if the credentials are valid, None if not valid, or an error if there was a problem
 #[cfg(feature = "ssr")]
 pub async fn validate_user(username_or_email: String, password: String) -> Result<Option<User>, ServerFnError> {
+	use leptos::server_fn::error::NoCustomError;
+
 	let db_user = find_user(username_or_email.clone()).await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting user from database: {}", e)))?;
 
