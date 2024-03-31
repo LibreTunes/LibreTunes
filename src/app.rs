@@ -37,7 +37,7 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
-    let mut play_status = PlayStatus::default();
+    let play_status = PlayStatus::default();
     let play_status = create_rw_signal(play_status);
 
     view! {

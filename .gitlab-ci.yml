@@ -2,6 +2,8 @@
 build:
   needs: []
   image: $CI_REGISTRY/libretunes/ops/docker-leptos:latest
+  variables:
+    RUSTFLAGS: "-D warnings"
   script:
     - cargo-leptos build
 
