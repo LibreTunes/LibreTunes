@@ -42,10 +42,8 @@ async fn main() {
 
     println!("listening on http://{}", &addr);
 
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(&addr).await.expect(&format!("Could not bind to {}", &addr));
+    axum::serve(listener, app.into_make_service()).await.expect("Server failed");
 }
 
 #[cfg(not(any(feature = "ssr", feature = "csr")))]
