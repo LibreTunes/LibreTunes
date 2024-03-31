@@ -19,6 +19,8 @@ async fn main() {
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use libretunes::app::*;
     use libretunes::fileserv::{file_and_error_handler, get_static_file};
+    use tower_sessions::SessionManagerLayer;
+    use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
 
     use dotenv::dotenv;
     dotenv().ok();
@@ -27,6 +29,13 @@ async fn main() {
     libretunes::database::migrate();
 
     let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
+    let redis_config = RedisConfig::from_url(&redis_url).expect(&format!("Unable to parse Redis URL: {}", redis_url));
+    let redis_pool = RedisPool::new(redis_config, None, None, None, 1).expect("Unable to create Redis pool");
+    redis_pool.connect();
+    redis_pool.wait_for_connect().await.expect("Unable to connect to Redis");
+
+    let session_store = RedisStore::new(redis_pool);
+    let session_layer = SessionManagerLayer::new(session_store);
 
     let conf = get_configuration(None).await.unwrap();
     let leptos_options = conf.leptos_options;
@@ -38,6 +47,7 @@ async fn main() {
         .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         .leptos_routes(&leptos_options, routes, App)
         .route("/assets/*uri", get(|uri| get_static_file(uri, "")))
+        .layer(session_layer)
         .fallback(file_and_error_handler)
         .with_state(leptos_options);
 
