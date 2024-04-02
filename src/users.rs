@@ -69,10 +69,10 @@ pub async fn create_user(new_user: &User) -> Result<(), ServerFnError> {
 /// Validate a user's credentials
 /// Returns a Result with the user if the credentials are valid, None if not valid, or an error if there was a problem
 #[cfg(feature = "ssr")]
-pub async fn validate_user(username_or_email: String, password: String) -> Result<Option<User>, ServerFnError> {
+pub async fn validate_user(credentials: UserCredentials) -> Result<Option<User>, ServerFnError> {
 	use leptos::server_fn::error::NoCustomError;
 
-	let db_user = find_user(username_or_email.clone()).await
+	let db_user = find_user(credentials.username_or_email.clone()).await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting user from database: {}", e)))?;
 
 	// If the user is not found, return None
@@ -87,7 +87,7 @@ pub async fn validate_user(username_or_email: String, password: String) -> Resul
 	let password_hash = PasswordHash::new(&db_password)
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error hashing supplied password: {}", e)))?;
 
-	match Pbkdf2.verify_password(password.as_bytes(), &password_hash) {
+	match Pbkdf2.verify_password(credentials.password.as_bytes(), &password_hash) {
 		Ok(()) => {},
 		Err(Error::Password) => {
 			return Ok(None);

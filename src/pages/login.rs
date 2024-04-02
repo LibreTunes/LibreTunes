@@ -3,6 +3,7 @@ use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
 use icondata;
+use crate::users::UserCredentials;
 
 #[component]
 pub fn Login() -> impl IntoView {
@@ -23,7 +24,12 @@ pub fn Login() -> impl IntoView {
         let password1 = password.get();
 
         spawn_local(async move {
-            let login_result = login(username_or_email1, password1).await;
+            let user_credentials = UserCredentials {
+                username_or_email: username_or_email1,
+                password: password1
+            };
+            
+            let login_result = login(user_credentials).await;
             if let Err(err) = login_result {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error logging in: {:?}", err);
