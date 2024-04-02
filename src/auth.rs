@@ -87,3 +87,36 @@ pub async fn logout() -> Result<(), ServerFnError> {
 	Ok(())
 }
 
+/// Check if a user is logged in
+/// Returns a Result with a boolean indicating if the user is logged in
+#[server(endpoint = "check_auth")]
+pub async fn check_auth() -> Result<bool, ServerFnError> {
+	let auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
+
+	Ok(auth_session.user.is_some())
+}
+
+/// Require that a user is logged in
+/// Returns a Result with the error message if the user is not logged in
+/// Intended to be used at the start of a protected route, to ensure the user is logged in:
+/// ```rust
+/// use leptos::*;
+/// use libretunes::auth::require_auth;
+/// #[server(endpoint = "protected_route")]
+/// pub async fn protected_route() -> Result<(), ServerFnError> {
+/// 	require_auth().await?;
+/// 	// Continue with protected route
+/// 	Ok(())
+/// }
+/// ```
+#[cfg(feature = "ssr")]
+pub async fn require_auth() -> Result<(), ServerFnError> {
+	check_auth().await.and_then(|logged_in| {
+		if logged_in {
+			Ok(())
+		} else {
+			Err(ServerFnError::<NoCustomError>::ServerError(format!("Unauthorized")))
+		}
+	})
+}
