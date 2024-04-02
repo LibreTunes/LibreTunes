@@ -14,7 +14,14 @@ cfg_if::cfg_if! {
 }
 
 use leptos::*;
+use serde::{Serialize, Deserialize};
 use crate::models::User;
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct UserCredentials {
+	pub username_or_email: String,
+	pub password: String
+}
 
 /// Get a user from the database by username or email
 /// Returns a Result with the user if found, None if not found, or an error if there was a problem
