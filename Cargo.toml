@@ -35,6 +35,7 @@ thiserror = "1.0.57"
 tower-sessions = { version = "0.11", default-features = false }
 tower-sessions-redis-store = { version = "0.11", optional = true }
 async-trait = "0.1.79"
+axum-login = "0.14.0"
 
 [patch.crates-io]
 gloo-net = { git = "https://github.com/rustwasm/gloo.git", rev = "a823fab7ecc4068e9a28bd669da5eaf3f0a56380" }
