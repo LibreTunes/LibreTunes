@@ -39,6 +39,21 @@ pub async fn find_user(username_or_email: String) -> Result<Option<User>, Server
 	Ok(user)
 }
 
+/// Get a user from the database by ID
+/// Returns a Result with the user if found, None if not found, or an error if there was a problem
+#[cfg(feature = "ssr")]
+pub async fn find_user_by_id(user_id: i32) -> Result<Option<User>, ServerFnError> {
+	use crate::schema::users::dsl::*;
+	use leptos::server_fn::error::NoCustomError;
+
+	let db_con = &mut get_db_conn();
+	let user = users.filter(id.eq(user_id))
+		.first::<User>(db_con).optional()
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting user from database: {}", e)))?;
+
+	Ok(user)
+}
+
 /// Create a new user in the database
 /// Returns an empty Result if successful, or an error if there was a problem
 #[cfg(feature = "ssr")]
