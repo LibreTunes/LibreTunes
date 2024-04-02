@@ -3,7 +3,6 @@ use crate::models::User;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use icondata;
 
 #[component]
 pub fn Signup() -> impl IntoView {

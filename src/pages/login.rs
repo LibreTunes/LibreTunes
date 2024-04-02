@@ -2,7 +2,6 @@ use crate::auth::login;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use icondata;
 use crate::users::UserCredentials;
 
 #[component]
