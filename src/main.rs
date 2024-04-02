@@ -21,6 +21,8 @@ async fn main() {
     use libretunes::fileserv::{file_and_error_handler, get_static_file};
     use tower_sessions::SessionManagerLayer;
     use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
+    use axum_login::AuthManagerLayerBuilder;
+    use libretunes::auth_backend::AuthBackend;
 
     use dotenv::dotenv;
     dotenv().ok();
@@ -37,6 +39,9 @@ async fn main() {
     let session_store = RedisStore::new(redis_pool);
     let session_layer = SessionManagerLayer::new(session_store);
 
+    let auth_backend = AuthBackend;
+    let auth_layer = AuthManagerLayerBuilder::new(auth_backend, session_layer).build();
+
     let conf = get_configuration(None).await.unwrap();
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
@@ -47,7 +52,7 @@ async fn main() {
         .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         .leptos_routes(&leptos_options, routes, App)
         .route("/assets/*uri", get(|uri| get_static_file(uri, "")))
-        .layer(session_layer)
+        .layer(auth_layer)
         .fallback(file_and_error_handler)
         .with_state(leptos_options);
 
