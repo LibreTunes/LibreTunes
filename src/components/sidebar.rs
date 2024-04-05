@@ -1,6 +1,7 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::BiIcon::*;
+use leptos_icons::IoIcon::*;
 use leptos_icons::OcIcon::*;
 use leptos_icons::*;
 
@@ -28,10 +29,25 @@ pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl Into
                     <h1>Search</h1>
                 </div>
             </div>
-            <div class="sidebar-bottom-container">
-                <h1>LibreTunes</h1>
-            </div>
+            <Bottom />
 
+        </div>
+    }
+}
+
+#[component]
+pub fn Bottom() -> impl IntoView {
+    view! {
+        <div class="sidebar-bottom-container">
+            <div class="heading">
+                <h1 class="header">Playlists</h1>
+                <button class="add-playlist">
+                    <div class="add-sign">
+                        <Icon icon=Icon::from(IoAddSharp) />
+                    </div>
+                    New Playlist
+                </button>
+            </div>
         </div>
     }
 }

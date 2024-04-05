@@ -50,4 +50,42 @@
   margin-top: 6px;
   padding: 0.2rem 1rem 1rem 1rem;
   height: calc(100% - 9rem);
+
+  .heading {
+    display: flex;
+    flex-direction: row;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .header {
+      font-size: 1.2rem;
+      font-weight: 200;
+    }
+
+    .add-playlist {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      border-radius: 50px;
+      border: none;
+      height: 2.2rem;
+      padding-right: 2rem;
+      padding-left: 2rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      .add-sign {
+        font-size: 1.5rem;
+        margin-top: auto;
+        margin-right: 5px;
+        color: white;
+      }
+    }
+    .add-playlist:hover {
+      background-color: #9e9e9e;
+    }
+  }
 }
