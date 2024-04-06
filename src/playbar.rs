@@ -1,4 +1,6 @@
 use crate::playstatus::PlayStatus;
+use crate::api::songs::get_artists;
+use crate::api::albums::get_album;
 use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
@@ -152,7 +154,7 @@ fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
 
                 if let Some(last_played_song) = last_played_song {
                     // Push the popped song to the front of the queue, and play it
-                    let next_src = last_played_song.song_path.clone();
+                    let next_src = last_played_song.storage_path.clone();
                     status.update(|status| status.queue.push_front(last_played_song));
                     set_play_src(status, next_src);
                     set_playing(status, true);
@@ -245,26 +247,39 @@ fn PlayDuration(elapsed_secs: MaybeSignal<i64>, total_secs: MaybeSignal<i64>) ->
 fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
     let name = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("No media playing".into(), |song| song.name.clone())
+			status.queue.front().map_or("No media playing".into(), |song| song.title.clone())
 		})
     });
 
-	let artist = Signal::derive(move || {
+	let song_id = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("".into(), |song| song.artist.clone())
+			status.queue.front().map_or(None, |song| song.id)
 		})
 	});
 
-	let album = Signal::derive(move || {
+	let song_artists_resource = create_resource(song_id, move |song_id| async move {
+		let artists_vec = get_artists(song_id).await.unwrap_or(Vec::new());
+		// convert the vec of artists to a string of artists separated by commas
+		let artists_string = artists_vec.iter().map(|artist| artist.name.clone()).collect::<Vec<String>>().join(", ");
+		artists_string
+	});
+
+	let album_id = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("".into(), |song| song.album.clone())
+			status.queue.front().map_or(None, |song| song.album_id)
 		})
+	});
+
+	let album_resource = create_resource(album_id, move |album_id| async move {
+		// get the album name attribute or return "Unknown Album"
+		let album_name = get_album(album_id).await.map_or("".to_string(), |album| album.title);
+		album_name
 	});
 
 	let image = Signal::derive(move || {
 		status.with(|status| {
 			// TODO Use some default / unknown image?
-			status.queue.front().map_or("".into(), |song| song.image_path.clone())
+			status.queue.front().map_or("".into(), |song| song.image_path.clone().unwrap_or("".into()))
 		})
 	});
 
@@ -274,7 +289,28 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
         <div class="media-info-text">
             {name}
             <br/>
-            {artist} - {album}
+            <Suspense 
+				fallback=move || {
+					view! {"Loading Artists..."}
+				}
+			>
+			{move || {
+				song_artists_resource.get().map(|artists_string| view! {
+					<p>{artists_string}</p>
+				})
+			}}
+			</Suspense>
+			<Suspense
+				fallback=move || {
+					view! {"Loading Album..."}
+				}
+			>
+			{move || {
+				album_resource.get().map(|album_name| view! {
+					<p>{album_name}</p>
+				})
+			}}
+			</Suspense>
         </div>
         </div>
     }
@@ -402,11 +438,11 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         status.with_untracked(|status| {
             // Start playing the first song in the queue, if available
             if let Some(song) = status.queue.front() {
-                log!("Starting playing with song: {}", song.name);
+                log!("Starting playing with song: {}", song.title);
 
                 // Don't use the set_play_src / set_playing helper function
                 // here because we already have access to the audio element
-                audio.set_src(&song.song_path);
+                audio.set_src(&song.storage_path);
 
                 if let Err(e) = audio.play() {
                     error!("Error playing audio on load: {:?}", e);
@@ -455,7 +491,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
             let prev_song = status.queue.pop_front();
 
             if let Some(prev_song) = prev_song {
-                log!("Adding song to history: {}", prev_song.name);
+                log!("Adding song to history: {}", prev_song.title);
                 status.history.push_back(prev_song);
             } else {
                 log!("Queue empty, no previous song to add to history");
@@ -464,7 +500,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
 
         // Get the next song to play, if available
         let next_src = status.with_untracked(|status| {
-            status.queue.front().map(|song| song.song_path.clone())
+            status.queue.front().map(|song| song.storage_path.clone())
         });
 
         if let Some(audio) = audio_ref.get() {

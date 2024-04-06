@@ -99,7 +99,7 @@ pub fn Queue(status: RwSignal<PlayStatus>) -> impl IntoView {
 									on:dragenter=move |e: DragEvent| on_drag_enter(e, index)
 									on:dragover=on_drag_over
 								>
-									<Song song_image_path=song.image_path.clone() song_title=song.name.clone() song_artist=song.artist.clone() />
+									<Song song_id_arg=song.id song_image_path=song.image_path.clone().unwrap_or("".to_string()) song_title=song.title.clone() />
 									<Show
 										when=move || index != 0
 										fallback=|| view!{
