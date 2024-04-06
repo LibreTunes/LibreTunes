@@ -43,7 +43,7 @@ use crate::components::personal::*;
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
-    let mut play_status = PlayStatus::default();
+    let play_status = PlayStatus::default();
     let play_status = create_rw_signal(play_status);
     
     let (dashboard_open, set_dashboard_open) = create_signal(true);

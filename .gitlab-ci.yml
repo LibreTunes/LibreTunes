@@ -2,17 +2,25 @@
 build:
   needs: []
   image: $CI_REGISTRY/libretunes/ops/docker-leptos:latest
+  variables:
+    RUSTFLAGS: "-D warnings"
   script:
     - cargo-leptos build
+
+.docker:
+  image: docker:latest
+  services:
+    - docker:dind
+  tags:
+    - docker
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
 # Build the docker image and push it to the registry
 docker-build:
   needs: ["build"]
-  image: docker:latest
+  extends: .docker
   script:
-    - /usr/local/bin/dockerd-entrypoint.sh &
-    - while ! docker info; do echo "Waiting for Docker to become available..."; sleep 1; done
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA .
       # If running on the default branch, tag as latest
     - if [ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]; then docker tag
@@ -44,35 +52,50 @@ cargo-doc:
     paths:
       - target/doc
 
-.argocd:
-  image: argoproj/argocd:v2.6.15
-  before_script:
-    - argocd login ${ARGOCD_SERVER} --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD} --grpc-web
-
 # Start the review environment
 start-review:
-  extends: .argocd
+  extends: .docker
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: manual
   script:
-    - argocd app sync argocd/libretunes-review-${CI_COMMIT_SHORT_SHA}
-    - argocd app wait argocd/libretunes-review-${CI_COMMIT_SHORT_SHA}
+    - apk add curl openssl
+    - cd cicd
+    - echo "$CLOUDFLARE_TUNNEL_AUTH_JSON" > tunnel-auth.json
+    - ./add-dns.sh $CLOUDFLARE_ZONE_ID review-$CI_COMMIT_SHORT_SHA libretunes-auto-review $CLOUDFLARE_API_TOKEN $CLOUDFLARE_TUNNEL_ID
+    - ./create-tunnel-config.sh http://libretunes:3000 review-$CI_COMMIT_SHORT_SHA.libretunes.xyz $CLOUDFLARE_TUNNEL_ID
+    - export COMPOSE_PROJECT_NAME=review-$CI_COMMIT_SHORT_SHA
+    - export POSTGRES_PASSWORD=$(openssl rand -hex 16)
+    - export LIBRETUNES_VERSION=$CI_COMMIT_SHORT_SHA
+    - docker compose --file docker-compose-cicd.yml pull
+    - docker compose --file docker-compose-cicd.yml create
+    - export CONFIG_VOL_NAME=review-${CI_COMMIT_SHORT_SHA}_cloudflared-config
+    - export TMP_CONTAINER_NAME=$(docker run --rm -d -v $CONFIG_VOL_NAME:/data busybox sh -c "sleep infinity")
+    - docker cp tunnel-auth.json $TMP_CONTAINER_NAME:/data/auth.json
+    - docker cp cloudflared-tunnel-config.yml $TMP_CONTAINER_NAME:/data/config.yml
+    - docker stop $TMP_CONTAINER_NAME
+    - docker compose --file docker-compose-cicd.yml up -d
   environment:
     name: review/$CI_COMMIT_SHORT_SHA
-    url: https://review-$CI_COMMIT_SHORT_SHA.libretunes.mregirouard.com
+    url: https://review-$CI_COMMIT_SHORT_SHA.libretunes.xyz
     on_stop: stop-review
+    auto_stop_in: 1 week
 
 # Stop the review environment
 stop-review:
   needs: ["start-review"]
-  extends: .argocd
+  extends: .docker
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: manual
   allow_failure: true
   script:
-    - argocd app delete argocd/libretunes-review-${CI_COMMIT_SHORT_SHA} --cascade
+    - apk add jq curl
+    - ./cicd/remove-dns.sh $CLOUDFLARE_ZONE_ID review-$CI_COMMIT_SHORT_SHA.libretunes.xyz libretunes-auto-review $CLOUDFLARE_API_TOKEN
+    - export COMPOSE_PROJECT_NAME=review-$CI_COMMIT_SHORT_SHA
+    - export LIBRETUNES_VERSION=$CI_COMMIT_SHORT_SHA
+    - docker compose --file cicd/docker-compose-cicd.yml down
+    - docker compose --file cicd/docker-compose-cicd.yml rm -f -v
   environment:
     name: review/$CI_COMMIT_SHORT_SHA
     action: stop

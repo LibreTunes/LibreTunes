@@ -14,8 +14,6 @@ pub fn Signup() -> impl IntoView {
 
     let (show_password, set_show_password) = create_signal(false);
 
-    let navigate = leptos_router::use_navigate();
-
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);
         log!("showing password");
