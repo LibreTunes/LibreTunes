@@ -1,0 +1,10 @@
+@import "theme.scss";
+
+.dashboard-container {
+  width: calc(100% - 22rem - 16rem);
+  .dashboard-header {
+    font-size: 1.2rem;
+    font-weight: 300;
+    border-bottom: 2px solid white;
+  }
+}

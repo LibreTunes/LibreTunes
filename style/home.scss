@@ -1,0 +1,16 @@
+@import "theme.scss";
+
+.home-container {
+  margin-top: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+}
+.home-component {
+  background: #1c1c1c;
+  height: 100vh;
+  margin: 2px;
+  padding: 0.2rem 1.5rem 1.5rem 1rem;
+  border-radius: 0.5rem;
+}

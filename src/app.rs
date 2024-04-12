@@ -8,6 +8,7 @@ use crate::pages::login::*;
 use crate::pages::signup::*;
 use crate::error_template::{AppError, ErrorTemplate};
 
+
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
@@ -41,15 +42,32 @@ pub fn App() -> impl IntoView {
     }
 }
 
+use crate::components::sidebar::*;
+use crate::components::dashboard::*;
+use crate::components::search::*;
+use crate::components::personal::*;
+
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
     let play_status = PlayStatus::default();
     let play_status = create_rw_signal(play_status);
+    
+    let (dashboard_open, set_dashboard_open) = create_signal(true);
 
     view! {
-        <PlayBar status=play_status/>
-        <Queue status=play_status/>
+        <div class="home-container">
+            <Sidebar setter=set_dashboard_open active=dashboard_open />
+            <Show 
+                when=move || {dashboard_open() == true}
+                fallback=move || view! { <Search /> }
+            >
+                <Dashboard />
+            </Show>
+            <Personal />
+            <PlayBar status=play_status/>
+            <Queue status=play_status/>
+        </div>
     }
 }
 

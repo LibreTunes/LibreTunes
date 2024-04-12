@@ -8,6 +8,7 @@ pub mod queue;
 pub mod song;
 pub mod models;
 pub mod pages;
+pub mod components;
 pub mod users;
 pub mod search;
 pub mod fileserv;

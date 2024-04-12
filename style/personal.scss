@@ -1,0 +1,74 @@
+@import "theme.scss";
+
+.personal-container {
+  width: 16rem;
+  background: #1c1c1c;
+  height: 100vh;
+  margin: 2px;
+  border-radius: 0.5rem;
+
+  .profile-container {
+    display: flex;
+    border-radius: 0.4rem;
+    margin: 0.2rem;
+    min-height: 6rem;
+    border: 2px solid rgba(89, 89, 89, 0.199);
+    padding: 0.5rem;
+
+    .profile-icon {
+      display: inline-flex;
+      padding: 0.2rem;
+      cursor: pointer;
+      font-size: 2rem;
+      border-radius: 50%;
+      transition: all 0.3s;
+      height: max-content;
+      margin-left: auto;
+    }
+
+    .profile-icon:hover {
+      transform: scale(1.1);
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-icon:active {
+      transform: scale(0.8);
+    }
+    .dropdown-container {
+      position: absolute;
+      top: 3.8rem;
+      right: 0.8rem;
+      background: #1c1c1c;
+      border-radius: 0.5rem;
+      width: 10rem;
+      z-index: 1;
+      background-color: red;
+      border: 1px solid grey;
+
+      .dropdown-not-logged {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        h1 {
+          font-size: 1.2rem;
+        }
+        .auth-button {
+        }
+      }
+    }
+    .dropdown-container:before {
+      content: "";
+      position: absolute;
+      top: -0.4rem;
+      right: 0.92rem;
+      width: 10px;
+      height: 10px;
+      transform: rotate(45deg);
+      background-color: red;
+      border-left: 1px solid grey;
+      border-top: 1px solid grey;
+    }
+  }
+}
