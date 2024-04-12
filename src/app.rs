@@ -1,13 +1,13 @@
+use crate::error_template::{AppError, ErrorTemplate};
+use crate::pages::login::*;
+use crate::pages::signup::*;
 use crate::playbar::PlayBar;
 use crate::playstatus::PlayStatus;
 use crate::queue::Queue;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
-use crate::pages::login::*;
-use crate::pages::signup::*;
-use crate::error_template::{AppError, ErrorTemplate};
-
+use leptos::leptos_dom::*;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -42,29 +42,48 @@ pub fn App() -> impl IntoView {
     }
 }
 
-use crate::components::sidebar::*;
 use crate::components::dashboard::*;
-use crate::components::search::*;
 use crate::components::personal::*;
+use crate::components::search::*;
+use crate::components::sidebar::*;
 
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
+    use crate::auth::check_auth;
+
     let play_status = PlayStatus::default();
     let play_status = create_rw_signal(play_status);
-    
+
+    let (logged_in, set_logged_in) = create_signal(false);
+
     let (dashboard_open, set_dashboard_open) = create_signal(true);
+
+    create_effect(move |_| {
+        spawn_local(async move {
+            let auth_result = check_auth().await;
+            if let Err(err) = auth_result {
+                log!("Error checking auth: {:?}", err);
+            } else if let Ok(true) = auth_result {
+                log!("User is logged in");
+                set_logged_in.update(|value| *value = true);
+            } else if let Ok(false) = auth_result {
+                log!("User is not logged in");
+                set_logged_in.update(|value| *value = false);
+            }
+        });
+    });
 
     view! {
         <div class="home-container">
             <Sidebar setter=set_dashboard_open active=dashboard_open />
-            <Show 
+            <Show
                 when=move || {dashboard_open() == true}
                 fallback=move || view! { <Search /> }
             >
                 <Dashboard />
             </Show>
-            <Personal />
+            <Personal logged_in=logged_in/>
             <PlayBar status=play_status/>
             <Queue status=play_status/>
         </div>

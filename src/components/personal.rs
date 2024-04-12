@@ -2,17 +2,20 @@ use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
 
+use crate::auth::check_auth;
+
 #[component]
-pub fn Personal() -> impl IntoView {
+pub fn Personal(logged_in: ReadSignal<bool>) -> impl IntoView {
     view! {
         <div class=" personal-container">
-            <Profile />
+            <Profile logged_in=logged_in/>
         </div>
     }
 }
 
 #[component]
-pub fn Profile() -> impl IntoView {
+pub fn Profile(logged_in: ReadSignal<bool>) -> impl IntoView {
+
     let (dropdown_open, set_dropdown_open) = create_signal(false);
 
     let open_dropdown = move |_| {
@@ -25,7 +28,13 @@ pub fn Profile() -> impl IntoView {
                 <Icon icon=icondata::CgProfile />
             </div>
             <div class="dropdown-container" style={move || if dropdown_open() {"display: flex"} else {"display: none"}}>
-                <DropDownNotLoggedIn />
+            <Show 
+                when=move || {logged_in() == true}
+                fallback=move || view!{<DropDownNotLoggedIn />}
+            >
+                <h1>Hello</h1>
+            </Show>
+                
             </div>
         </div>
     }
