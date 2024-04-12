@@ -1,5 +1,4 @@
 use leptos::*;
-use leptos::leptos_dom::*;
 
 #[component]
 pub fn Search() -> impl IntoView {
