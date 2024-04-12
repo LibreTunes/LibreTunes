@@ -1510,6 +1510,7 @@ dependencies = [
  "leptos_icons",
  "leptos_meta",
  "leptos_router",
+ "log",
  "openssl",
  "pbkdf2",
  "serde",
