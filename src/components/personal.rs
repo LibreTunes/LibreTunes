@@ -1,7 +1,6 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use leptos_icons::CgIcon::*;
 
 #[component]
 pub fn Personal() -> impl IntoView {
@@ -23,7 +22,7 @@ pub fn Profile() -> impl IntoView {
     view! {
         <div class="profile-container">
             <div class="profile-icon" on:click=open_dropdown>
-                <Icon icon=Icon::from(CgProfile) />
+                <Icon icon=icondata::CgProfile />
             </div>
             <div class="dropdown-container" style={move || if dropdown_open() {"display: flex"} else {"display: none"}}>
                 <DropDownNotLoggedIn />

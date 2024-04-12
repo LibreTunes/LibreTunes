@@ -1,8 +1,5 @@
 use leptos::leptos_dom::*;
 use leptos::*;
-use leptos_icons::BiIcon::*;
-use leptos_icons::IoIcon::*;
-use leptos_icons::OcIcon::*;
 use leptos_icons::*;
 
 #[component]
@@ -21,11 +18,11 @@ pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl Into
             <div class="sidebar-top-container">
                 <h2 class="header">LibreTunes</h2>
                 <div class="buttons" on:click=open_dashboard style={move || if active() {"color: #e1e3e1"} else {""}} >
-                    <Icon icon=Icon::from(OcHomeFillLg) />
+                    <Icon icon=icondata::OcHomeFillLg />
                     <h1>Dashboard</h1>
                 </div>
                 <div class="buttons" on:click=open_search style={move || if !active() {"color: #e1e3e1"} else {""}}>
-                    <Icon icon=Icon::from(BiSearchRegular) />
+                    <Icon icon=icondata::BiSearchRegular />
                     <h1>Search</h1>
                 </div>
             </div>
@@ -43,7 +40,7 @@ pub fn Bottom() -> impl IntoView {
                 <h1 class="header">Playlists</h1>
                 <button class="add-playlist">
                     <div class="add-sign">
-                        <Icon icon=Icon::from(IoAddSharp) />
+                        <Icon icon=icondata::IoAddSharp />
                     </div>
                     New Playlist
                 </button>
