@@ -1,9 +1,8 @@
 use crate::auth::login;
 use leptos::leptos_dom::*;
 use leptos::*;
-use leptos_icons::AiIcon::*;
-use leptos_icons::IoIcon::*;
 use leptos_icons::*;
+use crate::users::UserCredentials;
 
 #[component]
 pub fn Login() -> impl IntoView {
@@ -24,7 +23,12 @@ pub fn Login() -> impl IntoView {
         let password1 = password.get();
 
         spawn_local(async move {
-            let login_result = login(username_or_email1, password1).await;
+            let user_credentials = UserCredentials {
+                username_or_email: username_or_email1,
+                password: password1
+            };
+            
+            let login_result = login(user_credentials).await;
             if let Err(err) = login_result {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error logging in: {:?}", err);
@@ -42,7 +46,7 @@ pub fn Login() -> impl IntoView {
     view! {
         <div class="auth-page-container">
             <div class="login-container">
-                <a class="return" href="/"><Icon icon=Icon::from(IoReturnUpBackSharp) /></a>
+                <a class="return" href="/"><Icon icon=icondata::IoReturnUpBackSharp /></a>
                 <div class="header">
                     <h1>LibreTunes</h1>
                 </div>
@@ -70,11 +74,11 @@ pub fn Login() -> impl IntoView {
                         <Show
                             when=move || {show_password() == false}
                             fallback=move || view!{ <button on:click=toggle_password class="login-password-visibility">
-                                                  <Icon icon=Icon::from(AiEyeInvisibleFilled) />
+                                                  <Icon icon=icondata::AiEyeInvisibleFilled />
                                                </button> /> }
                         >
                             <button on:click=toggle_password class="login-password-visibility">
-                                <Icon icon=Icon::from(AiEyeFilled) />
+                                <Icon icon=icondata::AiEyeFilled />
                             </button>
 
                         </Show>

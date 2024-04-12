@@ -3,8 +3,6 @@ use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
 use leptos::*;
-use leptos_icons::BsIcon::*;
-use leptos_icons::RiIcon::*;
 use leptos_icons::*;
 
 /// Width and height of the forward/backward skip buttons
@@ -193,9 +191,9 @@ fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
     let icon = Signal::derive(move || {
         status.with(|status| {
             if status.playing {
-                Icon::from(BsPauseFill)
+                icondata::BsPauseFill
             } else {
-                Icon::from(BsPlayFill)
+                icondata::BsPlayFill
             }
         })
     });
@@ -204,7 +202,7 @@ fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
         <div class="playcontrols" align="center">
 
         <button on:click=skip_back on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=Icon::from(BsSkipStartFill) />
+        <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=icondata::BsSkipStartFill />
         </button>
 
         <button on:click=toggle_play on:mousedown=prevent_focus>
@@ -212,7 +210,7 @@ fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
         </button>
 
         <button on:click=skip_forward on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=Icon::from(BsSkipEndFill) />
+        <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=icondata::BsSkipEndFill />
         </button>
 
         </div>
@@ -337,7 +335,7 @@ fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
     view! {
         <div class="queue-toggle">
         <button on:click=update_queue on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon=Icon::from(RiPlayListMediaFill) />
+        <Icon class="controlbtn" width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon=icondata::RiPlayListMediaFill />
         </button>
         </div>
     }

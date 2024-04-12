@@ -8,27 +8,16 @@ build = "src/build.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-actix-files = { version = "0.6", optional = true }
-actix-web = { version = "4", optional = true, features = ["macros"] }
 console_error_panic_hook = "0.1"
 cfg-if = "1"
-http = { version = "0.2", optional = true }
-leptos = { version = "0.5", features = ["nightly"] }
-leptos_meta = { version = "0.5", features = ["nightly"] }
-leptos_actix = { version = "0.5", optional = true }
-leptos_router = { version = "0.5", features = ["nightly"] }
-wasm-bindgen = "=0.2.89"
-leptos_icons = { version = "0.1.0", default_features = false, features = [
-  "BsPlayFill",
-  "BsPauseFill",
-  "BsSkipStartFill",
-  "BsSkipEndFill",
-  "RiPlayListMediaFill",
-  "CgTrash",
-  "IoReturnUpBackSharp",
-  "AiEyeFilled",
-  "AiEyeInvisibleFilled"
-] }
+http = "1.0"
+leptos = { version = "0.6", features = ["nightly"] }
+leptos_meta = { version = "0.6", features = ["nightly"] }
+leptos_axum = { version = "0.6", optional = true }
+leptos_router = { version = "0.6", features = ["nightly"] }
+wasm-bindgen = "=0.2.92"
+leptos_icons = { version = "0.3.0" }
+icondata = { version = "0.3.0" }
 dotenv = { version = "0.15.0", optional = true }
 diesel = { version = "2.1.4", features = ["postgres", "r2d2", "time"], optional = true }
 lazy_static = { version = "1.4.0", optional = true }
@@ -36,18 +25,26 @@ serde = { versions = "1.0.195", features = ["derive"] }
 openssl = { version = "0.10.63", optional = true }
 time = { version = "0.3.34", features = ["serde"] }
 diesel_migrations = { version = "2.1.0", optional = true }
-actix-identity = { version = "0.7.0", optional = true }
-actix-session = { version = "0.9.0", features = ["redis-rs-session"], optional = true }
 pbkdf2 = { version = "0.12.2", features = ["simple"], optional = true }
 futures = { version = "0.3.30", default-features = false, optional = true }
+tokio = { version = "1", optional = true, features = ["rt-multi-thread"] }
+axum = { version = "0.7.5", optional = true }
+tower = { veresion = "0.4.13", optional = true }
+tower-http = { version = "0.5", optional = true, features = ["fs"] }
+thiserror = "1.0.57"
+tower-sessions = { version = "0.11", default-features = false }
+tower-sessions-redis-store = { version = "0.11", optional = true }
+async-trait = "0.1.79"
+axum-login = { version = "0.14.0", optional = true }
+
+[patch.crates-io]
+gloo-net = { git = "https://github.com/rustwasm/gloo.git", rev = "a823fab7ecc4068e9a28bd669da5eaf3f0a56380" }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
 ssr = [
-  "dep:actix-files",
-  "dep:actix-web",
-  "dep:leptos_actix",
+  "dep:leptos_axum",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
@@ -56,10 +53,14 @@ ssr = [
   "lazy_static",
   "openssl",
   "diesel_migrations",
-  "actix-identity",
-  "actix-session",
   "pbkdf2",
   "futures",
+  "tokio",
+  "axum",
+  "tower",
+  "tower-http",
+  "tower-sessions-redis-store",
+  "axum-login",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode

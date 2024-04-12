@@ -1,5 +1,18 @@
 use leptos::*;
+
+use cfg_if::cfg_if;
+
+cfg_if! {
+	if #[cfg(feature = "ssr")] {
+		use leptos::server_fn::error::NoCustomError;
+		use leptos_axum::extract;
+		use axum_login::AuthSession;
+		use crate::auth_backend::AuthBackend;
+	}
+}
+
 use crate::models::User;
+use crate::users::UserCredentials;
 
 /// Create a new user and log them in
 /// Takes in a NewUser struct, with the password in plaintext
@@ -8,10 +21,6 @@ use crate::models::User;
 pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 	use crate::users::create_user;
 
-	use leptos_actix::extract;
-	use actix_web::{HttpMessage, HttpRequest};
-	use actix_identity::Identity;
-
 	// Ensure the user has no id
 	let new_user = User {
 		id: None,
@@ -19,53 +28,95 @@ pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 	};
 
 	create_user(&new_user).await
-		.map_err(|e| ServerFnError::ServerError(format!("Error creating user: {}", e)))?;
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error creating user: {}", e)))?;
 
-	extract(|request: HttpRequest| async move {
-		Identity::login(&request.extensions(), new_user.username.clone())
-	}).await??;
+	let mut auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
 
-	Ok(())
+	let credentials = UserCredentials {
+		username_or_email: new_user.username.clone(),
+		password: new_user.password.clone().unwrap()
+	};
+
+	match auth_session.authenticate(credentials).await {
+		Ok(Some(user)) => {
+			auth_session.login(&user).await
+				.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error logging in user: {}", e)))
+		},
+		Ok(None) => {
+			Err(ServerFnError::<NoCustomError>::ServerError("Error authenticating user: User not found".to_string()))
+		},
+		Err(e) => {
+			Err(ServerFnError::<NoCustomError>::ServerError(format!("Error authenticating user: {}", e)))
+		}
+	}
 }
 
 /// Log a user in
 /// Takes in a username or email and a password in plaintext
 /// Returns a Result with a boolean indicating if the login was successful
 #[server(endpoint = "login")]
-pub async fn login(username_or_email: String, password: String) -> Result<bool, ServerFnError> {
+pub async fn login(credentials: UserCredentials) -> Result<bool, ServerFnError> {
 	use crate::users::validate_user;
-	use actix_web::{HttpMessage, HttpRequest};
-	use actix_identity::Identity;
-	use leptos_actix::extract;
 
-	let possible_user = validate_user(username_or_email, password).await
-		.map_err(|e| ServerFnError::ServerError(format!("Error validating user: {}", e)))?;
+	let mut auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
 
-	let user = match possible_user {
-		Some(user) => user,
-		None => return Ok(false)
-	};
+	let user = validate_user(credentials).await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error validating user: {}", e)))?;
 
-	extract(|request: HttpRequest| async move {
-		Identity::login(&request.extensions(), user.username.clone())
-	}).await??;
-	
-	Ok(true)
+	if let Some(user) = user {
+		auth_session.login(&user).await
+			.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error logging in user: {}", e)))?;
+		Ok(true)
+	} else {
+		Ok(false)
+	}
 }
 
 /// Log a user out
 /// Returns a Result with the error message if the user could not be logged out
 #[server(endpoint = "logout")]
 pub async fn logout() -> Result<(), ServerFnError> {
-	use leptos_actix::extract;
-	use actix_identity::Identity;
+	let mut auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
 
-	extract(|user: Option<Identity>| async move {
-		if let Some(user) = user {
-			user.logout();
-		}
-	}).await?;
+	auth_session.logout().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
 
 	Ok(())
 }
 
+/// Check if a user is logged in
+/// Returns a Result with a boolean indicating if the user is logged in
+#[server(endpoint = "check_auth")]
+pub async fn check_auth() -> Result<bool, ServerFnError> {
+	let auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
+
+	Ok(auth_session.user.is_some())
+}
+
+/// Require that a user is logged in
+/// Returns a Result with the error message if the user is not logged in
+/// Intended to be used at the start of a protected route, to ensure the user is logged in:
+/// ```rust
+/// use leptos::*;
+/// use libretunes::auth::require_auth;
+/// #[server(endpoint = "protected_route")]
+/// pub async fn protected_route() -> Result<(), ServerFnError> {
+/// 	require_auth().await?;
+/// 	// Continue with protected route
+/// 	Ok(())
+/// }
+/// ```
+#[cfg(feature = "ssr")]
+pub async fn require_auth() -> Result<(), ServerFnError> {
+	check_auth().await.and_then(|logged_in| {
+		if logged_in {
+			Ok(())
+		} else {
+			Err(ServerFnError::<NoCustomError>::ServerError(format!("Unauthorized")))
+		}
+	})
+}

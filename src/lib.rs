@@ -10,10 +10,13 @@ pub mod models;
 pub mod pages;
 pub mod users;
 pub mod search;
+pub mod fileserv;
+pub mod error_template;
 use cfg_if::cfg_if;
 
 cfg_if! {
-	if #[cfg(feature = "ssr")] {
+  if #[cfg(feature = "ssr")] {
+    pub mod auth_backend;
     pub mod schema;
   }
 }
