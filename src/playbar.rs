@@ -236,10 +236,14 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
 	});
 
 	let song_artists_resource = create_resource(song_id, move |song_id| async move {
-		let artists_vec = get_artists(song_id).await.unwrap_or(Vec::new());
-		// convert the vec of artists to a string of artists separated by commas
-		let artists_string = artists_vec.iter().map(|artist| artist.name.clone()).collect::<Vec<String>>().join(", ");
-		artists_string
+		if let Some(song_id) = song_id {
+			let artists_vec = get_artists(Some(song_id)).await.map_or(Vec::new(), |artists| artists);
+			// convert the vec of artists to a string of artists separated by commas
+			let artists_string = artists_vec.iter().map(|artist| artist.name.clone()).collect::<Vec<String>>().join(", ");
+			artists_string
+		} else {
+			"".into()
+		}
 	});
 
 	let album_id = Signal::derive(move || {
@@ -249,9 +253,12 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
 	});
 
 	let album_resource = create_resource(album_id, move |album_id| async move {
-		// get the album name attribute or return "Unknown Album"
-		let album_name = get_album(album_id).await.map_or("".to_string(), |album| album.title);
-		album_name
+		// get the album name attribute or return ""
+		if let Some(album_id) = album_id {
+			get_album(Some(album_id)).await.map_or("".into(), |album| album.title)
+		} else {
+			"".into()
+		}
 	});
 
 	let image = Signal::derive(move || {
@@ -266,26 +273,26 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
         <img class="media-info-img" align="left" src={image}/>
         <div class="media-info-text">
             {name}
-            <br/>
-            <Suspense 
+			<br/>
+			<Suspense 
 				fallback=move || {
-					view! {"Loading Artists..."}
+					view! {}
 				}
 			>
 			{move || {
-				song_artists_resource.get().map(|artists_string| view! {
-					<p>{artists_string}</p>
+				song_artists_resource.get().map_or(view!{{}""}, |artists_string| view! {
+					{artists_string}" - "
 				})
 			}}
 			</Suspense>
 			<Suspense
 				fallback=move || {
-					view! {"Loading Album..."}
+					view! {}
 				}
 			>
 			{move || {
-				album_resource.get().map(|album_name| view! {
-					<p>{album_name}</p>
+				album_resource.get().map_or(view!{{}""}, |album_name| view! {
+					""{album_name}
 				})
 			}}
 			</Suspense>
