@@ -1,4 +1,3 @@
-use leptos::ev::play;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
@@ -61,7 +60,7 @@ pub fn CreatePlayList(opened: ReadSignal<bool>,closer: WriteSignal<bool>) -> imp
 
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
-        
+
         let new_playlist_name = playlist_name.get();
         spawn_local(async move {
             let create_result = create_playlist(new_playlist_name).await;

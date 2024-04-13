@@ -1,5 +1,4 @@
 use leptos::*;
-use crate::models::Playlist;
 
 use cfg_if::cfg_if;
 
@@ -27,6 +26,7 @@ cfg_if! {
 pub async fn create_playlist(playlist_name: String)->Result<(), ServerFnError> {
     use crate::schema::playlists::dsl::*;
     use leptos::server_fn::error::NoCustomError;
+    use crate::models::Playlist;
 
     let auth_session = extract::<AuthSession<AuthBackend>>().await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
