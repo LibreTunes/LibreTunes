@@ -73,9 +73,7 @@ pub fn Login() -> impl IntoView {
                         <i></i>
                         <Show
                             when=move || {show_password() == false}
-                            fallback=move || view!{ <button on:click=toggle_password class="login-password-visibility">
-                                                  <Icon icon=icondata::AiEyeInvisibleFilled />
-                                               </button> /> }
+                            fallback=move || view!{ <button on:click=toggle_password class="login-password-visibility"><Icon icon=icondata::AiEyeInvisibleFilled /></button> /> }
                         >
                             <button on:click=toggle_password class="login-password-visibility">
                                 <Icon icon=icondata::AiEyeFilled />

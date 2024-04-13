@@ -34,17 +34,36 @@ pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl Into
 
 #[component]
 pub fn Bottom() -> impl IntoView {
+    let (create_playlist_open, set_create_playlist_open) = create_signal(false);
+
     view! {
         <div class="sidebar-bottom-container">
             <div class="heading">
                 <h1 class="header">Playlists</h1>
-                <button class="add-playlist">
+                <button on:click=move|_| set_create_playlist_open.update(|value|*value = true) class="add-playlist">
                     <div class="add-sign">
                         <Icon icon=icondata::IoAddSharp />
                     </div>
                     New Playlist
                 </button>
             </div>
+            <CreatePlayList opened=create_playlist_open closer=set_create_playlist_open/>
+        </div>
+    }
+}
+
+#[component]
+pub fn CreatePlayList(opened: ReadSignal<bool>,closer: WriteSignal<bool>) -> impl IntoView {
+    view! {
+        <div class="create-playlist-popup-container" style={move || if opened() {"display:flex"} else {"display:none"}}>
+            <div class="close-button" on:click=move |_| closer.update(|value| *value = false)>
+                <Icon icon=icondata::IoCloseSharp />
+            </div>
+            <h1 class="header">Create Playlist</h1>    
+            <form class="create-playlist-form" action="POST">
+                <input class="name-input" type="text" placeholder="Playlist Name" />
+                <button class="create-button" type="submit">Create</button>
+            </form>
         </div>
     }
 }
