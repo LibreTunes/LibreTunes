@@ -290,3 +290,102 @@ impl Song {
 		Ok(my_artists)
 	}
 }
+/// Model for an playlist
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::playlists))]
+#[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+#[derive(Serialize, Deserialize)]
+pub struct Playlist {
+	/// A unique id for the playlist
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
+	pub id: Option<i32>,
+	/// The playlist's name
+	pub name: String,
+	/// The user who created the playlist
+	pub user_id: i32,
+}
+impl Playlist {
+
+	/// Create a new, empty playlist in the database
+	/// 
+	/// # Arguments
+	/// 
+	/// * `new_playlist` - The new playlist
+	/// * `conn` - A mutable reference to a database connection
+	/// 	
+	/// # Returns
+	/// 
+	/// * `Result<(), Box<dyn Error>>` - A result indicating success with the new playlist, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn create_playlist(new_playlist: Playlist, conn: &mut PgPooledConn) -> Result<(), Box<dyn Error>> {
+		use crate::schema::playlists::dsl::*;
+		use crate::models::Playlist;
+		
+		let new_playlist = Playlist {
+			..new_playlist
+		};
+
+		diesel::insert_into(playlists)
+			.values(&new_playlist)
+			.execute(conn)?;
+
+		Ok(())
+	}
+
+	/// Add a song to this playlist in the database
+	/// 
+	/// The 'id' field of this playlist must be present (Some) to add a song
+	/// 
+	/// # Arguments
+	/// 
+	/// * `new_song_id` - The id of the song to add to this playlist
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<(), Box<dyn Error>>` - A result indicating success with an empty value, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn add_song(self: &Self, new_song_id: i32, conn: &mut PgPooledConn) -> Result<(), Box<dyn Error>> {
+		use crate::schema::playlist_songs::dsl::*;
+
+		let my_id = self.id.ok_or("Playlist id must be present (Some) to add a song")?;
+
+		diesel::insert_into(playlist_songs)
+			.values((playlist_id.eq(my_id), song_id.eq(new_song_id)))
+			.execute(conn)?;
+
+		Ok(())
+	}
+
+	/// Get songs by this playlist from the database
+	/// 
+	/// The 'id' field of this playlist must be present (Some) to get songs
+	/// 
+	/// # Arguments
+	/// 
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Vec<Song>, Box<dyn Error>>` - A result indicating success with a vector of songs, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn get_songs(self: &Self, conn: &mut PgPooledConn) -> Result<Vec<Song>, Box<dyn Error>> {
+		use crate::schema::songs::dsl::*;
+		use crate::schema::playlist_songs::dsl::*;
+
+		let my_id = self.id.ok_or("Playlist id must be present (Some) to get songs")?;
+
+		let my_songs = songs
+			.inner_join(playlist_songs)
+			.filter(playlist_id.eq(my_id))
+			.select(songs::all_columns())
+			.load(conn)?;
+
+		Ok(my_songs)
+	}
+
+
+}
