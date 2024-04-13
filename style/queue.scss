@@ -48,7 +48,12 @@
 						color: #fff; /* Adjust text color for song */
 					}
 			
-					p {
+					.fallback-artists {
+						margin: 14px 0 0 0; /* Adjust margin for blank space to align text */
+					}
+
+					.artists {
+						font-size: 14px;
 						margin: 0; /* Remove default margin for paragraph */
 						color: #aaa; /* Adjust text color for artist */
 					}
