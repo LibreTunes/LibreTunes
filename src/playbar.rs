@@ -113,26 +113,6 @@ fn toggle_queue(status: impl SignalUpdate<Value = PlayStatus>) {
 	
 }
 
-/// Set the source of the audio player
-/// 
-/// Logs an error if the audio element is not available
-/// 
-/// 
-/// # Arguments
-/// * `status` - The `PlayStatus` to get the audio element from, as a signal
-/// * `src` - The source to set the audio player to
-/// 
-fn set_play_src(status: impl SignalUpdate<Value = PlayStatus>, src: String) {
-    status.update(|status| {
-        if let Some(audio) = status.get_audio() {
-            audio.set_src(&src);
-            log!("Player set src to: {}", src);
-        } else {
-            error!("Unable to set src: Audio element not available");
-        }
-    });
-}
-
 /// The play, pause, and skip buttons
 #[component]
 fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
@@ -153,10 +133,8 @@ fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
                 status.update(|status| last_played_song = status.history.pop_back());
 
                 if let Some(last_played_song) = last_played_song {
-                    // Push the popped song to the front of the queue, and play it
-                    let next_src = last_played_song.storage_path.clone();
+                    // Push the popped song to the front of the queue, and set status to playing
                     status.update(|status| status.queue.push_front(last_played_song));
-                    set_play_src(status, next_src);
                     set_playing(status, true);
                 } else {
                     warn!("Unable to skip back: No previous song");
@@ -382,6 +360,33 @@ fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
 /// The main play bar component, containing the progress bar, media info, play controls, and play duration
 #[component]
 pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
+
+	// Set the source of the audio player to the first song in the queue
+	let current_song_path = create_memo(
+		move |_| {
+			status.with(|status| {
+				status.queue.front().map(|song| song.storage_path.clone())
+			})
+		}
+	);
+	create_effect(move |_| {
+		current_song_path.with(|current_song_path| {
+			status.with_untracked(|status| {
+				if let Some(audio) = status.get_audio() {
+					if let Some(song_path) = current_song_path {
+						audio.set_src(&song_path);
+						log!("Player set src to: {}", song_path);
+					} else {
+						// We are treating this as a non-fatal error because the queue could be empty or finished
+						warn!("Unable to set src: No song in queue");
+					}
+				} else {
+					error!("Unable to set src: Audio element not available");
+				}
+			});
+		});
+	});
+
     // Listen for key down events -- arrow keys don't seem to trigger key press events
     let _arrow_key_handle = window_event_listener(ev::keydown, move |e: ev::KeyboardEvent| {
         if e.key() == "ArrowRight" {
