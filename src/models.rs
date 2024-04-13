@@ -294,7 +294,7 @@ impl Song {
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::playlists))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Playlist {
 	/// A unique id for the playlist
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
