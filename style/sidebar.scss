@@ -154,4 +154,33 @@
       }
     }
   }
+  .playlists {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 5px;
+    height: 100%;
+    
+    .playlist {
+      padding: 0;
+      margin: 0;
+      margin-top: 5px;
+      display: flex;
+      flex-direction: row;
+      border: 1px solid grey;
+      height: 3rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      .name {
+        font-size: 1rem;
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+        color: white;
+      }
+    }
+    .playlist:hover {
+      background-color: #adadad36;
+    }
+  }
 }

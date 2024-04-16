@@ -1,4 +1,5 @@
 use leptos::*;
+use crate::models::Playlist;
 
 use cfg_if::cfg_if;
 
@@ -26,7 +27,6 @@ cfg_if! {
 pub async fn create_playlist(playlist_name: String)->Result<(), ServerFnError> {
     use crate::schema::playlists::dsl::*;
     use leptos::server_fn::error::NoCustomError;
-    use crate::models::Playlist;
 
     let auth_session = extract::<AuthSession<AuthBackend>>().await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
@@ -47,3 +47,27 @@ pub async fn create_playlist(playlist_name: String)->Result<(), ServerFnError> {
     Ok(())
 }
 
+/// Get all playlists for the current user
+/// 
+/// # Returns
+/// 
+/// * `Result<Vec<Playlist>, ServerFnError>` - A vector of playlists if successful, or an error
+/// 
+#[server(endpoint = "playlists/get-playlists")]
+pub async fn get_playlists() -> Result<Vec<Playlist>, ServerFnError> {
+    use crate::schema::playlists::dsl::*;
+    use leptos::server_fn::error::NoCustomError;
+
+    let auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
+
+    let other_user_id = auth_session.user.unwrap().id.expect("User has no id");
+
+    let db_con = &mut get_db_conn();
+    let results = playlists
+        .filter(user_id.eq(other_user_id))
+        .load::<Playlist>(db_con)
+        .map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting playlists: {}", e)))?;
+
+    Ok(results)
+}

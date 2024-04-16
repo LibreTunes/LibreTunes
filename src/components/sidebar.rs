@@ -2,6 +2,7 @@ use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
 use crate::api::playlists::create_playlist;
+use crate::api::playlists::get_playlists;
 
 #[component]
 pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl IntoView {
@@ -36,7 +37,21 @@ pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl Into
 #[component]
 pub fn Bottom() -> impl IntoView {
     let (create_playlist_open, set_create_playlist_open) = create_signal(false);
+    let (playlists, set_playlists) = create_signal(vec![]);
 
+    create_effect(move |_| {
+        spawn_local(async move {
+            let playlists = get_playlists().await;
+            if let Err(err) = playlists {
+                // Handle the error here, e.g., log it or display to the user
+                log!("Error getting playlists: {:?}", err);
+            } else {
+                log!("Playlists: {:?}", playlists);
+                set_playlists.update(|value| *value = playlists.unwrap());
+            }
+        })
+    });
+    
     view! {
         <div class="sidebar-bottom-container">
             <div class="heading">
@@ -49,6 +64,16 @@ pub fn Bottom() -> impl IntoView {
                 </button>
             </div>
             <CreatePlayList opened=create_playlist_open closer=set_create_playlist_open/>
+            <ul class="playlists">
+                {
+                    move || playlists.get().iter().map(|playlist| view! {
+                        <div class="playlist">
+                            <h1 class="name">{playlist.name.clone()}</h1>
+                        </div>
+                    }).collect::<Vec<_>>()
+                }
+            </ul>
+            
         </div>
     }
 }
@@ -60,7 +85,6 @@ pub fn CreatePlayList(opened: ReadSignal<bool>,closer: WriteSignal<bool>) -> imp
 
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
-
         let new_playlist_name = playlist_name.get();
         spawn_local(async move {
             let create_result = create_playlist(new_playlist_name).await;
@@ -69,9 +93,9 @@ pub fn CreatePlayList(opened: ReadSignal<bool>,closer: WriteSignal<bool>) -> imp
                 log!("Error creating playlist: {:?}", err);
             } else {
                 log!("Playlist created successfully!");
+                closer.update(|value| *value = false);
             }
         })
-
     }; 
 
     view! {

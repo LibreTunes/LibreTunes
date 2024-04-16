@@ -71,6 +71,7 @@ fn HomePage() -> impl IntoView {
                 log!("User is not logged in");
                 set_logged_in.update(|value| *value = false);
             }
+            
         });
     });
 
