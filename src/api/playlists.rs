@@ -71,3 +71,31 @@ pub async fn get_playlists() -> Result<Vec<Playlist>, ServerFnError> {
 
     Ok(results)
 }
+/// Add a song to a playlist
+/// 
+/// # Arguments
+/// 
+/// * `playlist_id` - The id of the playlist
+/// * `song_id` - The id of the song
+/// 
+/// # Returns
+/// 
+/// * `Result<(), ServerFnError>` - An empty result if successful, or an error
+/// 
+#[server(endpoint = "playlists/add-song")]
+pub async fn add_song(new_playlist_id: Option<i32>, new_song_id: Option<i32>) -> Result<(), ServerFnError> {
+    use crate::schema::playlist_songs::dsl::*;
+    use leptos::server_fn::error::NoCustomError;
+
+    let other_playlist_id = new_playlist_id.ok_or(ServerFnError::<NoCustomError>::ServerError("Playlist id must be present (Some) to add song".to_string()))?;
+
+    let other_song_id = new_song_id.ok_or(ServerFnError::<NoCustomError>::ServerError("Song id must be present (Some) to add song".to_string()))?;
+
+    let db_con = &mut get_db_conn();
+    diesel::insert_into(playlist_songs)
+        .values((playlist_id.eq(other_playlist_id), song_id.eq(other_song_id)))
+        .execute(db_con)
+        .map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error adding song to playlist: {}", e)))?;
+
+    Ok(())
+}

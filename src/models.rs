@@ -320,7 +320,6 @@ impl Playlist {
 	#[cfg(feature = "ssr")]
 	pub fn create_playlist(new_playlist: Playlist, conn: &mut PgPooledConn) -> Result<(), Box<dyn Error>> {
 		use crate::schema::playlists::dsl::*;
-		use crate::models::Playlist;
 		
 		let new_playlist = Playlist {
 			..new_playlist

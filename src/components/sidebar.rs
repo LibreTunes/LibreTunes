@@ -3,6 +3,7 @@ use leptos::*;
 use leptos_icons::*;
 use crate::api::playlists::create_playlist;
 use crate::api::playlists::get_playlists;
+use crate::models::Playlist;
 
 #[component]
 pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl IntoView {
@@ -66,10 +67,8 @@ pub fn Bottom() -> impl IntoView {
             <CreatePlayList opened=create_playlist_open closer=set_create_playlist_open/>
             <ul class="playlists">
                 {
-                    move || playlists.get().iter().map(|playlist| view! {
-                        <div class="playlist">
-                            <h1 class="name">{playlist.name.clone()}</h1>
-                        </div>
+                    move || playlists.get().iter().enumerate().map(|(index,playlist)| view! {
+                       <Playlist playlist=playlist.clone() />
                     }).collect::<Vec<_>>()
                 }
             </ul>
@@ -114,6 +113,22 @@ pub fn CreatePlayList(opened: ReadSignal<bool>,closer: WriteSignal<bool>) -> imp
                 />
                 <button class="create-button" type="submit">Create</button>
             </form>
+        </div>
+    }
+}
+#[component]
+pub fn Playlist(playlist: Playlist) -> impl IntoView {
+    let (show_playlist, set_show_playlist) = create_signal(false);
+
+    view! {
+        <div class="playlist" on:click=move|_| set_show_playlist.update(|value| *value=true) >
+            <h1 class="name">{playlist.name.clone()}</h1>
+            <div class="playlist-container" style={move || if show_playlist() {"display: flex"} else {"display: none"}}>
+                <div class="close-button" on:click=move |_| set_show_playlist.update(|value| *value = false)>
+                    <Icon icon=icondata::IoCloseSharp />
+                </div>
+                <h1>{playlist.name.clone()}</h1>
+            </div>
         </div>
     }
 }

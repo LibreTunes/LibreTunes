@@ -178,6 +178,37 @@
         margin-top: 0.5rem;
         color: white;
       }
+      .playlist-container {
+        background-color: red;
+        width: 10rem;
+        height: 10rem;
+        position: fixed;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        .close-button {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          border-radius: 50%;
+          font-size: 1.6rem;
+          transition: all 0.3s;
+        }
+
+        .close-button:hover {
+          transform: scale(1.1);
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+    
+        .close-button:active {
+          transform: scale(0.8);
+        }
+      }
     }
     .playlist:hover {
       background-color: #adadad36;
