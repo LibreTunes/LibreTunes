@@ -1,0 +1,37 @@
+use leptos::*;
+use crate::models::Artist;
+
+
+use cfg_if::cfg_if;
+
+cfg_if! {
+if #[cfg(feature = "ssr")] {
+	use crate::database::get_db_conn;
+	use diesel::prelude::*;
+}
+}
+
+/// Gets a Vector of Artists associated with a Song
+/// 
+/// # Arguments
+/// `song_id_arg` - The id of the Song to get the Artists for
+/// 
+/// # Returns
+/// A Result containing a Vector of Artists if the operation was successful, or an error if the operation failed
+#[server(endpoint = "songs/get-artists")]
+pub async fn get_artists(song_id_arg: Option<i32>) -> Result<Vec<Artist>, ServerFnError> {
+	use crate::schema::artists::dsl::*;
+	use crate::schema::song_artists::dsl::*;
+    use leptos::server_fn::error::NoCustomError;
+
+	let other_song_id = song_id_arg.ok_or(ServerFnError::<NoCustomError>::ServerError("Song id must be present (Some) to get artists".to_string()))?;
+
+	let my_artists = artists
+		.inner_join(song_artists)
+		.filter(song_id.eq(other_song_id))
+		.select(artists::all_columns())
+		.load(&mut get_db_conn())?;
+
+	Ok(my_artists)
+}
+

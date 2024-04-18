@@ -99,3 +99,58 @@ pub async fn add_song(new_playlist_id: Option<i32>, new_song_id: Option<i32>) ->
 
     Ok(())
 }
+/// Get songs from a playlist
+/// 
+/// # Arguments
+/// 
+/// * `playlist_id` - The id of the playlist
+/// 
+/// # Returns
+/// 
+/// * `Result<Vec<Song>, ServerFnError>` - A vector of songs if successful, or an error
+/// 
+#[server(endpoint = "playlists/get-songs")]
+pub async fn get_songs(new_playlist_id: Option<i32>) -> Result<Vec<crate::models::Song>, ServerFnError> {
+    use crate::schema::playlist_songs::dsl::*;
+    use crate::schema::songs::dsl::*;
+    use leptos::server_fn::error::NoCustomError;
+
+    let other_playlist_id = new_playlist_id.ok_or(ServerFnError::<NoCustomError>::ServerError("Playlist id must be present (Some) to get songs".to_string()))?;
+
+    let db_con = &mut get_db_conn();
+    let results = playlist_songs
+        .inner_join(songs)
+        .filter(playlist_id.eq(other_playlist_id))
+        .select(songs::all_columns())
+        .load(db_con)
+        .map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting songs from playlist: {}", e)))?;
+
+    Ok(results)
+}
+/// Remove a song from a playlist
+/// 
+/// # Arguments
+/// 
+/// * `playlist_id` - The id of the playlist
+/// * `song_id` - The id of the song
+/// 
+/// # Returns
+///    
+/// * `Result<(), ServerFnError>` - An empty result if successful, or an error
+///
+#[server(endpoint = "playlists/remove-song")]
+pub async fn remove_song(new_playlist_id: Option<i32>, new_song_id: Option<i32>) -> Result<(), ServerFnError> {
+    use crate::schema::playlist_songs::dsl::*;
+    use leptos::server_fn::error::NoCustomError;
+
+    let other_playlist_id = new_playlist_id.ok_or(ServerFnError::<NoCustomError>::ServerError("Playlist id must be present (Some) to remove song".to_string()))?;
+
+    let other_song_id = new_song_id.ok_or(ServerFnError::<NoCustomError>::ServerError("Song id must be present (Some) to remove song".to_string()))?;
+
+    let db_con = &mut get_db_conn();
+    diesel::delete(playlist_songs.filter(playlist_id.eq(other_playlist_id).and(song_id.eq(other_song_id))))
+        .execute(db_con)
+        .map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error removing song from playlist: {}", e)))?;
+
+    Ok(())
+} 
