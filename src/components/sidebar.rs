@@ -1,12 +1,11 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use crate::api::playlists::create_playlist;
-use crate::api::playlists::get_playlists;
-use crate::models::Playlist;
+use crate::components::playlists::Playlists;
+
 
 #[component]
-pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl IntoView {
+pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>, logged_in:ReadSignal<bool>) -> impl IntoView {
     let open_dashboard = move |_| {
         setter.update(|value| *value = true);
         log!("open dashboard");
@@ -29,106 +28,15 @@ pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl Into
                     <h1>Search</h1>
                 </div>
             </div>
-            <Bottom />
-
-        </div>
-    }
-}
-
-#[component]
-pub fn Bottom() -> impl IntoView {
-    let (create_playlist_open, set_create_playlist_open) = create_signal(false);
-    let (playlists, set_playlists) = create_signal(vec![]);
-
-    create_effect(move |_| {
-        spawn_local(async move {
-            let playlists = get_playlists().await;
-            if let Err(err) = playlists {
-                // Handle the error here, e.g., log it or display to the user
-                log!("Error getting playlists: {:?}", err);
-            } else {
-                log!("Playlists: {:?}", playlists);
-                set_playlists.update(|value| *value = playlists.unwrap());
-            }
-        })
-    });
-    
-    view! {
-        <div class="sidebar-bottom-container">
-            <div class="heading">
-                <h1 class="header">Playlists</h1>
-                <button on:click=move|_| set_create_playlist_open.update(|value|*value = true) class="add-playlist">
-                    <div class="add-sign">
-                        <Icon icon=icondata::IoAddSharp />
-                    </div>
-                    New Playlist
-                </button>
-            </div>
-            <CreatePlayList opened=create_playlist_open closer=set_create_playlist_open/>
-            <ul class="playlists">
-                {
-                    move || playlists.get().iter().enumerate().map(|(index,playlist)| view! {
-                       <Playlist playlist=playlist.clone() />
-                    }).collect::<Vec<_>>()
-                }
-            </ul>
-            
-        </div>
-    }
-}
-
-#[component]
-pub fn CreatePlayList(opened: ReadSignal<bool>,closer: WriteSignal<bool>) -> impl IntoView {
-
-    let (playlist_name, set_playlist_name) = create_signal("".to_string());
-
-    let on_submit = move |ev: leptos::ev::SubmitEvent| {
-        ev.prevent_default();
-        let new_playlist_name = playlist_name.get();
-        spawn_local(async move {
-            let create_result = create_playlist(new_playlist_name).await;
-            if let Err(err) = create_result {
-                // Handle the error here, e.g., log it or display to the user
-                log!("Error creating playlist: {:?}", err);
-            } else {
-                log!("Playlist created successfully!");
-                closer.update(|value| *value = false);
-            }
-        })
-    }; 
-
-    view! {
-        <div class="create-playlist-popup-container" style={move || if opened() {"display:flex"} else {"display:none"}}>
-            <div class="close-button" on:click=move |_| closer.update(|value| *value = false)>
-                <Icon icon=icondata::IoCloseSharp />
-            </div>
-            <h1 class="header">Create Playlist</h1>    
-            <form class="create-playlist-form" action="POST" on:submit=on_submit>
-                <input class="name-input"  type="text" placeholder="Playlist Name" 
-                    on:input=move |ev| {
-                        set_playlist_name(event_target_value(&ev));
-                        log!("playlist name changed to: {}", playlist_name.get());
-                    }
-                    prop:value=playlist_name
-                />
-                <button class="create-button" type="submit">Create</button>
-            </form>
-        </div>
-    }
-}
-#[component]
-pub fn Playlist(playlist: Playlist) -> impl IntoView {
-    let (show_playlist, set_show_playlist) = create_signal(false);
-
-    view! {
-        <div class="playlist" on:click=move|_| set_show_playlist.update(|value| *value=true) >
-            <h1 class="name">{playlist.name.clone()}</h1>
-            <div class="playlist-container" style={move || if show_playlist() {"display: flex"} else {"display: none"}}>
-                <div class="close-button" on:click=move |_| set_show_playlist.update(|value| *value = false)>
-                    <Icon icon=icondata::IoCloseSharp />
-                </div>
-                <h1>{playlist.name.clone()}</h1>
+            <div class="sidebar-bottom-container">
+                <Show 
+                    when=move || {logged_in() == true}
+                    fallback=move|| view!{<h1>LOG IN PLEASE</h1>}
+                >
+                    <Playlists />
+                </Show>
             </div>
         </div>
     }
 }
+

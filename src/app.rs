@@ -77,7 +77,7 @@ fn HomePage() -> impl IntoView {
 
     view! {
         <div class="home-container">
-            <Sidebar setter=set_dashboard_open active=dashboard_open />
+            <Sidebar setter=set_dashboard_open active=dashboard_open logged_in=logged_in/>
             <Show
                 when=move || {dashboard_open() == true}
                 fallback=move || view! { <Search /> }
