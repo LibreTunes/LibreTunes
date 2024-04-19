@@ -84,7 +84,10 @@ pub fn PlayListPopUp(playlist: Playlist, set_show_playlist: WriteSignal<bool>) -
                 <h1>{playlist.name.clone()}</h1>
                 <p>{move || songs.get().len()} songs {move || convert_to_text_time(total_duration(songs))}</p>
             </div>
-            
+            <div class="options">
+                <button><Icon class="button-icons" icon=icondata::BsPlayFill />Play</button>
+                <button><Icon class="button-icons" icon=icondata::IoShuffle />Shuffle</button>
+            </div>
             <ul class="songs">
                 {
                     move || songs.get().iter().enumerate().map(|(index,song)| view! {
