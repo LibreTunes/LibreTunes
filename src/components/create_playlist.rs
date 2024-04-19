@@ -4,7 +4,7 @@ use leptos::leptos_dom::*;
 use crate::api::playlists::create_playlist;
 
 #[component]
-pub fn CreatePlayList(opened: ReadSignal<bool>,closer: WriteSignal<bool>) -> impl IntoView {
+pub fn CreatePlayList(closer: WriteSignal<bool>) -> impl IntoView {
 
     let (playlist_name, set_playlist_name) = create_signal("".to_string());
 
@@ -24,7 +24,7 @@ pub fn CreatePlayList(opened: ReadSignal<bool>,closer: WriteSignal<bool>) -> imp
     }; 
 
     view! {
-        <div class="create-playlist-popup-container" style={move || if opened() {"display:flex"} else {"display:none"}}>
+        <div class="create-playlist-popup-container">
             <div class="close-button" on:click=move |_| closer.update(|value| *value = false)>
                 <Icon icon=icondata::IoCloseSharp />
             </div>

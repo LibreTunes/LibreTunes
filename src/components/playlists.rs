@@ -34,7 +34,13 @@ pub fn Playlists() -> impl IntoView {
                     New Playlist
                 </button>
             </div>
-            <CreatePlayList opened=create_playlist_open closer=set_create_playlist_open/>
+            <Show
+                when=move || create_playlist_open()
+                fallback=move || view! {<div></div>}
+            >
+                <CreatePlayList closer=set_create_playlist_open/>
+            </Show>
+            
             <ul class="playlists">
                 {
                     move || playlists.get().iter().enumerate().map(|(index,playlist)| view! {
