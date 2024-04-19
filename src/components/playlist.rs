@@ -5,6 +5,15 @@ use crate::models::Playlist;
 use crate::models::Song;
 use crate::api::playlists::get_songs;
 use crate::api::songs::get_artists;
+use crate::api::playlists::remove_song;
+
+fn total_duration(songs: ReadSignal<Vec<Song>>) -> i32 {
+    let mut total_duration = 0;
+    for song in songs.get() {
+        total_duration += song.duration;
+    }
+    total_duration
+}
 
 fn convert_seconds(seconds: i32) -> String {
     let minutes = seconds / 60;
@@ -15,6 +24,12 @@ fn convert_seconds(seconds: i32) -> String {
         format!("{}", seconds)
     };
     format!("{}:{}", minutes, seconds_string)
+}
+
+fn convert_to_text_time(seconds: i32) -> String {
+    let hours = seconds / 3600;
+    let minutes = (seconds % 3600) / 60;
+    format!("{} hour{}, {} minute{}", hours, if hours > 1 { "s" } else { "" }, minutes, if minutes > 1 { "s" } else { "" })
 }
 
 #[component]
@@ -55,6 +70,7 @@ pub fn PlayListPopUp(playlist: Playlist, set_show_playlist: WriteSignal<bool>) -
                 log!("Songs: {:?}", playlist_songs);
                 log!("number of songs: {:?}", playlist_songs.clone().expect("REASON").len());
                 set_songs.update(|value| *value = playlist_songs.unwrap());
+
             }
         })
     });
@@ -66,13 +82,13 @@ pub fn PlayListPopUp(playlist: Playlist, set_show_playlist: WriteSignal<bool>) -
             </div>
             <div class="info">
                 <h1>{playlist.name.clone()}</h1>
-                <h1>{move || songs.get().len()}</h1>
+                <p>{move || songs.get().len()} songs {move || convert_to_text_time(total_duration(songs))}</p>
             </div>
             
             <ul class="songs">
                 {
                     move || songs.get().iter().enumerate().map(|(index,song)| view! {
-                        <PlaylistSong song=song.clone() />
+                        <PlaylistSong song=song.clone()  playlist_id=playlist.id.clone() set_songs=set_songs />
                     }).collect::<Vec<_>>()
                 }
             </ul>
@@ -80,9 +96,22 @@ pub fn PlayListPopUp(playlist: Playlist, set_show_playlist: WriteSignal<bool>) -
     }
 }
 #[component]
-pub fn PlaylistSong(song: Song) -> impl IntoView {
+pub fn PlaylistSong(song: Song, playlist_id: Option<i32>, set_songs: WriteSignal<Vec<Song>>) -> impl IntoView {
     let (artists, set_artists) = create_signal("".to_string());
     let (is_hovered, set_is_hovered) = create_signal(false);
+
+    let delete_song = move |_| {
+        spawn_local(async move {
+            let delete_result = remove_song(song.id.clone(), playlist_id).await;
+            if let Err(err) = delete_result {
+                // Handle the error here, e.g., log it or display to the user
+                log!("Error deleting song: {:?}", err);
+            } else {
+                log!("Song deleted successfully!");
+                set_songs.update(|value| *value = value.iter().filter(|s| s.id != song.id).cloned().collect());
+            }
+        })
+    };
 
 
     create_effect(move |_| {
@@ -120,7 +149,9 @@ pub fn PlaylistSong(song: Song) -> impl IntoView {
                     when=move || is_hovered()
                     fallback=move || view! {<p class="duration">{convert_seconds(song.duration)}</p>}            
                 >
+                <div class="delete-song" on:click=delete_song>
                     <Icon icon=icondata::FaTrashCanRegular />
+                </div>
                 </Show>
             </div>
         </div>
