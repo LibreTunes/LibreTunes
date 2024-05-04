@@ -11,16 +11,16 @@ pub fn Playlists() -> impl IntoView {
     let (playlists, set_playlists) = create_signal(vec![]);
 
     create_effect(move |_| {
+        
         spawn_local(async move {
-            let playlists = get_playlists().await;
-            if let Err(err) = playlists {
+            let playlists2 = get_playlists().await;
+            if let Err(err) = playlists2 {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error getting playlists: {:?}", err);
             } else {
-                log!("Playlists: {:?}", playlists);
-                set_playlists.update(|value| *value = playlists.unwrap());
+                set_playlists.update(|value| *value = playlists2.unwrap());
             }
-        })
+        });
     });
     
     view! {

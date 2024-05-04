@@ -122,6 +122,7 @@ pub async fn get_songs(new_playlist_id: Option<i32>) -> Result<Vec<crate::models
         .inner_join(songs)
         .filter(playlist_id.eq(other_playlist_id))
         .select(songs::all_columns())
+        .order_by(position)
         .load(db_con)
         .map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting songs from playlist: {}", e)))?;
 

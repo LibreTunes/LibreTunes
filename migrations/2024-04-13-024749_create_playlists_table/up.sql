@@ -8,5 +8,6 @@ CREATE TABLE playlists (
 CREATE TABLE playlist_songs (
     playlist_id INTEGER REFERENCES playlists(id) ON DELETE CASCADE NOT NULL,
     song_id INTEGER REFERENCES songs(id) ON DELETE CASCADE NOT NULL,
+    position INTEGER NOT NULL,
     PRIMARY KEY (playlist_id, song_id)
 );

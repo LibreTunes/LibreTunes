@@ -105,7 +105,7 @@ pub fn PlaylistSong(song: Song, playlist_id: Option<i32>, set_songs: WriteSignal
 
     let delete_song = move |_| {
         spawn_local(async move {
-            let delete_result = remove_song(song.id.clone(), playlist_id).await;
+            let delete_result = remove_song(playlist_id,song.id.clone()).await;
             if let Err(err) = delete_result {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error deleting song: {:?}", err);

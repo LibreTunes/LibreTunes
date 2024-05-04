@@ -26,6 +26,7 @@ diesel::table! {
     playlist_songs (playlist_id, song_id) {
         playlist_id -> Int4,
         song_id -> Int4,
+        position -> Int4,
     }
 }
 
