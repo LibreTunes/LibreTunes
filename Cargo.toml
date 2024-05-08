@@ -36,6 +36,8 @@ tower-sessions = { version = "0.11", default-features = false }
 tower-sessions-redis-store = { version = "0.11", optional = true }
 async-trait = "0.1.79"
 axum-login = { version = "0.14.0", optional = true }
+log = { version = "0.4.21", optional = true }
+flexi_logger = { version = "0.28.0", optional = true, default-features = false }
 
 [patch.crates-io]
 gloo-net = { git = "https://github.com/rustwasm/gloo.git", rev = "a823fab7ecc4068e9a28bd669da5eaf3f0a56380" }
@@ -61,6 +63,8 @@ ssr = [
   "tower-http",
   "tower-sessions-redis-store",
   "axum-login",
+  "log",
+  "flexi_logger",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
