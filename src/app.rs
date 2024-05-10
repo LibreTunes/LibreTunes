@@ -46,18 +46,20 @@ use crate::components::sidebar::*;
 use crate::components::dashboard::*;
 use crate::components::search::*;
 use crate::components::personal::*;
+use crate::components::upload::*;
 
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
     let play_status = PlayStatus::default();
     let play_status = create_rw_signal(play_status);
-    
+    let upload_open = create_rw_signal(false);
     let (dashboard_open, set_dashboard_open) = create_signal(true);
 
     view! {
         <div class="home-container">
-            <Sidebar setter=set_dashboard_open active=dashboard_open />
+            <Upload open=upload_open/>
+            <Sidebar setter=set_dashboard_open active=dashboard_open upload_open=upload_open />
             <Show 
                 when=move || {dashboard_open() == true}
                 fallback=move || view! { <Search /> }
