@@ -1,11 +1,13 @@
+use symphonia::core::codecs::CodecType;
 use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
 use std::fs::File;
 
-/// Measure the duration (in seconds) of an audio file
-pub fn measure_duration(file: File) -> Result<u64, Box<dyn std::error::Error>> {
+/// Extract the codec and duration of an audio file
+/// This is combined into one function because the file object will be consumed
+pub fn extract_metadata(file: File) -> Result<(CodecType, u64), Box<dyn std::error::Error>> {
 	let source_stream = MediaSourceStream::new(Box::new(file), Default::default());
 
 	let hint = Hint::new();
@@ -26,8 +28,10 @@ pub fn measure_duration(file: File) -> Result<u64, Box<dyn std::error::Error>> {
 		.map(|frames| track.codec_params.start_ts + frames)
 		.ok_or("Missing number of frames")?;
 
-	duration
+	let duration = duration
 		.checked_mul(time_base.numer as u64)
 		.and_then(|v| v.checked_div(time_base.denom as u64))
-		.ok_or("Overflow while computing duration".into())
+		.ok_or("Overflow while computing duration")?;
+
+	Ok((track.codec_params.codec, duration))
 }
