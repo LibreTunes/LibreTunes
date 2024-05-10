@@ -39,23 +39,25 @@
 		}
 	}
 
-	.media-info {
-		font-size: 16;
-		margin-left: 10px;
-
-		position: absolute;
-		top: 50%;
-		transform: translateY(-50%);
-		display: grid;
-		grid-template-columns: 50px 1fr;
-
-		.media-info-img {
-			width: 50px;
-		}
-
-		.media-info-text {
-			text-align: left;
+	.playbar-left-group {
+		.media-info {
+			font-size: 16;
 			margin-left: 10px;
+
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			display: grid;
+			grid-template-columns: 50px 1fr;
+
+			.media-info-img {
+				width: 50px;
+			}
+
+			.media-info-text {
+				text-align: left;
+				margin-left: 10px;
+			}
 		}
 	}
 

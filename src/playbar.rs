@@ -486,7 +486,9 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
             on:timeupdate=on_time_update on:ended=on_end type="audio/mpeg" />
         <div class="playbar">
         <ProgressBar percentage=percentage.into() status=status />
+        <div class="playbar-left-group">
         <MediaInfo status=status />
+        </div>
         <PlayControls status=status />
         <PlayDuration elapsed_secs=elapsed_secs.into() total_secs=total_secs.into() />
         <QueueToggle status=status />
