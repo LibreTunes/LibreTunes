@@ -44,7 +44,7 @@ pub struct User {
 }
 
 /// Model for an artist
-#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable, Identifiable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::artists))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
 #[derive(Serialize, Deserialize)]
@@ -165,7 +165,7 @@ impl Artist {
 }
 
 /// Model for an album
-#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable, Identifiable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::albums))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
 #[derive(Serialize, Deserialize)]
