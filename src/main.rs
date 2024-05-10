@@ -23,12 +23,22 @@ async fn main() {
     use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
     use axum_login::AuthManagerLayerBuilder;
     use libretunes::auth_backend::AuthBackend;
+    use log::*;
+
+    flexi_logger::Logger::try_with_env_or_str("debug").unwrap().format(flexi_logger::opt_format).start().unwrap();
+
+    info!("\n{}", include_str!("../ascii_art.txt"));
+    info!("Starting Leptos server...");
 
     use dotenv::dotenv;
     dotenv().ok();
 
+    debug!("Running database migrations...");
+
     // Bring the database up to date
     libretunes::database::migrate();
+
+    debug!("Connecting to Redis...");
 
     let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
     let redis_config = RedisConfig::from_url(&redis_url).expect(&format!("Unable to parse Redis URL: {}", redis_url));
@@ -55,9 +65,10 @@ async fn main() {
         .fallback(file_and_error_handler)
         .with_state(leptos_options);
 
-    println!("listening on http://{}", &addr);
-
     let listener = tokio::net::TcpListener::bind(&addr).await.expect(&format!("Could not bind to {}", &addr));
+
+    info!("Listening on http://{}", &addr);
+
     axum::serve(listener, app.into_make_service()).await.expect("Server failed");
 }
 
