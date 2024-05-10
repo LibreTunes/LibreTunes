@@ -64,23 +64,6 @@
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-
-		button {
-			.controlbtn {
-				color: $text-controls-color;
-			}
-
-			.controlbtn:hover {
-				color: $controls-hover-color;
-			}
-
-			.controlbtn:active {
-				color: $controls-click-color;
-			}
-	
-			background-color: transparent;
-			border: transparent;
-		}
 	}
 
 	.playduration {
@@ -94,22 +77,22 @@
 		bottom: 13px;
 		top: 13px;
 		right: 90px;
+	}
 
-		button {
-			.controlbtn {
-				color: $text-controls-color;
-			}
-
-			.controlbtn:hover {
-				color: $controls-hover-color;
-			}
-
-			.controlbtn:active {
-				color: $controls-click-color;
-			}
-	
-			background-color: transparent;
-			border: transparent;
+	button {
+		.controlbtn {
+			color: $text-controls-color;
 		}
+
+		.controlbtn:hover {
+			color: $controls-hover-color;
+		}
+
+		.controlbtn:active {
+			color: $controls-click-color;
+		}
+
+		background-color: transparent;
+		border: transparent;
 	}
 }
