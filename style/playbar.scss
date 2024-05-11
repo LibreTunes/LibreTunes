@@ -40,24 +40,23 @@
 	}
 
 	.playbar-left-group {
-		.media-info {
-			font-size: 16;
+		display: flex;
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		margin-left: 10px;
+
+		.media-info-img {
+			width: 50px;
+		}
+
+		.media-info-text {
+			text-align: left;
 			margin-left: 10px;
+		}
 
-			position: absolute;
-			top: 50%;
-			transform: translateY(-50%);
-			display: grid;
-			grid-template-columns: 50px 1fr;
-
-			.media-info-img {
-				width: 50px;
-			}
-
-			.media-info-text {
-				text-align: left;
-				margin-left: 10px;
-			}
+		.like-dislike {
+			margin-left: 20px;
 		}
 	}
 

@@ -267,13 +267,11 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
 	});
 
     view! {
-        <div class="media-info">
         <img class="media-info-img" align="left" src={image}/>
         <div class="media-info-text">
             {name}
             <br/>
             {artist} - {album}
-        </div>
         </div>
     }
 }
