@@ -1,0 +1,23 @@
+.dashboard-tile {
+	img {
+		width: $dashboard-tile-size;
+		height: $dashboard-tile-size;
+		border-radius: 7px;
+		margin-right: 20px;
+	}
+
+	p.dashboard-tile-title {
+		font-size: 16px;
+		font-weight: bold;
+		margin: 0;
+		padding: 0;
+	}
+
+	p.dashboard-tile-description {
+		font-size: 12px;
+		margin: 0;
+		padding: 0;
+	}
+	
+	margin-right: 10px;
+}
