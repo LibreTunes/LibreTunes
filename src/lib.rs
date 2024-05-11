@@ -13,6 +13,8 @@ pub mod users;
 pub mod search;
 pub mod fileserv;
 pub mod error_template;
+pub mod media_type;
+
 use cfg_if::cfg_if;
 
 cfg_if! {
