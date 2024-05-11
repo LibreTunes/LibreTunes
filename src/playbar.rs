@@ -278,6 +278,75 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
     }
 }
 
+/// The like and dislike buttons
+#[component]
+fn LikeDislike(status: RwSignal<PlayStatus>) -> impl IntoView {
+    let like_icon = Signal::derive(move || {
+        status.with(|status| {
+            if status.liked {
+                icondata::TbThumbUpFilled
+            } else {
+                icondata::TbThumbUp
+            }
+        })
+    });
+
+    let dislike_icon = Signal::derive(move || {
+        status.with(|status| {
+            if status.disliked {
+                icondata::TbThumbDownFilled
+            } else {
+                icondata::TbThumbDown
+            }
+        })
+    });
+
+    let toggle_like = move |_| {
+        status.update(|status| {
+            if status.queue.is_empty() {
+                return;
+            }
+
+            status.liked = !status.liked;
+
+            if status.liked {
+                status.disliked = false;
+            }
+
+            // TODO call the API to like the song
+        });
+    };
+
+    let toggle_dislike = move |_| {
+        status.update(|status| {
+            if status.queue.is_empty() {
+                return;
+            }
+
+            status.disliked = !status.disliked;
+
+            if status.disliked {
+                status.liked = false;
+            }
+
+            // TODO call the API to dislike the song
+        });
+    };
+
+    // TODO update like and dislike status using the API when a new song starts playing
+
+    view! {
+        <div class="like-dislike">
+            <button on:click=toggle_dislike>
+                <Icon class="controlbtn hmirror" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=dislike_icon />
+            </button>
+            <button on:click=toggle_like>
+                <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=like_icon />
+            </button>
+        </div>
+    }
+}
+
 /// The play progress bar, and click handler for skipping to a certain time in the song
 #[component]
 fn ProgressBar(percentage: MaybeSignal<f64>, status: RwSignal<PlayStatus>) -> impl IntoView {
@@ -488,6 +557,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         <ProgressBar percentage=percentage.into() status=status />
         <div class="playbar-left-group">
         <MediaInfo status=status />
+        <LikeDislike status=status />
         </div>
         <PlayControls status=status />
         <PlayDuration elapsed_secs=elapsed_secs.into() total_secs=total_secs.into() />
