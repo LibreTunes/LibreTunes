@@ -1,6 +1,37 @@
 .dashboard-tile-row {
+	.dashboard-tile-row-title-row {
+		display: flex;
+
+		.dashboard-tile-row-scroll-btn {
+			margin-left: auto;
+			margin-top: auto;
+			margin-bottom: auto;
+
+			button {
+				background-color: transparent;
+				border: none;
+				
+				.dashboard-tile-row-scroll {
+					color: $text-controls-color;
+					width: 2.5rem;
+					height: 2.5rem;
+				}
+				
+				.dashboard-tile-row-scroll:hover {
+					color: $controls-hover-color;
+				}
+				
+				.dashboard-tile-row-scroll:active {
+					color: $controls-click-color;
+				}
+			}
+		}
+	}
+
 	ul {
 		display: flex;
+		overflow-x: hidden;
+		scroll-behavior: smooth;
 
 		li {
 			list-style-type: none;
