@@ -15,6 +15,7 @@ pub mod fileserv;
 pub mod error_template;
 pub mod upload;
 pub mod util;
+pub mod api;
 
 use cfg_if::cfg_if;
 
