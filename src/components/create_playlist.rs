@@ -2,9 +2,11 @@ use leptos::*;
 use leptos_icons::*;
 use leptos::leptos_dom::*;
 use crate::api::playlists::create_playlist;
+use crate::api::playlists::get_playlists;
+use crate::models::Playlist;
 
 #[component]
-pub fn CreatePlayList(closer: WriteSignal<bool>) -> impl IntoView {
+pub fn CreatePlayList(closer: WriteSignal<bool>, set_playlists: WriteSignal<Vec<Playlist>>) -> impl IntoView {
 
     let (playlist_name, set_playlist_name) = create_signal("".to_string());
 
@@ -19,6 +21,13 @@ pub fn CreatePlayList(closer: WriteSignal<bool>) -> impl IntoView {
             } else {
                 log!("Playlist created successfully!");
                 closer.update(|value| *value = false);
+            }
+            let playlists = get_playlists().await;
+            if let Err(err) = playlists {
+                // Handle the error here, e.g., log it or display to the user
+                log!("Error getting playlists: {:?}", err);
+            } else {
+                set_playlists.update(|value| *value = playlists.unwrap());
             }
         })
     }; 

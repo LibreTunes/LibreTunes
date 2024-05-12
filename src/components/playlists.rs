@@ -11,7 +11,6 @@ pub fn Playlists() -> impl IntoView {
     let (playlists, set_playlists) = create_signal(vec![]);
 
     create_effect(move |_| {
-        
         spawn_local(async move {
             let playlists2 = get_playlists().await;
             if let Err(err) = playlists2 {
@@ -38,12 +37,12 @@ pub fn Playlists() -> impl IntoView {
                 when=move || create_playlist_open()
                 fallback=move || view! {<div></div>}
             >
-                <CreatePlayList closer=set_create_playlist_open/>
+                <CreatePlayList closer=set_create_playlist_open set_playlists=set_playlists/>
             </Show>
             
             <ul class="playlists">
                 {
-                    move || playlists.get().iter().enumerate().map(|(index,playlist)| view! {
+                    move || playlists.get().iter().enumerate().map(|(_index,playlist)| view! {
                        <Playlist playlist=playlist.clone() />
                     }).collect::<Vec<_>>()
                 }

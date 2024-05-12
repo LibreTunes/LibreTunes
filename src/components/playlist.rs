@@ -90,7 +90,7 @@ pub fn PlayListPopUp(playlist: Playlist, set_show_playlist: WriteSignal<bool>) -
             </div>
             <ul class="songs">
                 {
-                    move || songs.get().iter().enumerate().map(|(index,song)| view! {
+                    move || songs.get().iter().enumerate().map(|(_index,song)| view! {
                         <PlaylistSong song=song.clone()  playlist_id=playlist.id.clone() set_songs=set_songs />
                     }).collect::<Vec<_>>()
                 }
