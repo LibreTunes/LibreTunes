@@ -17,10 +17,8 @@ pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>, upload_open:
     view! {
         <div class="sidebar-container">
             <div class="sidebar-top-container">
-                <div class="sidebar-top-header-container">
-                    <h2 class="header">LibreTunes</h2>
-                    <UploadBtn dialog_open=upload_open />
-                </div>
+                <h2 class="header">LibreTunes</h2>
+                <UploadBtn dialog_open=upload_open />
                 <div class="buttons" on:click=open_dashboard style={move || if active() {"color: #e1e3e1"} else {""}} >
                     <Icon icon=icondata::OcHomeFillLg />
                     <h1>Dashboard</h1>

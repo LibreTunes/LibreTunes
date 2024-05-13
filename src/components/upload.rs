@@ -33,53 +33,45 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 
 	view! {
 		<Show when=open fallback=move || view! {}>
-			<div class="dialog-container" on:click=close_dialog>
-				<dialog open=open on:click=click_cancel_bubble>
-					<div class="dialog-header">
-						<button class="close-button" on:click=close_dialog><Icon icon=icondata::IoClose /></button>
-						<h1>Upload Song</h1>
+			<div class="upload-container" open=open>
+				<div class="close-button" on:click=close_dialog><Icon icon=icondata::IoClose /></div>
+				<div class="upload-header">
+					<h1>Upload Song</h1>
+				</div>
+				<Form action="/api/upload" method="POST" enctype=String::from("multipart/form-data") class="upload-form">
+
+					<div class="input-bx">
+						<input type="text" name="title" required class="text-input" required/>
+						<span>Title</span>
+					</div>
+					<div class="input-bx">
+						<input type="text" name="artist_ids" class="text-input" required/>
+						<span>Artists</span>
+					</div>
+					<div class="input-bx">
+						<input type="text" name="album_id" class="text-input" required/>
+						<span>Album ID</span>
+					</div>
+					<div class="input-bx">
+						<input type="number" name="track_number" class="text-input" required/>
+						<span>Track Number</span>
 					</div>
 
-					<Form action="/api/upload" method="POST" enctype=String::from("multipart/form-data")>
-						<div class="input-box">
-							<input class="info" type="text" name="title" required/>
-							<span>Title</span>
-							<i></i>
+					<div class="release-date">
+						<div class="left">
+							<span>Release</span>
+							<span>Date</span>
 						</div>
+						<input class="info" type="date" name="release_date"/>
+					</div>
 
-						<div class="input-box">
-							<input class="info" type="text" name="artist"/>
-							<span>Artist</span>
-							<i></i>
-						</div>
+					<div class="file">
+						<span>File</span>
+						<input class="info" type="file" name="file"/>
+					</div>
 
-						<div class="input-box">
-							<input class="info" type="text" name="album_id"/>
-							<span>Album</span>
-							<i></i>
-						</div>
-
-						<div class="input-box">
-							<input class="info" type="number" name="track_number"/>
-							<span>Track Number</span>
-							<i></i>
-						</div>
-
-						<div>
-							<input class="info" type="date" name="release_date"/>
-							<span>Release Date</span>
-							<i></i>
-						</div>
-
-						<div>
-							<input class="info" type="file" name="file"/>
-							<span>File</span>
-							<i></i>
-						</div>
-
-						<button type="submit">Upload</button>
-					</Form>
-				</dialog>
+					<button type="submit" class="upload-button">Upload</button>
+				</Form>
 			</div>
 		</Show>
 	}
