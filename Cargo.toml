@@ -19,7 +19,7 @@ wasm-bindgen = { version = "=0.2.92", default-features = false, optional = true 
 leptos_icons = { version = "0.3.0" }
 icondata = { version = "0.3.0" }
 dotenv = { version = "0.15.0", optional = true }
-diesel = { version = "2.1.4", features = ["postgres", "r2d2", "time"], optional = true }
+diesel = { version = "2.1.4", features = ["postgres", "r2d2", "time"], default-features = false, optional = true }
 lazy_static = { version = "1.4.0", optional = true }
 serde = { version = "1.0.195", features = ["derive"] }
 openssl = { version = "0.10.63", optional = true }
