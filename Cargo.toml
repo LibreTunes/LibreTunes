@@ -43,7 +43,6 @@ flexi_logger = { version = "0.28.0", optional = true, default-features = false }
 gloo-net = { git = "https://github.com/rustwasm/gloo.git", rev = "a823fab7ecc4068e9a28bd669da5eaf3f0a56380" }
 
 [features]
-csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
 ssr = [
   "dep:leptos_axum",
