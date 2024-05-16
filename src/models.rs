@@ -168,7 +168,7 @@ impl Artist {
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable, Identifiable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::albums))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Album {
 	/// A unique id for the album
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
