@@ -141,5 +141,31 @@
                 color: #7f8fa6;
             }
         }
+        .artists {
+            position: relative;
+            width: 325px;
+            .input-bx {
+                
+            }
+            .artist_results {
+                display: flex;
+                flex-direction: column;
+                border: 1px solid white;
+                width: 100%;
+                position: absolute;
+                top: 75%;
+                background-color: #1c1c1c;
+                z-index: 2;
+                border-radius: 5px;
+                padding: 0;
+                .artist {
+                    border-bottom: 1px solid white; 
+                    padding: 10px;
+                }
+                .artist:last-child {
+                    border-bottom: none;
+                }
+            }
+        }
     }
 }
