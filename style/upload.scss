@@ -161,6 +161,11 @@
                 .artist {
                     border-bottom: 1px solid white; 
                     padding: 10px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                    &:hover {
+                        background-color: #7f8fa6;
+                    }
                 }
                 .artist:last-child {
                     border-bottom: none;
