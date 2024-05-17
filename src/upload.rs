@@ -149,8 +149,6 @@ pub async fn upload(data: MultipartData) -> Result<(), ServerFnError> {
 	while let Ok(Some(mut field)) = data.next_field().await {
 		let name = field.name().unwrap_or_default().to_string();
 
-		println!("Field name: {}", name);
-
 		match name.as_str() {
 			"title" => { title = Some(extract_field(field).await?); },
 			"artist_ids" => { artist_ids = Some(validate_artist_ids(field).await?); },
