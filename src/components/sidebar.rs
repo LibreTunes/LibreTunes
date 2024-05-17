@@ -3,28 +3,30 @@ use leptos::*;
 use leptos_icons::*;
 
 #[component]
-pub fn Sidebar(setter: WriteSignal<bool>, active: ReadSignal<bool>) -> impl IntoView {
-    let open_dashboard = move |_| {
-        setter.update(|value| *value = true);
-        log!("open dashboard");
-    };
-    let open_search = move |_| {
-        setter.update(|value| *value = false);
-        log!("open search");
-    };
+pub fn Sidebar() -> impl IntoView {
+    use leptos_router::use_location;
+    let location = use_location();
+
+    let on_dashboard = Signal::derive(
+        move || location.pathname.get().starts_with("/dashboard") || location.pathname.get() == "/",
+    );
+
+    let on_search = Signal::derive(
+        move || location.pathname.get().starts_with("/search"),
+    );
 
     view! {
         <div class="sidebar-container">
             <div class="sidebar-top-container">
                 <h2 class="header">LibreTunes</h2>
-                <div class="buttons" on:click=open_dashboard style={move || if active() {"color: #e1e3e1"} else {""}} >
+                <a class="buttons" href="/dashboard" style={move || if on_dashboard() {"color: #e1e3e1"} else {""}} >
                     <Icon icon=icondata::OcHomeFillLg />
                     <h1>Dashboard</h1>
-                </div>
-                <div class="buttons" on:click=open_search style={move || if !active() {"color: #e1e3e1"} else {""}}>
+                </a>
+                <a class="buttons" href="/search" style={move || if on_search() {"color: #e1e3e1"} else {""}}>
                     <Icon icon=icondata::BiSearchRegular />
                     <h1>Search</h1>
-                </div>
+                </a>
             </div>
             <Bottom />
 
