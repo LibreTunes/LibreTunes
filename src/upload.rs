@@ -35,7 +35,7 @@ async fn validate_artist_ids(artist_ids: Field<'static>) -> Result<Vec<i32>, Ser
 	// Extract the artist id from the field
 	match artist_ids.text().await {
 		Ok(artist_ids) => {
-			let artist_ids = artist_ids.split(',');
+			let artist_ids = artist_ids.trim_end_matches(',').split(',');
 
 			artist_ids.map(|artist_id| {
 				// Parse the artist id as an integer
