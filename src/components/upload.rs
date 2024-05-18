@@ -89,6 +89,10 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 	let handle_response = Rc::new(move |response: &Response| {
 		if response.ok() {
 			set_error_msg.update(|value| *value = None);
+			set_filtered_artists.update(|value| *value = vec![]);
+			set_filtered_albums.update(|value| *value = vec![]);
+			set_artists.update(|value| *value = "".to_string());
+			set_albums.update(|value| *value = "".to_string());
 			open.set(false);
 		} else {
 			// TODO: Extract error message from response
