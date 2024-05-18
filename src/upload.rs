@@ -239,6 +239,11 @@ pub async fn upload(data: MultipartData) -> Result<(), ServerFnError> {
 	let track = track.unwrap_or(None);
 	let release_date = release_date.unwrap_or(None);
 
+	if album_id.is_some() != track.is_some() {
+		return Err(ServerFnError::<NoCustomError>
+			::ServerError("Album id and track number must both be present or both be absent".to_string()));
+	}
+
 	// Create the song
 	use crate::models::Song;
 	let song = Song {
