@@ -34,7 +34,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 	let (albums, set_albums) = create_signal("".to_string());
 	let (filtered_albums, set_filtered_albums) = create_signal(vec![]);
 
-	let (error_msg, set_error_msg) = create_signal::<Option<String>>(Some("Error uploading song".to_string()));
+	let (error_msg, set_error_msg) = create_signal::<Option<String>>(None);
 
 	let close_dialog = move |ev: leptos::ev::MouseEvent| {
 		ev.prevent_default();
