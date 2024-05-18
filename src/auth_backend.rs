@@ -1,9 +1,16 @@
-use async_trait::async_trait;
 use axum_login::{AuthnBackend, AuthUser, UserId};
 use crate::users::UserCredentials;
 use leptos::server_fn::error::ServerFnErrorErr;
 
 use crate::models::User;
+
+use cfg_if::cfg_if;
+
+cfg_if! {
+	if #[cfg(feature = "ssr")] {
+		use async_trait::async_trait;
+	}
+}
 
 impl AuthUser for User {
 	type Id = i32;
