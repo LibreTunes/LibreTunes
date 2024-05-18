@@ -143,7 +143,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					</div>
 					<div class="file">
 						<span>File</span>
-						<input class="info" type="file" name="file" required/>
+						<input class="info" type="file" accept=".mp3" name="file" required/>
 					</div>
 					<button type="submit" class="upload-button">Upload</button>
 				</Form>
