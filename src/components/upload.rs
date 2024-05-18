@@ -95,7 +95,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					</div>
 					<div class="artists has-search">
 						<div class="input-bx">
-							<input type="text" name="artist_ids" class="text-input" prop:value=artists required on:input=handle_filter_artists/>
+							<input type="text" name="artist_ids" class="text-input" prop:value=artists on:input=handle_filter_artists/>
 							<span>Artists</span>
 						</div>
 						<Show
@@ -113,7 +113,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					</div>
 					<div class="albums has-search">
 						<div class="input-bx">
-							<input type="text" name="album_id" class="text-input" required prop:value=albums on:input=handle_filter_albums/>
+							<input type="text" name="album_id" class="text-input" prop:value=albums on:input=handle_filter_albums/>
 							<span>Album ID</span>
 						</div>
 						<Show
@@ -131,7 +131,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					</div>
 					
 					<div class="input-bx">
-						<input type="number" name="track_number" class="text-input" required/>
+						<input type="number" name="track_number" class="text-input"/>
 						<span>Track Number</span>
 					</div>
 					<div class="release-date">
@@ -143,7 +143,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					</div>
 					<div class="file">
 						<span>File</span>
-						<input class="info" type="file" name="file"/>
+						<input class="info" type="file" name="file" required/>
 					</div>
 					<button type="submit" class="upload-button">Upload</button>
 				</Form>
