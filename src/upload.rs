@@ -37,7 +37,7 @@ async fn validate_artist_ids(artist_ids: Field<'static>) -> Result<Vec<i32>, Ser
 		Ok(artist_ids) => {
 			let artist_ids = artist_ids.trim_end_matches(',').split(',');
 
-			artist_ids.map(|artist_id| {
+			artist_ids.filter(|artist_id| !artist_id.is_empty()).map(|artist_id| {
 				// Parse the artist id as an integer
 				if let Ok(artist_id) = artist_id.parse::<i32>() {
 					// Check if the artist exists
@@ -64,13 +64,17 @@ async fn validate_artist_ids(artist_ids: Field<'static>) -> Result<Vec<i32>, Ser
 /// Validate the album id in a multipart field
 /// Expects a field with an album id, and ensures it is a valid album id in the database
 #[cfg(feature = "ssr")]
-async fn validate_album_id(album_id: Field<'static>) -> Result<i32, ServerFnError> {
+async fn validate_album_id(album_id: Field<'static>) -> Result<Option<i32>, ServerFnError> {
 	use crate::models::Album;
 	use diesel::result::Error::NotFound;
 
 	// Extract the album id from the field
 	match album_id.text().await {
 		Ok(album_id) => {
+			if album_id.is_empty() {
+				return Ok(None);
+			}
+
 			// Parse the album id as an integer
 			if let Ok(album_id) = album_id.parse::<i32>() {
 				// Check if the album exists
@@ -78,7 +82,7 @@ async fn validate_album_id(album_id: Field<'static>) -> Result<i32, ServerFnErro
 				let album = crate::schema::albums::dsl::albums.find(album_id).first::<Album>(db_con);
 
 				match album {
-					Ok(_) => Ok(album_id),
+					Ok(_) => Ok(Some(album_id)),
 					Err(NotFound) => Err(ServerFnError::<NoCustomError>::
 						ServerError("Album does not exist".to_string())),
 					Err(e) => Err(ServerFnError::<NoCustomError>::
@@ -95,15 +99,19 @@ async fn validate_album_id(album_id: Field<'static>) -> Result<i32, ServerFnErro
 /// Validate the track number in a multipart field
 /// Expects a field with a track number, and ensures it is a valid track number (non-negative integer)
 #[cfg(feature = "ssr")]
-async fn validate_track_number(track_number: Field<'static>) -> Result<i32, ServerFnError> {
+async fn validate_track_number(track_number: Field<'static>) -> Result<Option<i32>, ServerFnError> {
 	match track_number.text().await {
 		Ok(track_number) => {
+			if track_number.is_empty() {
+				return Ok(None);
+			}
+
 			if let Ok(track_number) = track_number.parse::<i32>() {
 				if track_number < 0 {
 					return Err(ServerFnError::<NoCustomError>::
 						ServerError("Track number must be positive or 0".to_string()));
 				} else {
-					Ok(track_number)
+					Ok(Some(track_number))
 				}
 			} else {
 				return Err(ServerFnError::<NoCustomError>::ServerError("Error parsing track number".to_string()));
@@ -116,14 +124,18 @@ async fn validate_track_number(track_number: Field<'static>) -> Result<i32, Serv
 /// Validate the release date in a multipart field
 /// Expects a field with a release date, and ensures it is a valid date in the format [year]-[month]-[day]
 #[cfg(feature = "ssr")]
-async fn validate_release_date(release_date: Field<'static>) -> Result<Date, ServerFnError> {
+async fn validate_release_date(release_date: Field<'static>) -> Result<Option<Date>, ServerFnError> {
 	match release_date.text().await {
 		Ok(release_date) => {
+			if release_date.trim().is_empty() {
+				return Ok(None);
+			}
+
 			let date_format = time::macros::format_description!("[year]-[month]-[day]");
 			let release_date = Date::parse(&release_date.trim(), date_format);
 
 			match release_date {
-				Ok(release_date) => Ok(release_date),
+				Ok(release_date) => Ok(Some(release_date)),
 				Err(_) => Err(ServerFnError::<NoCustomError>::ServerError("Invalid release date".to_string())),
 			}
 		},
@@ -222,6 +234,10 @@ pub async fn upload(data: MultipartData) -> Result<(), ServerFnError> {
 	let duration = duration.ok_or(ServerFnError::<NoCustomError>::ServerError("Missing duration".to_string()))?;
 	let duration = i32::try_from(duration).map_err(|e| ServerFnError::<NoCustomError>::
 		ServerError(format!("Error converting duration to i32: {}", e)))?;
+
+	let album_id = album_id.unwrap_or(None);
+	let track = track.unwrap_or(None);
+	let release_date = release_date.unwrap_or(None);
 
 	// Create the song
 	use crate::models::Song;
