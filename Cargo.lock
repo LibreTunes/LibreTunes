@@ -1612,6 +1612,7 @@ dependencies = [
  "tower-sessions",
  "tower-sessions-redis-store",
  "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
