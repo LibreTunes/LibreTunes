@@ -1588,7 +1588,6 @@ dependencies = [
  "tokio",
  "tower",
  "tower-http",
- "tower-sessions",
  "tower-sessions-redis-store",
  "wasm-bindgen",
 ]
