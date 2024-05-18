@@ -1,7 +1,9 @@
+use std::rc::Rc;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
 use leptos_router::Form;
+use web_sys::Response;
 use crate::search::search_artists;
 use crate::search::search_albums;
 use crate::models::Artist;
@@ -31,6 +33,8 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 
 	let (albums, set_albums) = create_signal("".to_string());
 	let (filtered_albums, set_filtered_albums) = create_signal(vec![]);
+
+	let (error_msg, set_error_msg) = create_signal::<Option<String>>(Some("Error uploading song".to_string()));
 
 	let close_dialog = move |ev: leptos::ev::MouseEvent| {
 		ev.prevent_default();
@@ -81,6 +85,17 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 			}
 		})
 	};
+
+	let handle_response = Rc::new(move |response: &Response| {
+		if response.ok() {
+			set_error_msg.update(|value| *value = None);
+			open.set(false);
+		} else {
+			// TODO: Extract error message from response
+			set_error_msg.update(|value| *value = Some("Error uploading song".to_string()));
+		}
+	});
+
 	view! {
 		<Show when=open fallback=move || view! {}>
 			<div class="upload-container" open=open>
@@ -88,7 +103,8 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 				<div class="upload-header">
 					<h1>Upload Song</h1>
 				</div>
-				<Form action="/api/upload" method="POST" enctype=String::from("multipart/form-data") class="upload-form">
+				<Form action="/api/upload" method="POST" enctype=String::from("multipart/form-data")
+					class="upload-form" on_response=handle_response.clone()>
 					<div class="input-bx">
 						<input type="text" name="title" required class="text-input" required/>
 						<span>Title</span>
@@ -147,6 +163,15 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					</div>
 					<button type="submit" class="upload-button">Upload</button>
 				</Form>
+				<Show
+					when=move || {error_msg.get().is_some()}
+					fallback=move || view! {}
+				>
+					<div class="error-msg">
+						<Icon icon=icondata::IoAlertCircleSharp />
+						{error_msg.get().as_ref().unwrap()}
+					</div>
+				</Show>
 			</div>
 		</Show>
 	}
