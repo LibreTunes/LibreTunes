@@ -1,9 +1,10 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
+use crate::components::upload::*;
 
 #[component]
-pub fn Sidebar() -> impl IntoView {
+pub fn Sidebar(upload_open: RwSignal<bool>) -> impl IntoView {
     use leptos_router::use_location;
     let location = use_location();
 
@@ -19,6 +20,7 @@ pub fn Sidebar() -> impl IntoView {
         <div class="sidebar-container">
             <div class="sidebar-top-container">
                 <h2 class="header">LibreTunes</h2>
+                <UploadBtn dialog_open=upload_open />
                 <a class="buttons" href="/dashboard" style={move || if on_dashboard() {"color: #e1e3e1"} else {""}} >
                     <Icon icon=icondata::OcHomeFillLg />
                     <h1>Dashboard</h1>
