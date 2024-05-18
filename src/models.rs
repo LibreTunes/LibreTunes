@@ -177,6 +177,8 @@ pub struct Album {
 	pub title: String,
 	/// The album's release date
 	pub release_date: Option<Date>,
+	/// The path to the album's image file
+	pub image_path: Option<String>,
 }
 
 impl Album {

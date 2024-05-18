@@ -14,6 +14,10 @@ pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
+    let play_status = PlayStatus::default();
+    let play_status = create_rw_signal(play_status);
+    let upload_open = create_rw_signal(false);
+
     view! {
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
@@ -33,7 +37,11 @@ pub fn App() -> impl IntoView {
         }>
             <main>
                 <Routes>
-                    <Route path="" view=HomePage/>
+                    <Route path="" view=move || view! { <HomePage play_status=play_status upload_open=upload_open/> }>
+                        <Route path="" view=Dashboard />
+                        <Route path="dashboard" view=Dashboard />
+                        <Route path="search" view=Search />
+                    </Route>
                     <Route path="/login" view=Login />
                     <Route path="/signup" view=Signup />
                 </Routes>
@@ -50,22 +58,13 @@ use crate::components::upload::*;
 
 /// Renders the home page of your application.
 #[component]
-fn HomePage() -> impl IntoView {
-    let play_status = PlayStatus::default();
-    let play_status = create_rw_signal(play_status);
-    let upload_open = create_rw_signal(false);
-    let (dashboard_open, set_dashboard_open) = create_signal(true);
-
+fn HomePage(play_status: RwSignal<PlayStatus>, upload_open: RwSignal<bool>) -> impl IntoView {
     view! {
         <div class="home-container">
             <Upload open=upload_open/>
-            <Sidebar setter=set_dashboard_open active=dashboard_open upload_open=upload_open />
-            <Show 
-                when=move || {dashboard_open() == true}
-                fallback=move || view! { <Search /> }
-            >
-                <Dashboard />
-            </Show>
+            <Sidebar upload_open=upload_open/>
+            // This <Outlet /> will render the child route components
+            <Outlet />
             <Personal />
             <PlayBar status=play_status/>
             <Queue status=play_status/>

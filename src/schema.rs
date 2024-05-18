@@ -12,6 +12,7 @@ diesel::table! {
         id -> Int4,
         title -> Varchar,
         release_date -> Nullable<Date>,
+        image_path -> Nullable<Varchar>,
     }
 }
 
