@@ -25,6 +25,7 @@ pub fn Signup() -> impl IntoView {
             email: email.get(),
             password: Some(password.get()),
             created_at: None,
+            admin: false,
         };
         log!("new user: {:?}", new_user);
 
