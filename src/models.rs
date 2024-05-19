@@ -43,6 +43,148 @@ pub struct User {
 	pub created_at: Option<SystemTime>,
 }
 
+impl User {
+	/// Get the history of songs listened to by this user from the database
+	/// 
+	/// The returned history will be ordered by date in descending order,
+	/// and a limit of N will select the N most recent entries.
+	/// The `id` field of this user must be present (Some) to get history
+	/// 
+	/// # Arguments
+	/// 
+	/// * `limit` - An optional limit on the number of history entries to return
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Vec<HistoryEntry>, Box<dyn Error>>` -
+	/// 	A result indicating success with a vector of history entries, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn get_history(self: &Self, limit: Option<i64>, conn: &mut PgPooledConn) ->
+		Result<Vec<HistoryEntry>, Box<dyn Error>> {
+		use crate::schema::song_history::dsl::*;
+
+		let my_id = self.id.ok_or("Artist id must be present (Some) to get history")?;
+
+		let my_history = 
+		if let Some(limit) = limit {
+			song_history
+				.filter(user_id.eq(my_id))
+				.order(date.desc())
+				.limit(limit)
+				.load(conn)?
+		} else {
+			song_history
+				.filter(user_id.eq(my_id))
+				.load(conn)?
+		};
+
+		Ok(my_history)
+	}
+
+	/// Get the history of songs listened to by this user from the database
+	/// 
+	/// The returned history will be ordered by date in descending order,
+	/// and a limit of N will select the N most recent entries.
+	/// The `id` field of this user must be present (Some) to get history
+	/// 
+	/// # Arguments
+	/// 
+	/// * `limit` - An optional limit on the number of history entries to return
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Vec<(SystemTime, Song)>, Box<dyn Error>>` -
+	/// 	A result indicating success with a vector of listen dates and songs, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn get_history_songs(self: &Self, limit: Option<i64>, conn: &mut PgPooledConn) ->
+		Result<Vec<(SystemTime, Song)>, Box<dyn Error>> {
+		use crate::schema::songs::dsl::*;
+		use crate::schema::song_history::dsl::*;
+
+		let my_id = self.id.ok_or("Artist id must be present (Some) to get history")?;
+
+		let my_history =
+		if let Some(limit) = limit {
+			song_history
+				.inner_join(songs)
+				.filter(user_id.eq(my_id))
+				.order(date.desc())
+				.limit(limit)
+				.select((date, songs::all_columns()))
+				.load(conn)?
+		} else {
+			song_history
+				.inner_join(songs)
+				.filter(user_id.eq(my_id))
+				.order(date.desc())
+				.select((date, songs::all_columns()))
+				.load(conn)?
+		};
+
+		Ok(my_history)
+	}
+
+	/// Add a song to this user's history in the database
+	/// 
+	/// The date of the history entry will be the current time
+	/// The `id` field of this user must be present (Some) to add history
+	/// 
+	/// # Arguments
+	/// 
+	/// * `song_id` - The id of the song to add to this user's history
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<(), Box<dyn Error>>` - A result indicating success with an empty value, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn add_history(self: &Self, song_id: i32, conn: &mut PgPooledConn) -> Result<(), Box<dyn Error>> {
+		use crate::schema::song_history;
+
+		let my_id = self.id.ok_or("Artist id must be present (Some) to add history")?;
+
+		diesel::insert_into(song_history::table)
+			.values((song_history::user_id.eq(my_id), song_history::song_id.eq(song_id)))
+			.execute(conn)?;
+
+		Ok(())
+	}
+
+	/// Check if this user has listened to a song
+	/// 
+	/// The `id` field of this user must be present (Some) to check history
+	/// 
+	/// # Arguments
+	/// 
+	/// * `song_id` - The id of the song to check if this user has listened to
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<bool, Box<dyn Error>>` - A result indicating success with a boolean value, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn has_listened_to(self: &Self, song_id: i32, conn: &mut PgPooledConn) -> Result<bool, Box<dyn Error>> {
+		use crate::schema::song_history::{self, user_id};
+
+		let my_id = self.id.ok_or("Artist id must be present (Some) to check history")?;
+
+		let has_listened = song_history::table
+			.filter(user_id.eq(my_id))
+			.filter(song_history::song_id.eq(song_id))
+			.first::<HistoryEntry>(conn)
+			.optional()?
+			.is_some();
+
+		Ok(has_listened)
+	}
+}
+
 /// Model for an artist
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable, Identifiable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::artists))]
