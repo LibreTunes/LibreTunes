@@ -31,6 +31,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    song_history (id) {
+        id -> Int4,
+        user_id -> Int4,
+        date -> Timestamp,
+        song_id -> Int4,
+    }
+}
+
+diesel::table! {
     songs (id) {
         id -> Int4,
         title -> Varchar,
@@ -57,6 +66,8 @@ diesel::joinable!(album_artists -> albums (album_id));
 diesel::joinable!(album_artists -> artists (artist_id));
 diesel::joinable!(song_artists -> artists (artist_id));
 diesel::joinable!(song_artists -> songs (song_id));
+diesel::joinable!(song_history -> songs (song_id));
+diesel::joinable!(song_history -> users (user_id));
 diesel::joinable!(songs -> albums (album_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
@@ -64,6 +75,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     albums,
     artists,
     song_artists,
+    song_history,
     songs,
     users,
 );
