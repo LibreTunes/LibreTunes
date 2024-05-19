@@ -41,6 +41,8 @@ pub struct User {
 	/// The time the user was created
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = SystemTime))]
 	pub created_at: Option<SystemTime>,
+	/// Whether the user is an admin
+	pub admin: bool,
 }
 
 /// Model for an artist
