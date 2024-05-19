@@ -21,9 +21,10 @@ use crate::users::UserCredentials;
 pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 	use crate::users::create_user;
 
-	// Ensure the user has no id
+	// Ensure the user has no id, and is not a self-proclaimed admin
 	let new_user = User {
 		id: None,
+		admin: false,
 		..new_user
 	};
 
