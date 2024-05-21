@@ -1,6 +1,8 @@
 use leptos::*;
 use leptos_icons::*;
 use leptos::leptos_dom::*;
+use crate::components::upload::*;
+use crate::components::add_artist::*;
 
 #[component]
 pub fn UploadDropdownBtn(dropdown_open: RwSignal<bool>) -> impl IntoView {
@@ -17,10 +19,11 @@ pub fn UploadDropdownBtn(dropdown_open: RwSignal<bool>) -> impl IntoView {
 }
 
 #[component]
-pub fn UploadDropdown() -> impl IntoView {
+pub fn UploadDropdown(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add_album_open: RwSignal<bool>) -> impl IntoView {
     view! {
         <div class="upload-dropdown">
-            hello
+            <UploadBtn dialog_open=upload_open/>
+            <AddArtistBtn add_artist_open=add_artist_open/>
         </div>
     }
 }

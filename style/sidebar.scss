@@ -29,7 +29,7 @@
         padding-right: 1rem;
         padding-left: 1rem;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: all 0.3s ease;
         .add-sign {
           font-size: 1.5rem;
           margin-top: auto;
@@ -40,10 +40,22 @@
       }
       .upload-dropdown-btn-active {
         border-radius: 12.5px 12.5px 0 0;
+        width: 110px;
       }
       .upload-dropdown {
         background-color: #f0ecec;
         color: black;
+        width: 110px;
+        .add-btns {
+          border: none;
+          border-bottom: 1px solid black;
+          width: 100%;
+          padding: 0.25rem;
+          cursor: pointer;
+        }
+        .add-btns:first-child {
+          border-top: 1px solid black;
+        }
       }
     }
     
