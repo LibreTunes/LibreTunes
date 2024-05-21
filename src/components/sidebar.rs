@@ -1,12 +1,14 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use crate::components::upload::*;
+use crate::components::upload_dropdown::*;
 
 #[component]
 pub fn Sidebar(upload_open: RwSignal<bool>) -> impl IntoView {
     use leptos_router::use_location;
     let location = use_location();
+
+    let dropdown_open = create_rw_signal(false);
 
     let on_dashboard = Signal::derive(
         move || location.pathname.get().starts_with("/dashboard") || location.pathname.get() == "/",
@@ -20,7 +22,15 @@ pub fn Sidebar(upload_open: RwSignal<bool>) -> impl IntoView {
         <div class="sidebar-container">
             <div class="sidebar-top-container">
                 <h2 class="header">LibreTunes</h2>
-                <UploadBtn dialog_open=upload_open />
+                <div class="upload-dropdown-container">
+                    <UploadDropdownBtn dropdown_open=dropdown_open/>
+                    <Show
+                        when= move || dropdown_open()
+                        fallback=move || view! {}
+                    >
+                        <UploadDropdown/>
+                    </Show>
+                </div>
                 <a class="buttons" href="/dashboard" style={move || if on_dashboard() {"color: #e1e3e1"} else {""}} >
                     <Icon icon=icondata::OcHomeFillLg />
                     <h1>Dashboard</h1>
