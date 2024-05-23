@@ -21,6 +21,16 @@ pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add
     view! {
         <div class="sidebar-container">
             <div class="sidebar-top-container">
+                <Show
+                    when=move || {upload_open.get() || add_artist_open.get() || add_album_open.get()}
+                    fallback=move || view! {}
+                >
+                    <div class="upload-overlay" on:click=move |_| {
+                        upload_open.set(false);
+                        add_artist_open.set(false);
+                        add_album_open.set(false);
+                    }></div>
+                </Show>
                 <h2 class="header">LibreTunes</h2>
                 <div class="upload-dropdown-container">
                     <UploadDropdownBtn dropdown_open=dropdown_open/>
