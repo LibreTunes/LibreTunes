@@ -33,7 +33,7 @@ pub async fn add_artist(artist_name: String) -> Result<(), ServerFnError> {
     diesel::insert_into(artists)
         .values(&new_artist)
         .execute(db)
-        .map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error creating playlist: {}", e)))?;
+        .map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error adding artist: {}", e)))?;
     
     Ok(())
 }

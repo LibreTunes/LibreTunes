@@ -1,6 +1,5 @@
 use leptos::*;
 use leptos_icons::*;
-use leptos::leptos_dom::*;
 use crate::components::upload::*;
 use crate::components::add_artist::*;
 
