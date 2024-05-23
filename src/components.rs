@@ -5,3 +5,4 @@ pub mod personal;
 pub mod upload;
 pub mod upload_dropdown;
 pub mod add_artist;
+pub mod add_album;

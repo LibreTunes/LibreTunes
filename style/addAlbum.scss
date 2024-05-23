@@ -1,12 +1,12 @@
 @import "theme.scss";
 
-.upload-container {
+.add-album-container {
     position: fixed;
     top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 30rem;
-    height: 30rem;
+    height: 24rem;
     border: 1px solid white;
     border-radius: 5px;
     padding: 1rem;
@@ -15,6 +15,13 @@
     display: flex;
     flex-direction: column;
     background-color: #1c1c1c;
+    .upload-header {
+        font-size: .7rem;
+        font-weight: 300;
+        padding-bottom: 0;
+        border-bottom: 1px solid white;
+        font-family: "Roboto", sans-serif;
+    }
     .close-button {
         position: absolute;
         top: 5px;
@@ -27,31 +34,21 @@
         font-size: 1.6rem;
         transition: all 0.3s;
         border: none;
+
     }
     .close-button:hover {
-    transform: scale(1.1);
+        transform: scale(1.1);
     background-color: rgba(255, 255, 255, 0.1);
     }
     .close-button:active {
-    transform: scale(0.8);
+        transform: scale(0.8);
     }
-    .upload-header {
-        font-size: .7rem;
-        font-weight: 300;
-        padding-bottom: 0;
-        border-bottom: 1px solid white;
-        font-family: "Roboto", sans-serif;
-    }
-    .upload-form {
-        padding: .1rem;
-        display: flex;
-        flex-direction: column;
-        width: 100%;
+    .create-album-form {
+        width:100%;
         height: 100%;
         position: relative;
         .input-bx{
             margin-top: 1rem;
-            position: relative;
             width: 300px;
             input{
                 width: 100%;
@@ -66,7 +63,6 @@
             span{
                 position: absolute;
                 left: 0;
-                top: 1px;
                 padding: 10px;
                 font-size: 1rem;
                 color: #7f8fa6;
@@ -90,6 +86,7 @@
                 color: #fff;
                 border: 2px solid #fff;
             }
+
         }
         .release-date {
             margin-top: 1rem;
@@ -111,29 +108,14 @@
                 padding: 8px;
             }
         }
-        .file {
-            margin-top: .5rem;
-            display: flex;
-            align-items: center;
-            span {
-                font-size: .9rem;
-                color: #7f8fa6;
-                font-family: "Roboto", sans-serif;
-                margin-left: 5px;
-                margin-right: 10px;
-            }
-            input {
-                padding: 10px;
-            }
-        }
         .upload-button {
             position: absolute;
             bottom: 5px;
-            width: 100%;
             margin-top: 1rem;
             padding: 10px;
             background-color: #7f8fa6;
             color: #fff;
+            width: 100%;
             font-size: 1rem;
             font-family: "Roboto", sans-serif;
             border: none;
@@ -145,48 +127,6 @@
                 color: #7f8fa6;
             }
         }
-        .has-search {
-            position: relative;
-            width: 325px;
-            .search-results {
-                display: flex;
-                flex-direction: column;
-                border: 1px solid white;
-                width: 100%;
-                position: absolute;
-                top: 75%;
-                background-color: #1c1c1c;
-                z-index: 2;
-                border-radius: 5px;
-                padding: 0;
-                .result {
-                    border-bottom: 1px solid white; 
-                    padding: 10px;
-                    cursor: pointer;
-                    transition: 0.3s;
-                    &:hover {
-                        background-color: #7f8fa6;
-                    }
-                }
-                .result:last-child {
-                    border-bottom: none;
-                }
-            }
-        }
     }
-
-    .error-msg {
-        padding-top: 10px;
-        color: red;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        svg {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
-        }
-    }
+    
 }

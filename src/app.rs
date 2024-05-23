@@ -64,6 +64,7 @@ use crate::components::search::*;
 use crate::components::personal::*;
 use crate::components::upload::*;
 use crate::components::add_artist::AddArtist;
+use crate::components::add_album::AddAlbum;
 
 /// Renders the home page of your application.
 #[component]
@@ -72,6 +73,7 @@ fn HomePage(play_status: RwSignal<PlayStatus>, upload_open: RwSignal<bool>, add_
         <div class="home-container">
             <Upload open=upload_open/>
             <AddArtist open=add_artist_open/>
+            <AddAlbum open=add_album_open/>
             <Sidebar upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/>
             // This <Outlet /> will render the child route components
             <Outlet />

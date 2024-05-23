@@ -1,5 +1,4 @@
 use leptos::*;
-use crate::models::Artist;
 
 use cfg_if::cfg_if;
 
@@ -22,6 +21,7 @@ cfg_if! {
 #[server(endpoint = "artists/add-artist")]
 pub async fn add_artist(artist_name: String) -> Result<(), ServerFnError> {
     use crate::schema::artists::dsl::*;
+    use crate::models::Artist;
     use leptos::server_fn::error::NoCustomError;
 
     let new_artist = Artist {
