@@ -28,7 +28,7 @@ pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add
                         when= move || dropdown_open()
                         fallback=move || view! {}
                     >
-                        <UploadDropdown upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/>
+                        <UploadDropdown dropdown_open=dropdown_open upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/>
                     </Show>
                 </div>
                 <a class="buttons" href="/dashboard" style={move || if on_dashboard() {"color: #e1e3e1"} else {""}} >

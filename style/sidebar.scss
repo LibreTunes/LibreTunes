@@ -46,6 +46,7 @@
         background-color: #f0ecec;
         color: black;
         width: 110px;
+        border-radius: 0 0 5px 5px;
         .add-btns {
           border: none;
           border-bottom: 1px solid black;
@@ -55,6 +56,9 @@
         }
         .add-btns:first-child {
           border-top: 1px solid black;
+        }
+        .add-btns:last-child {
+          border-radius: 0 0 5px 5px;
         }
       }
     }
