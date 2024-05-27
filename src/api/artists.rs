@@ -10,14 +10,14 @@ cfg_if! {
 }
 
 /// Add an artist to the database
-	/// 
-	/// # Arguments
-	/// 
-	/// * `artist_name` - The name of the artist to add
-	/// 
-	/// # Returns
-	///  * `Result<(), Box<dyn Error>>` - A empty result if successful, or an error
-	/// 
+/// 
+/// # Arguments
+/// 
+/// * `artist_name` - The name of the artist to add
+/// 
+/// # Returns
+///  * `Result<(), Box<dyn Error>>` - A empty result if successful, or an error
+/// 
 #[server(endpoint = "artists/add-artist")]
 pub async fn add_artist(artist_name: String) -> Result<(), ServerFnError> {
     use crate::schema::artists::dsl::*;

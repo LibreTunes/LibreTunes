@@ -11,16 +11,16 @@ cfg_if! {
 }
 
 /// Add an album to the database
-	/// 
-	/// # Arguments
-	/// 
-	/// * `album_title` - The name of the artist to add
-    /// * `release_data` - The release date of the album (Optional)
-    /// * `image_path` - The path to the album's image file (Optional)
-	/// 
-	/// # Returns
-	///  * `Result<(), Box<dyn Error>>` - A empty result if successful, or an error
-	/// 
+/// 
+/// # Arguments
+/// 
+/// * `album_title` - The name of the artist to add
+/// * `release_data` - The release date of the album (Optional)
+/// * `image_path` - The path to the album's image file (Optional)
+/// 
+/// # Returns
+///  * `Result<(), Box<dyn Error>>` - A empty result if successful, or an error
+/// 
 #[server(endpoint = "albums/add-album")]
 pub async fn add_album(album_title: String, release_date: Option<String>, image_path: Option<String>) -> Result<(), ServerFnError> {
     use crate::schema::albums::{self};
