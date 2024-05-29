@@ -49,6 +49,7 @@
         height: 100%;
         position: relative;
         .input-bx{
+            position: relative;
             margin-top: 1rem;
             width: 300px;
             input{
@@ -64,6 +65,7 @@
             span{
                 position: absolute;
                 left: 0;
+                top: 1px;
                 padding: 10px;
                 font-size: 1rem;
                 color: #7f8fa6;
