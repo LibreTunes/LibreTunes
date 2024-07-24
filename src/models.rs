@@ -313,4 +313,30 @@ impl Song {
 
 		Ok(my_artists)
 	}
+
+	/// Get the album for this song from the database
+	/// 
+	/// # Arguments
+	/// 
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Option<Album>, Box<dyn Error>>` - A result indicating success with an album, or None if
+	/// the song does not have an album, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn get_album(self: &Self, conn: &mut PgPooledConn) -> Result<Option<Album>, Box<dyn Error>> {
+		use crate::schema::albums::dsl::*;
+
+		if let Some(album_id) = self.album_id {
+			let my_album = albums
+				.filter(id.eq(album_id))
+				.first::<Album>(conn)?;
+
+			Ok(Some(my_album))
+		} else {
+			Ok(None)
+		}
+	}
 }
