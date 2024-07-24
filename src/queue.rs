@@ -1,3 +1,4 @@
+use crate::models::Artist;
 use crate::playstatus::PlayStatus;
 use crate::song::Song;
 use leptos::ev::MouseEvent;
@@ -98,7 +99,7 @@ pub fn Queue(status: RwSignal<PlayStatus>) -> impl IntoView {
 									on:dragenter=move |e: DragEvent| on_drag_enter(e, index)
 									on:dragover=on_drag_over
 								>
-									<Song song_image_path=song.image_path.clone() song_title=song.name.clone() song_artist=song.artist.clone() />
+									<Song song_image_path=song.image_path.clone() song_title=song.title.clone() song_artist=Artist::display_list(&song.artists) />
 									<Show
 										when=move || index != 0
 										fallback=|| view!{

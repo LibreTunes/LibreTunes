@@ -164,6 +164,26 @@ impl Artist {
 
 		Ok(my_songs)
 	}
+
+	/// Display a list of artists as a string.
+	/// 
+	/// For one artist, displays [artist1]. For two artists, displays [artist1] & [artist2].
+	/// For three or more artists, displays [artist1], [artist2], & [artist3].
+	pub fn display_list(artists: &Vec<Artist>) -> String {
+		let mut artist_list = String::new();
+
+		for (i, artist) in artists.iter().enumerate() {
+			if i == 0 {
+				artist_list.push_str(&artist.name);
+			} else if i == artists.len() - 1 {
+				artist_list.push_str(&format!(" & {}", artist.name));
+			} else {
+				artist_list.push_str(&format!(", {}", artist.name));
+			}
+		}
+
+		artist_list
+	}
 }
 
 /// Model for an album
@@ -292,5 +312,31 @@ impl Song {
 			.load(conn)?;
 
 		Ok(my_artists)
+	}
+
+	/// Get the album for this song from the database
+	/// 
+	/// # Arguments
+	/// 
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Option<Album>, Box<dyn Error>>` - A result indicating success with an album, or None if
+	/// the song does not have an album, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn get_album(self: &Self, conn: &mut PgPooledConn) -> Result<Option<Album>, Box<dyn Error>> {
+		use crate::schema::albums::dsl::*;
+
+		if let Some(album_id) = self.album_id {
+			let my_album = albums
+				.filter(id.eq(album_id))
+				.first::<Album>(conn)?;
+
+			Ok(Some(my_album))
+		} else {
+			Ok(None)
+		}
 	}
 }
