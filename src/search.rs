@@ -102,7 +102,7 @@ pub async fn search(query: String, limit: i64) -> Result<(Vec<Album>, Vec<Artist
 	let artists = search_artists(query.clone(), limit);
 	let songs = search_songs(query.clone(), limit);
 
-	use futures::join;
+	use tokio::join;
 
 	let (albums, artists, songs) = join!(albums, artists, songs);
 	Ok((albums?, artists?, songs?))
