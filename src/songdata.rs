@@ -1,4 +1,3 @@
-use crate::database;
 use crate::models::{Album, Artist, Song};
 
 use time::Date;
@@ -39,6 +38,7 @@ impl TryInto<SongData> for Song {
 	/// The SongData/Song conversions are also not truly reversible,
 	/// due to the way the image_path, album, and artist data is handled.
 	fn try_into(self) -> Result<SongData, Self::Error> {
+		use crate::database;
 		let mut db_con = database::get_db_conn();
 
 		let album = self.get_album(&mut db_con)?;
