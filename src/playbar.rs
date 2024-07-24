@@ -261,7 +261,7 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
 
 	let image = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("/assets/images/placeholders/MusicPlaceholder.svg".into(),
+			status.queue.front().map_or("/images/placeholders/MusicPlaceholder.svg".into(),
                 |song| song.image_path.clone())
 		})
 	});
