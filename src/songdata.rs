@@ -26,6 +26,8 @@ pub struct SongData {
 	/// Path to song image, relative to the root of the web server.
 	/// For example, `"/assets/images/Song.jpg"`
 	pub image_path: String,
+	/// Whether the song is liked by the user
+	pub like_dislike: Option<(bool, bool)>,
 }
 
 
