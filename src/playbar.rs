@@ -1,5 +1,7 @@
 use crate::models::Artist;
 use crate::playstatus::PlayStatus;
+use crate::songdata::SongData;
+use crate::api::songs;
 use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
@@ -283,53 +285,101 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
 fn LikeDislike(status: RwSignal<PlayStatus>) -> impl IntoView {
     let like_icon = Signal::derive(move || {
         status.with(|status| {
-            if status.liked {
-                icondata::TbThumbUpFilled
-            } else {
-                icondata::TbThumbUp
+            match status.queue.front() {
+                Some(SongData { like_dislike: Some((true, _)), .. }) => icondata::TbThumbUpFilled,
+                _ => icondata::TbThumbUp,
             }
         })
     });
 
     let dislike_icon = Signal::derive(move || {
         status.with(|status| {
-            if status.disliked {
-                icondata::TbThumbDownFilled
-            } else {
-                icondata::TbThumbDown
+            match status.queue.front() {
+                Some(SongData { like_dislike: Some((_, true)), .. }) => icondata::TbThumbDownFilled,
+                _ => icondata::TbThumbDown,
             }
         })
     });
 
     let toggle_like = move |_| {
         status.update(|status| {
-            if status.queue.is_empty() {
-                return;
+            match status.queue.front_mut() {
+                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                    *liked = !*liked;
+
+                    if *liked {
+                        *disliked = false;
+                    }
+
+                    let id = *id;
+                    let liked = *liked;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_like_song(id, liked).await {
+                            error!("Error liking song: {:?}", e);
+                        }
+                    });
+                },
+                Some(SongData { id, like_dislike, .. }) => {
+                    // This arm should only be reached if like_dislike is None
+                    // In this case, the buttons will show up not filled, indicating that the song is not
+                    // liked or disliked. Therefore, clicking the like button should like the song.
+
+                    *like_dislike = Some((true, false));
+
+                    let id = *id;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_like_song(id, true).await {
+                            error!("Error liking song: {:?}", e);
+                        }
+                    });
+                },
+                _ => {
+                    log!("Unable to like song: No song in queue");
+                    return;
+                }
             }
-
-            status.liked = !status.liked;
-
-            if status.liked {
-                status.disliked = false;
-            }
-
-            // TODO call the API to like the song
         });
     };
 
     let toggle_dislike = move |_| {
+        log!("Dislike button pressed");
+
         status.update(|status| {
-            if status.queue.is_empty() {
-                return;
+            match status.queue.front_mut() {
+                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                    *disliked = !*disliked;
+
+                    if *disliked {
+                        *liked = false;
+                    }
+
+                    let id = *id;
+                    let disliked = *disliked;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_dislike_song(id, disliked).await {
+                            error!("Error disliking song: {:?}", e);
+                        }
+                    });
+                },
+                Some(SongData { id, like_dislike, .. }) => {
+                    // This arm should only be reached if like_dislike is None
+                    // In this case, the buttons will show up not filled, indicating that the song is not
+                    // liked or disliked. Therefore, clicking the dislike button should dislike the song.
+                    
+                    *like_dislike = Some((false, true));
+
+                    let id = *id;
+                    spawn_local(async move { 
+                        if let Err(e) = songs::set_dislike_song(id, true).await {
+                            error!("Error disliking song: {:?}", e);
+                        }
+                    });
+                },
+                _ => {
+                    log!("Unable to dislike song: No song in queue");
+                    return;
+                }
             }
-
-            status.disliked = !status.disliked;
-
-            if status.disliked {
-                status.liked = false;
-            }
-
-            // TODO call the API to dislike the song
         });
     };
 

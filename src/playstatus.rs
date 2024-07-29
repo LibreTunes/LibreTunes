@@ -17,10 +17,6 @@ pub struct PlayStatus {
     pub history: VecDeque<SongData>,
 	/// A queue of songs that have yet to be played, ordered from next up to last
     pub queue: VecDeque<SongData>,
-	/// Whether the current playing song is liked
-	pub liked: bool,
-	/// Whether the current playing song is disliked
-	pub disliked: bool,
 }
 
 impl PlayStatus {
@@ -63,8 +59,6 @@ impl Default for PlayStatus {
             audio_player: None,
             history: VecDeque::new(),
             queue: VecDeque::new(),
-			liked: false,
-			disliked: false,
         }
     }
 }
