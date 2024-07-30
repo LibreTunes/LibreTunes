@@ -342,8 +342,6 @@ fn LikeDislike(status: RwSignal<PlayStatus>) -> impl IntoView {
     };
 
     let toggle_dislike = move |_| {
-        log!("Dislike button pressed");
-
         status.update(|status| {
             match status.queue.front_mut() {
                 Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
