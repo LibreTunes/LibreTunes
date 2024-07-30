@@ -381,8 +381,6 @@ fn LikeDislike(status: RwSignal<PlayStatus>) -> impl IntoView {
         });
     };
 
-    // TODO update like and dislike status using the API when a new song starts playing
-
     view! {
         <div class="like-dislike">
             <button on:click=toggle_dislike>
