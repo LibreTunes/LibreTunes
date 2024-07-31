@@ -1,4 +1,6 @@
 use crate::models::{Album, Artist, Song};
+use crate::components::dashboard_tile::DashboardTile;
+use crate::media_type::MediaType;
 
 use time::Date;
 
@@ -93,5 +95,16 @@ impl TryInto<Song> for SongData {
 				Some(self.image_path)
 			},
 		})
+	}
+}
+
+impl Into<DashboardTile> for SongData {
+	fn into(self) -> DashboardTile {
+		DashboardTile {
+			image_path: self.image_path,
+			title: self.title,
+			media_type: Some(MediaType::Song),
+			artist: Some(Artist::display_list(&self.artists)),
+		}
 	}
 }
