@@ -1,6 +1,7 @@
 use leptos::html::Ul;
 use leptos::leptos_dom::*;
 use leptos::*;
+use leptos_use::{use_element_size, UseElementSizeReturn, use_scroll, UseScrollReturn};
 use serde::{Deserialize, Serialize};
 use crate::components::dashboard_tile::DashboardTile;
 use leptos_icons::*;
@@ -68,15 +69,38 @@ impl IntoView for DashboardRow {
 			}
 		};
 
+		let UseElementSizeReturn { width: scroll_element_width, .. } = use_element_size(list_ref);
+		let UseScrollReturn { x: scroll_x, .. } = use_scroll(list_ref);
+
+		let scroll_right_hidden = Signal::derive(move || {
+			if let Some(scroll_element) = list_ref.get() {
+				if scroll_element.scroll_width() as f64 - scroll_element_width.get() <= scroll_x.get() {
+					"visibility: hidden"
+				} else {
+					""
+				}
+			} else {
+				""
+			}
+		});
+
+		let scroll_left_hidden = Signal::derive(move || {
+			if scroll_x.get() <= 0.0 {
+				"visibility: hidden"
+			} else {
+				""
+			}
+		});
+
 		view! {
 			<div class="dashboard-tile-row">
 				<div class="dashboard-tile-row-title-row">
 					<h2>{self.title}</h2>
 					<div class="dashboard-tile-row-scroll-btn">
-						<button on:click=scroll_left tabindex=-1>
+						<button on:click=scroll_left tabindex=-1 style=scroll_left_hidden>
 							<Icon class="dashboard-tile-row-scroll" icon=icondata::FiChevronLeft />
 						</button>
-						<button on:click=scroll_right tabindex=-1>
+						<button on:click=scroll_right tabindex=-1 style=scroll_right_hidden>
 							<Icon class="dashboard-tile-row-scroll" icon=icondata::FiChevronRight />
 						</button>
 					</div>
