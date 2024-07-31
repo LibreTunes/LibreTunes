@@ -36,7 +36,7 @@ impl IntoView for DashboardRow {
 
 				if let Some(first_tile) = scroll_element.first_element_child() {
 					let tile_width = first_tile.client_width() as f64;
-					let scroll_pos = desired_pos + (tile_width - (desired_pos % tile_width)) + 15.0;
+					let scroll_pos = desired_pos + (tile_width - (desired_pos % tile_width));
 					scroll_element.scroll_to_with_x_and_y(scroll_pos, 0.0);
 				} else {
 					warn!("Could not get first tile to scroll left");
@@ -56,7 +56,7 @@ impl IntoView for DashboardRow {
 				
 				if let Some(first_tile) = scroll_element.first_element_child() {
 					let tile_width = first_tile.client_width() as f64;
-					let scroll_pos = desired_pos - (desired_pos % tile_width) + 15.0;
+					let scroll_pos = desired_pos - (desired_pos % tile_width);
 					scroll_element.scroll_to_with_x_and_y(scroll_pos, 0.0);
 				} else {
 					warn!("Could not get first tile to scroll right");

@@ -32,6 +32,8 @@
 		display: flex;
 		overflow-x: hidden;
 		scroll-behavior: smooth;
+		margin-left: 40px;
+		padding-inline-start: 0;
 
 		li {
 			list-style-type: none;
