@@ -29,7 +29,7 @@ impl IntoView for DashboardRow {
 		// This is done by scrolling to the nearest multiple of the tile width, plus some for padding
 
 		let scroll_left = move |_| {
-			if let Some(scroll_element) = list_ref.get() {
+			if let Some(scroll_element) = list_ref.get_untracked() {
 				let client_width = scroll_element.client_width() as f64;
 				let current_pos = scroll_element.scroll_left() as f64;
 				let desired_pos = current_pos - client_width;
@@ -49,7 +49,7 @@ impl IntoView for DashboardRow {
 		};
 
 		let scroll_right = move |_| {
-			if let Some(scroll_element) = list_ref.get() {
+			if let Some(scroll_element) = list_ref.get_untracked() {
 				let client_width = scroll_element.client_width() as f64;
 				let current_pos = scroll_element.scroll_left() as f64;
 				let desired_pos = current_pos + client_width;
