@@ -45,6 +45,135 @@ pub struct User {
 	pub admin: bool,
 }
 
+impl User {
+	/// Like or unlike a song for this user
+	/// If likeing a song, remove dislike if it exists
+	#[cfg(feature = "ssr")]
+	pub async fn set_like_song(self: &Self, song_id: i32, like: bool, conn: &mut PgPooledConn) -> 
+		Result<(), Box<dyn Error>> {
+		use log::*;
+		debug!("Setting like for song {} to {}", song_id, like);
+
+		use crate::schema::song_likes;
+		use crate::schema::song_dislikes;
+
+		let my_id = self.id.ok_or("User id must be present (Some) to like/un-like a song")?;
+
+		if like {
+			diesel::insert_into(song_likes::table)
+				.values((song_likes::song_id.eq(song_id), song_likes::user_id.eq(my_id)))
+				.execute(conn)?;
+
+			// Remove dislike if it exists
+			diesel::delete(song_dislikes::table.filter(song_dislikes::song_id.eq(song_id)
+				.and(song_dislikes::user_id.eq(my_id))))
+				.execute(conn)?;
+		} else {
+			diesel::delete(song_likes::table.filter(song_likes::song_id.eq(song_id).and(song_likes::user_id.eq(my_id))))
+				.execute(conn)?;
+		}
+
+		Ok(())
+	}
+
+	/// Get the like status of a song for this user
+	#[cfg(feature = "ssr")]
+	pub async fn get_like_song(self: &Self, song_id: i32, conn: &mut PgPooledConn) -> Result<bool, Box<dyn Error>> {
+		use crate::schema::song_likes;
+
+		let my_id = self.id.ok_or("User id must be present (Some) to get like status of a song")?;
+
+		let like = song_likes::table
+			.filter(song_likes::song_id.eq(song_id).and(song_likes::user_id.eq(my_id)))
+			.first::<(i32, i32)>(conn)
+			.optional()?
+			.is_some();
+
+		Ok(like)
+	}
+
+	/// Get songs liked by this user
+	#[cfg(feature = "ssr")]
+	pub async fn get_liked_songs(self: &Self, conn: &mut PgPooledConn) -> Result<Vec<Song>, Box<dyn Error>> {
+		use crate::schema::songs::dsl::*;
+		use crate::schema::song_likes::dsl::*;
+
+		let my_id = self.id.ok_or("User id must be present (Some) to get liked songs")?;
+
+		let my_songs = songs
+			.inner_join(song_likes)
+			.filter(user_id.eq(my_id))
+			.select(songs::all_columns())
+			.load(conn)?;
+
+		Ok(my_songs)
+	}
+
+	/// Dislike or remove dislike from a song for this user
+	/// If disliking a song, remove like if it exists
+	#[cfg(feature = "ssr")]
+	pub async fn set_dislike_song(self: &Self, song_id: i32, dislike: bool, conn: &mut PgPooledConn) -> 
+		Result<(), Box<dyn Error>> {
+		use log::*;
+		debug!("Setting dislike for song {} to {}", song_id, dislike);
+
+		use crate::schema::song_likes;
+		use crate::schema::song_dislikes;
+
+		let my_id = self.id.ok_or("User id must be present (Some) to dislike/un-dislike a song")?;
+
+		if dislike {
+			diesel::insert_into(song_dislikes::table)
+				.values((song_dislikes::song_id.eq(song_id), song_dislikes::user_id.eq(my_id)))
+				.execute(conn)?;
+
+			// Remove like if it exists
+			diesel::delete(song_likes::table.filter(song_likes::song_id.eq(song_id)
+				.and(song_likes::user_id.eq(my_id))))
+				.execute(conn)?;
+		} else {
+			diesel::delete(song_dislikes::table.filter(song_dislikes::song_id.eq(song_id)
+				.and(song_dislikes::user_id.eq(my_id))))
+				.execute(conn)?;
+		}
+
+		Ok(())
+	}
+
+	/// Get the dislike status of a song for this user
+	#[cfg(feature = "ssr")]
+	pub async fn get_dislike_song(self: &Self, song_id: i32, conn: &mut PgPooledConn) -> Result<bool, Box<dyn Error>> {
+		use crate::schema::song_dislikes;
+
+		let my_id = self.id.ok_or("User id must be present (Some) to get dislike status of a song")?;
+
+		let dislike = song_dislikes::table
+			.filter(song_dislikes::song_id.eq(song_id).and(song_dislikes::user_id.eq(my_id)))
+			.first::<(i32, i32)>(conn)
+			.optional()?
+			.is_some();
+
+		Ok(dislike)
+	}
+
+	/// Get songs disliked by this user
+	#[cfg(feature = "ssr")]
+	pub async fn get_disliked_songs(self: &Self, conn: &mut PgPooledConn) -> Result<Vec<Song>, Box<dyn Error>> {
+		use crate::schema::songs::dsl::*;
+		use crate::schema::song_likes::dsl::*;
+
+		let my_id = self.id.ok_or("User id must be present (Some) to get disliked songs")?;
+
+		let my_songs = songs
+			.inner_join(song_likes)
+			.filter(user_id.eq(my_id))
+			.select(songs::all_columns())
+			.load(conn)?;
+
+		Ok(my_songs)
+	}
+}
+
 /// Model for an artist
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable, Identifiable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::artists))]

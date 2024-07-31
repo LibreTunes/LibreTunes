@@ -31,6 +31,20 @@ diesel::table! {
 }
 
 diesel::table! {
+    song_dislikes (song_id, user_id) {
+        song_id -> Int4,
+        user_id -> Int4,
+    }
+}
+
+diesel::table! {
+    song_likes (song_id, user_id) {
+        song_id -> Int4,
+        user_id -> Int4,
+    }
+}
+
+diesel::table! {
     songs (id) {
         id -> Int4,
         title -> Varchar,
@@ -58,6 +72,10 @@ diesel::joinable!(album_artists -> albums (album_id));
 diesel::joinable!(album_artists -> artists (artist_id));
 diesel::joinable!(song_artists -> artists (artist_id));
 diesel::joinable!(song_artists -> songs (song_id));
+diesel::joinable!(song_dislikes -> songs (song_id));
+diesel::joinable!(song_dislikes -> users (user_id));
+diesel::joinable!(song_likes -> songs (song_id));
+diesel::joinable!(song_likes -> users (user_id));
 diesel::joinable!(songs -> albums (album_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
@@ -65,6 +83,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     albums,
     artists,
     song_artists,
+    song_dislikes,
+    song_likes,
     songs,
     users,
 );
