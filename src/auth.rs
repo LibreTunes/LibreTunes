@@ -21,9 +21,10 @@ use crate::users::UserCredentials;
 pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 	use crate::users::create_user;
 
-	// Ensure the user has no id
+	// Ensure the user has no id, and is not a self-proclaimed admin
 	let new_user = User {
 		id: None,
+		admin: false,
 		..new_user
 	};
 
@@ -142,4 +143,38 @@ pub async fn get_user() -> Result<User, ServerFnError> {
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
 
 	auth_session.user.ok_or(ServerFnError::<NoCustomError>::ServerError("User not logged in".to_string()))
+}
+
+/// Check if a user is an admin
+/// Returns a Result with a boolean indicating if the user is logged in and an admin
+#[server(endpoint = "check_admin")]
+pub async fn check_admin() -> Result<bool, ServerFnError> {
+	let auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
+
+	Ok(auth_session.user.as_ref().map(|u| u.admin).unwrap_or(false))
+}
+
+/// Require that a user is logged in and an admin
+/// Returns a Result with the error message if the user is not logged in or is not an admin
+/// Intended to be used at the start of a protected route, to ensure the user is logged in and an admin:
+/// ```rust
+/// use leptos::*;
+/// use libretunes::auth::require_admin;
+/// #[server(endpoint = "protected_admin_route")]
+/// pub async fn protected_admin_route() -> Result<(), ServerFnError> {
+/// 	require_admin().await?;
+/// 	// Continue with protected route
+/// 	Ok(())
+/// }
+/// ```
+#[cfg(feature = "ssr")]
+pub async fn require_admin() -> Result<(), ServerFnError> {
+	check_admin().await.and_then(|is_admin| {
+		if is_admin {
+			Ok(())
+		} else {
+			Err(ServerFnError::<NoCustomError>::ServerError(format!("Unauthorized")))
+		}
+	})
 }

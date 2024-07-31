@@ -59,6 +59,7 @@ diesel::table! {
         email -> Varchar,
         password -> Varchar,
         created_at -> Timestamp,
+        admin -> Bool,
     }
 }
 
