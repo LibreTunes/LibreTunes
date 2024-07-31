@@ -1,3 +1,4 @@
+use crate::models::Artist;
 use crate::playstatus::PlayStatus;
 use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
@@ -243,26 +244,27 @@ fn PlayDuration(elapsed_secs: MaybeSignal<i64>, total_secs: MaybeSignal<i64>) ->
 fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
     let name = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("No media playing".into(), |song| song.name.clone())
+			status.queue.front().map_or("No media playing".into(), |song| song.title.clone())
 		})
     });
 
 	let artist = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("".into(), |song| song.artist.clone())
+			status.queue.front().map_or("".into(), |song| format!("{}", Artist::display_list(&song.artists)))
 		})
 	});
 
 	let album = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("".into(), |song| song.album.clone())
+			status.queue.front().map_or("".into(), |song|
+                song.album.as_ref().map_or("".into(), |album| album.title.clone()))
 		})
 	});
 
 	let image = Signal::derive(move || {
 		status.with(|status| {
-			// TODO Use some default / unknown image?
-			status.queue.front().map_or("".into(), |song| song.image_path.clone())
+			status.queue.front().map_or("/images/placeholders/MusicPlaceholder.svg".into(),
+                |song| song.image_path.clone())
 		})
 	});
 
@@ -400,7 +402,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         status.with_untracked(|status| {
             // Start playing the first song in the queue, if available
             if let Some(song) = status.queue.front() {
-                log!("Starting playing with song: {}", song.name);
+                log!("Starting playing with song: {}", song.title);
 
                 // Don't use the set_play_src / set_playing helper function
                 // here because we already have access to the audio element
@@ -453,7 +455,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
             let prev_song = status.queue.pop_front();
 
             if let Some(prev_song) = prev_song {
-                log!("Adding song to history: {}", prev_song.name);
+                log!("Adding song to history: {}", prev_song.title);
                 status.history.push_back(prev_song);
             } else {
                 log!("Queue empty, no previous song to add to history");

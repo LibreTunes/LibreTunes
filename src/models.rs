@@ -41,13 +41,15 @@ pub struct User {
 	/// The time the user was created
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = SystemTime))]
 	pub created_at: Option<SystemTime>,
+	/// Whether the user is an admin
+	pub admin: bool,
 }
 
 /// Model for an artist
-#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable, Identifiable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::artists))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Artist {
 	/// A unique id for the artist
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
@@ -162,13 +164,33 @@ impl Artist {
 
 		Ok(my_songs)
 	}
+
+	/// Display a list of artists as a string.
+	/// 
+	/// For one artist, displays [artist1]. For two artists, displays [artist1] & [artist2].
+	/// For three or more artists, displays [artist1], [artist2], & [artist3].
+	pub fn display_list(artists: &Vec<Artist>) -> String {
+		let mut artist_list = String::new();
+
+		for (i, artist) in artists.iter().enumerate() {
+			if i == 0 {
+				artist_list.push_str(&artist.name);
+			} else if i == artists.len() - 1 {
+				artist_list.push_str(&format!(" & {}", artist.name));
+			} else {
+				artist_list.push_str(&format!(", {}", artist.name));
+			}
+		}
+
+		artist_list
+	}
 }
 
 /// Model for an album
-#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable, Identifiable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::albums))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Album {
 	/// A unique id for the album
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
@@ -177,6 +199,8 @@ pub struct Album {
 	pub title: String,
 	/// The album's release date
 	pub release_date: Option<Date>,
+	/// The path to the album's image file
+	pub image_path: Option<String>,
 }
 
 impl Album {
@@ -288,5 +312,31 @@ impl Song {
 			.load(conn)?;
 
 		Ok(my_artists)
+	}
+
+	/// Get the album for this song from the database
+	/// 
+	/// # Arguments
+	/// 
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Option<Album>, Box<dyn Error>>` - A result indicating success with an album, or None if
+	/// the song does not have an album, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn get_album(self: &Self, conn: &mut PgPooledConn) -> Result<Option<Album>, Box<dyn Error>> {
+		use crate::schema::albums::dsl::*;
+
+		if let Some(album_id) = self.album_id {
+			let my_album = albums
+				.filter(id.eq(album_id))
+				.first::<Album>(conn)?;
+
+			Ok(Some(my_album))
+		} else {
+			Ok(None)
+		}
 	}
 }

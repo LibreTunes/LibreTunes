@@ -19,16 +19,26 @@ async fn main() {
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use libretunes::app::*;
     use libretunes::fileserv::{file_and_error_handler, get_static_file};
-    use tower_sessions::SessionManagerLayer;
+    use axum_login::tower_sessions::SessionManagerLayer;
     use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
     use axum_login::AuthManagerLayerBuilder;
     use libretunes::auth_backend::AuthBackend;
+    use log::*;
+
+    flexi_logger::Logger::try_with_env_or_str("debug").unwrap().format(flexi_logger::opt_format).start().unwrap();
+
+    info!("\n{}", include_str!("../ascii_art.txt"));
+    info!("Starting Leptos server...");
 
     use dotenv::dotenv;
     dotenv().ok();
 
+    debug!("Running database migrations...");
+
     // Bring the database up to date
     libretunes::database::migrate();
+
+    debug!("Connecting to Redis...");
 
     let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
     let redis_config = RedisConfig::from_url(&redis_url).expect(&format!("Unable to parse Redis URL: {}", redis_url));
@@ -55,30 +65,16 @@ async fn main() {
         .fallback(file_and_error_handler)
         .with_state(leptos_options);
 
-    println!("listening on http://{}", &addr);
-
     let listener = tokio::net::TcpListener::bind(&addr).await.expect(&format!("Could not bind to {}", &addr));
+
+    info!("Listening on http://{}", &addr);
+
     axum::serve(listener, app.into_make_service()).await.expect("Server failed");
 }
 
-#[cfg(not(any(feature = "ssr", feature = "csr")))]
+#[cfg(not(feature = "ssr"))]
 pub fn main() {
     // no client-side main function
     // unless we want this to work with e.g., Trunk for pure client-side testing
     // see lib.rs for hydration function instead
-    // see optional feature `csr` instead
-}
-
-#[cfg(all(not(feature = "ssr"), feature = "csr"))]
-pub fn main() {
-    // a client-side main function is required for using `trunk serve`
-    // prefer using `cargo leptos serve` instead
-    // to run: `trunk serve --open --features csr`
-    use leptos::*;
-    use libretunes::app::*;
-    use wasm_bindgen::prelude::wasm_bindgen;
-
-    console_error_panic_hook::set_once();
-
-    leptos::mount_to_body(App);
 }

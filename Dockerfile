@@ -32,6 +32,7 @@ COPY style /app/style
 # Minify CSS
 RUN npx tailwindcss -i /app/style/main.scss -o /app/style/main.scss --minify
 
+COPY ascii_art.txt /app/ascii_art.txt
 COPY assets /app/assets
 COPY src /app/src
 COPY migrations /app/migrations
