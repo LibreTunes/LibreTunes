@@ -1,13 +1,19 @@
-FROM registry.mregirouard.com/libretunes/ops/docker-leptos/musl:latest as builder
+FROM clux/muslrust:nightly AS builder
 
 WORKDIR /app
+
+RUN rustup target add wasm32-unknown-unknown
 
 # Install a few dependencies
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
+		pkg-config \
+		clang \
 		npm; \
 	rm -rf /var/lib/apt/lists/*
+
+RUN cargo install cargo-leptos
 
 RUN npm install tailwindcss@3.1.8 -g
 
