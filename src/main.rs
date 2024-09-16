@@ -1,10 +1,10 @@
 // Needed for building in Docker container
 // See https://github.com/clux/muslrust?tab=readme-ov-file#diesel-and-pq-builds
 // See https://github.com/sgrif/pq-sys/issues/25
-#[cfg(target = "x86_64-unknown-linux-musl")]
+#[cfg(target_env = "musl")]
 extern crate openssl;
 
-#[cfg(target = "x86_64-unknown-linux-musl")]
+#[cfg(target_env = "musl")]
 #[macro_use]
 extern crate diesel;
 
