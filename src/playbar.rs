@@ -1,5 +1,7 @@
 use crate::models::Artist;
 use crate::playstatus::PlayStatus;
+use crate::songdata::SongData;
+use crate::api::songs;
 use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
@@ -269,13 +271,124 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
 	});
 
     view! {
-        <div class="media-info">
         <img class="media-info-img" align="left" src={image}/>
         <div class="media-info-text">
             {name}
             <br/>
             {artist} - {album}
         </div>
+    }
+}
+
+/// The like and dislike buttons
+#[component]
+fn LikeDislike(status: RwSignal<PlayStatus>) -> impl IntoView {
+    let like_icon = Signal::derive(move || {
+        status.with(|status| {
+            match status.queue.front() {
+                Some(SongData { like_dislike: Some((true, _)), .. }) => icondata::TbThumbUpFilled,
+                _ => icondata::TbThumbUp,
+            }
+        })
+    });
+
+    let dislike_icon = Signal::derive(move || {
+        status.with(|status| {
+            match status.queue.front() {
+                Some(SongData { like_dislike: Some((_, true)), .. }) => icondata::TbThumbDownFilled,
+                _ => icondata::TbThumbDown,
+            }
+        })
+    });
+
+    let toggle_like = move |_| {
+        status.update(|status| {
+            match status.queue.front_mut() {
+                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                    *liked = !*liked;
+
+                    if *liked {
+                        *disliked = false;
+                    }
+
+                    let id = *id;
+                    let liked = *liked;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_like_song(id, liked).await {
+                            error!("Error liking song: {:?}", e);
+                        }
+                    });
+                },
+                Some(SongData { id, like_dislike, .. }) => {
+                    // This arm should only be reached if like_dislike is None
+                    // In this case, the buttons will show up not filled, indicating that the song is not
+                    // liked or disliked. Therefore, clicking the like button should like the song.
+
+                    *like_dislike = Some((true, false));
+
+                    let id = *id;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_like_song(id, true).await {
+                            error!("Error liking song: {:?}", e);
+                        }
+                    });
+                },
+                _ => {
+                    log!("Unable to like song: No song in queue");
+                    return;
+                }
+            }
+        });
+    };
+
+    let toggle_dislike = move |_| {
+        status.update(|status| {
+            match status.queue.front_mut() {
+                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                    *disliked = !*disliked;
+
+                    if *disliked {
+                        *liked = false;
+                    }
+
+                    let id = *id;
+                    let disliked = *disliked;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_dislike_song(id, disliked).await {
+                            error!("Error disliking song: {:?}", e);
+                        }
+                    });
+                },
+                Some(SongData { id, like_dislike, .. }) => {
+                    // This arm should only be reached if like_dislike is None
+                    // In this case, the buttons will show up not filled, indicating that the song is not
+                    // liked or disliked. Therefore, clicking the dislike button should dislike the song.
+                    
+                    *like_dislike = Some((false, true));
+
+                    let id = *id;
+                    spawn_local(async move { 
+                        if let Err(e) = songs::set_dislike_song(id, true).await {
+                            error!("Error disliking song: {:?}", e);
+                        }
+                    });
+                },
+                _ => {
+                    log!("Unable to dislike song: No song in queue");
+                    return;
+                }
+            }
+        });
+    };
+
+    view! {
+        <div class="like-dislike">
+            <button on:click=toggle_dislike>
+                <Icon class="controlbtn hmirror" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=dislike_icon />
+            </button>
+            <button on:click=toggle_like>
+                <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=like_icon />
+            </button>
         </div>
     }
 }
@@ -488,7 +601,10 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
             on:timeupdate=on_time_update on:ended=on_end type="audio/mpeg" />
         <div class="playbar">
         <ProgressBar percentage=percentage.into() status=status />
+        <div class="playbar-left-group">
         <MediaInfo status=status />
+        <LikeDislike status=status />
+        </div>
         <PlayControls status=status />
         <PlayDuration elapsed_secs=elapsed_secs.into() total_secs=total_secs.into() />
         <QueueToggle status=status />
