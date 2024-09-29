@@ -24,6 +24,22 @@ diesel::table! {
 }
 
 diesel::table! {
+    friend_requests (from_id, to_id) {
+        created_at -> Timestamp,
+        from_id -> Int4,
+        to_id -> Int4,
+    }
+}
+
+diesel::table! {
+    friendships (friend_1_id, friend_2_id) {
+        created_at -> Timestamp,
+        friend_1_id -> Int4,
+        friend_2_id -> Int4,
+    }
+}
+
+diesel::table! {
     song_artists (song_id, artist_id) {
         song_id -> Int4,
         artist_id -> Int4,
@@ -82,6 +98,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     album_artists,
     albums,
     artists,
+    friend_requests,
+    friendships,
     song_artists,
     song_dislikes,
     song_likes,
