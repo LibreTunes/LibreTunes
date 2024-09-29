@@ -7,6 +7,7 @@ use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
+use leptos_use::{utils::Pausable, use_interval_fn};
 
 /// Width and height of the forward/backward skip buttons
 const SKIP_BTN_SIZE: &str = "3.5em";
@@ -21,6 +22,9 @@ const MIN_SKIP_BACK_TIME: f64 = 5.0;
 
 /// How many seconds to skip forward/backward when the user presses the arrow keys
 const ARROW_KEY_SKIP_TIME: f64 = 5.0;
+
+/// Threshold in seconds for considering when the user has listened to a song, for adding it to the history
+const HISTORY_LISTEN_THRESHOLD: u64 = MIN_SKIP_BACK_TIME as u64;
 
 // TODO Handle errors better, when getting audio HTML element and when playing/pausing audio
 
@@ -532,6 +536,39 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         });
     });
 
+    let current_song_id = create_memo(move |_| {
+        status.with(|status| {
+            status.queue.front().map(|song| song.id)
+        })
+    });
+
+    // Track the last song that was added to the history to prevent duplicates
+    let last_history_song_id = create_rw_signal(None);
+
+    let Pausable { 
+        is_active: hist_timeout_pending,
+        resume: resume_hist_timeout,
+        pause: pause_hist_timeout,
+        ..
+    } = use_interval_fn(move || {
+        if last_history_song_id.get_untracked() == current_song_id.get_untracked() {
+            return;
+        }
+
+        if let Some(current_song_id) = current_song_id.get_untracked() {
+            last_history_song_id.set(Some(current_song_id));
+
+            spawn_local(async move {
+                if let Err(e) = crate::api::history::add_history(current_song_id).await {
+                    error!("Error adding song {} to history: {}", current_song_id, e);
+                }
+            });
+        }
+    }, HISTORY_LISTEN_THRESHOLD * 1000);
+
+    // Initially pause the timeout, since the audio starts off paused
+    pause_hist_timeout();
+
     let on_play = move |_| {
         log!("Audio playing");
         status.update(|status| status.playing = true);
@@ -540,6 +577,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
     let on_pause = move |_| {
         log!("Audio paused");
         status.update(|status| status.playing = false);
+        pause_hist_timeout();
     };
 
     let on_time_update = move |_| {
@@ -557,6 +595,11 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
                 error!("Unable to update time: Audio element not available");
             }
         });
+
+        // If time is updated, audio is playing, so make sure the history timeout is running
+        if !hist_timeout_pending.get_untracked() {
+            resume_hist_timeout();
+        }
     };
 
     let on_end = move |_| {

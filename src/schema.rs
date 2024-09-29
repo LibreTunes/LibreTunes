@@ -54,6 +54,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    song_history (id) {
+        id -> Int4,
+        user_id -> Int4,
+        date -> Timestamp,
+        song_id -> Int4,
+    }
+}
+
+diesel::table! {
     song_likes (song_id, user_id) {
         song_id -> Int4,
         user_id -> Int4,
@@ -90,6 +99,8 @@ diesel::joinable!(song_artists -> artists (artist_id));
 diesel::joinable!(song_artists -> songs (song_id));
 diesel::joinable!(song_dislikes -> songs (song_id));
 diesel::joinable!(song_dislikes -> users (user_id));
+diesel::joinable!(song_history -> songs (song_id));
+diesel::joinable!(song_history -> users (user_id));
 diesel::joinable!(song_likes -> songs (song_id));
 diesel::joinable!(song_likes -> users (user_id));
 diesel::joinable!(songs -> albums (album_id));
@@ -102,6 +113,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     friendships,
     song_artists,
     song_dislikes,
+    song_history,
     song_likes,
     songs,
     users,
