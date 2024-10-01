@@ -3,22 +3,10 @@ on: push
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: libretunes-cicd
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Rust toolchain
-        id: setup-toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: nightly
-          targets: wasm32-unknown-unknown,x86_64-unknown-linux-gnu
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-            prefix-key: ${{ steps.setup-toolchain.outputs.cachekey }}
-      - name: Install cargo-leptos
-        run: cargo install cargo-leptos
       - name: Build project
         env:
           RUSTFLAGS: "-D warnings"
@@ -58,58 +46,26 @@ jobs:
           cache-to: type=inline
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: libretunes-cicd
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Rust toolchain
-        id: setup-toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: nightly
-          targets: wasm32-unknown-unknown,x86_64-unknown-linux-gnu
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-            prefix-key: ${{ steps.setup-toolchain.outputs.cachekey }}
       - name: Test project
         run: cargo test --all-targets --all-features
 
   leptos-test:
-    runs-on: ubuntu-latest
+    runs-on: libretunes-cicd
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Rust toolchain
-        id: setup-toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: nightly
-          targets: wasm32-unknown-unknown,x86_64-unknown-linux-gnu
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-            prefix-key: ${{ steps.setup-toolchain.outputs.cachekey }}
-      - name: Install cargo-leptos
-        run: cargo install cargo-leptos
       - name: Run Leptos tests
         run: cargo-leptos test
 
   docs:
-    runs-on: ubuntu-latest
+    runs-on: libretunes-cicd
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Rust toolchain
-        id: setup-toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: nightly
-          targets: wasm32-unknown-unknown,x86_64-unknown-linux-gnu
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-            prefix-key: ${{ steps.setup-toolchain.outputs.cachekey }}
       - name: Generate docs
         run: cargo doc --no-deps
       - name: Upload docs
