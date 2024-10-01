@@ -1,11 +1,12 @@
 use leptos::*;
-use server_fn::{codec::{MultipartData, MultipartFormData}, error::NoCustomError};
+use server_fn::codec::{MultipartData, MultipartFormData};
 
 use cfg_if::cfg_if;
 
 cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use crate::auth::get_user;
+		use server_fn::error::NoCustomError;
 	}
 }
 
