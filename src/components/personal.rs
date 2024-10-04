@@ -33,10 +33,10 @@ pub fn Profile() -> impl IntoView {
 #[component]
 pub fn DropDownNotLoggedIn() -> impl IntoView {
     view! {
-        <div class="dropdown-not-logged">
-            <h1>Not Logged in!</h1>
+        <div class="dropdown-logged">
+            <h1>Not Logged In</h1>
             <a href="/login"><button class="auth-button">Log In</button></a>
-            <a href="/signup"><button class="auth-button">Sign up</button></a>
+            <a href="/signup"><button class="auth-button">Sign Up</button></a>
         </div>
     }
 }

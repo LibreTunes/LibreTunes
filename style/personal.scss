@@ -27,12 +27,12 @@
     }
 
     .profile-icon:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
       background-color: rgba(255, 255, 255, 0.1);
     }
 
     .profile-icon:active {
-      transform: scale(0.8);
+      transform: scale(0.95);
     }
     .dropdown-container {
       position: absolute;
@@ -42,10 +42,10 @@
       border-radius: 0.5rem;
       width: 10rem;
       z-index: 1;
-      background-color: red;
-      border: 1px solid grey;
+      background-color: #1c1c1c;
+      border: 2px solid rgba(89, 89, 89, 0.199);
 
-      .dropdown-not-logged {
+      .dropdown-logged {
         display: flex;
         flex-direction: column;
         width: 100%;
@@ -55,20 +55,17 @@
           font-size: 1.2rem;
         }
         .auth-button {
+		  margin-top: 0.5rem;
+		  padding: 0.5rem;
+		  border-radius: 0.5rem;
+		  background-color: #1c1c1c;
+		  border: 2px solid rgba(89, 89, 89, 0.199);
+		  color: white;
+		  cursor: pointer;
+		  transition: all 0.3s;
+		  margin-bottom: 0.5rem;
         }
       }
-    }
-    .dropdown-container:before {
-      content: "";
-      position: absolute;
-      top: -0.4rem;
-      right: 0.92rem;
-      width: 10px;
-      height: 10px;
-      transform: rotate(45deg);
-      background-color: red;
-      border-left: 1px solid grey;
-      border-top: 1px solid grey;
     }
   }
 }
