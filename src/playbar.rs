@@ -466,12 +466,11 @@ fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
 pub fn CustomTitle(play_status: RwSignal<PlayStatus>) -> impl IntoView {
     let title = create_memo(move |_| {
         play_status.with(|play_status| {
-            match play_status.queue.front() {
-                Some(song_data) => song_data.title.clone(),
-                None => "LibreTunes".to_owned(),
-            }
-        })
-    });
+            play_status.queue.front().map_or("LibreTunes".to_string(), |song_data| {
+                    format!("{} - {} | {}",song_data.title.clone(),Artist::display_list(&song_data.artists), "LibreTunes")
+                })
+            })
+        });
     view! {
         <Title text=title />
     }
