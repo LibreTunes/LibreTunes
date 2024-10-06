@@ -2,19 +2,17 @@ use leptos::html::Ul;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_use::{use_element_size, UseElementSizeReturn, use_scroll, UseScrollReturn};
-use serde::{Deserialize, Serialize};
 use crate::components::dashboard_tile::DashboardTile;
 use leptos_icons::*;
 
 /// A row of dashboard tiles, with a title
-#[derive(Serialize, Deserialize)]
 pub struct DashboardRow {
 	pub title: String,
-	pub tiles: Vec<DashboardTile>,
+	pub tiles: Vec<Box<dyn DashboardTile>>,
 }
 
 impl DashboardRow {
-	pub fn new(title: String, tiles: Vec<DashboardTile>) -> Self {
+	pub fn new(title: String, tiles: Vec<Box<dyn DashboardTile>>) -> Self {
 		Self {
 			title,
 			tiles,
@@ -109,7 +107,7 @@ impl IntoView for DashboardRow {
 				{self.tiles.into_iter().map(|tile_info| {
 					view! {
 						<li>
-							{ tile_info }
+							{ tile_info.into_view() }
 						</li>
 					}
 				}).collect::<Vec<_>>()}
