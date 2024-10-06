@@ -1,6 +1,7 @@
 pub mod app;
 pub mod auth;
 pub mod songdata;
+pub mod albumdata;
 pub mod playstatus;
 pub mod playbar;
 pub mod database;
