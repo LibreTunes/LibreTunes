@@ -1,0 +1,11 @@
+CREATE TABLE song_likes (
+	song_id INTEGER REFERENCES songs(id) ON DELETE CASCADE NOT NULL,
+	user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+	PRIMARY KEY (song_id, user_id)
+);
+
+CREATE TABLE song_dislikes (
+	song_id INTEGER REFERENCES songs(id) ON DELETE CASCADE NOT NULL,
+	user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+	PRIMARY KEY (song_id, user_id)
+);

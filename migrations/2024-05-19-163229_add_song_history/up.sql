@@ -1,0 +1,8 @@
+CREATE TABLE song_history (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+	date TIMESTAMP NOT NULL DEFAULT NOW(),
+	song_id INTEGER REFERENCES songs(id) ON DELETE CASCADE NOT NULL
+);
+
+CREATE INDEX song_history_user_id_idx ON song_history(user_id);

@@ -122,6 +122,29 @@ pub async fn require_auth() -> Result<(), ServerFnError> {
 	})
 }
 
+/// Get the current logged-in user
+/// Returns a Result with the user if they are logged in
+/// Returns an error if the user is not logged in, or if there is an error getting the user
+/// Intended to be used in a route to get the current user:
+/// ```rust
+/// use leptos::*;
+/// use libretunes::auth::get_user;
+/// #[server(endpoint = "user_route")]
+/// pub async fn user_route() -> Result<(), ServerFnError> {
+/// 	let user = get_user().await?;
+/// 	println!("Logged in as: {}", user.username);
+/// 	// Do something with the user
+/// 	Ok(())
+/// }
+/// ```
+#[cfg(feature = "ssr")]
+pub async fn get_user() -> Result<User, ServerFnError> {
+	let auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
+
+	auth_session.user.ok_or(ServerFnError::<NoCustomError>::ServerError("User not logged in".to_string()))
+}
+
 /// Check if a user is an admin
 /// Returns a Result with a boolean indicating if the user is logged in and an admin
 #[server(endpoint = "check_admin")]

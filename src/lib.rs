@@ -14,6 +14,7 @@ pub mod search;
 pub mod fileserv;
 pub mod error_template;
 pub mod media_type;
+pub mod api;
 pub mod upload;
 pub mod util;
 

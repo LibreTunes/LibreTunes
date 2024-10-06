@@ -24,9 +24,48 @@ diesel::table! {
 }
 
 diesel::table! {
+    friend_requests (from_id, to_id) {
+        created_at -> Timestamp,
+        from_id -> Int4,
+        to_id -> Int4,
+    }
+}
+
+diesel::table! {
+    friendships (friend_1_id, friend_2_id) {
+        created_at -> Timestamp,
+        friend_1_id -> Int4,
+        friend_2_id -> Int4,
+    }
+}
+
+diesel::table! {
     song_artists (song_id, artist_id) {
         song_id -> Int4,
         artist_id -> Int4,
+    }
+}
+
+diesel::table! {
+    song_dislikes (song_id, user_id) {
+        song_id -> Int4,
+        user_id -> Int4,
+    }
+}
+
+diesel::table! {
+    song_history (id) {
+        id -> Int4,
+        user_id -> Int4,
+        date -> Timestamp,
+        song_id -> Int4,
+    }
+}
+
+diesel::table! {
+    song_likes (song_id, user_id) {
+        song_id -> Int4,
+        user_id -> Int4,
     }
 }
 
@@ -58,13 +97,24 @@ diesel::joinable!(album_artists -> albums (album_id));
 diesel::joinable!(album_artists -> artists (artist_id));
 diesel::joinable!(song_artists -> artists (artist_id));
 diesel::joinable!(song_artists -> songs (song_id));
+diesel::joinable!(song_dislikes -> songs (song_id));
+diesel::joinable!(song_dislikes -> users (user_id));
+diesel::joinable!(song_history -> songs (song_id));
+diesel::joinable!(song_history -> users (user_id));
+diesel::joinable!(song_likes -> songs (song_id));
+diesel::joinable!(song_likes -> users (user_id));
 diesel::joinable!(songs -> albums (album_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     album_artists,
     albums,
     artists,
+    friend_requests,
+    friendships,
     song_artists,
+    song_dislikes,
+    song_history,
+    song_likes,
     songs,
     users,
 );

@@ -1,10 +1,14 @@
 use crate::models::Artist;
 use crate::playstatus::PlayStatus;
+use crate::songdata::SongData;
+use crate::api::songs;
 use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
+use leptos_meta::Title;
 use leptos::*;
 use leptos_icons::*;
+use leptos_use::{utils::Pausable, use_interval_fn};
 
 /// Width and height of the forward/backward skip buttons
 const SKIP_BTN_SIZE: &str = "3.5em";
@@ -19,6 +23,9 @@ const MIN_SKIP_BACK_TIME: f64 = 5.0;
 
 /// How many seconds to skip forward/backward when the user presses the arrow keys
 const ARROW_KEY_SKIP_TIME: f64 = 5.0;
+
+/// Threshold in seconds for considering when the user has listened to a song, for adding it to the history
+const HISTORY_LISTEN_THRESHOLD: u64 = MIN_SKIP_BACK_TIME as u64;
 
 // TODO Handle errors better, when getting audio HTML element and when playing/pausing audio
 
@@ -269,13 +276,124 @@ fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
 	});
 
     view! {
-        <div class="media-info">
         <img class="media-info-img" align="left" src={image}/>
         <div class="media-info-text">
             {name}
             <br/>
             {artist} - {album}
         </div>
+    }
+}
+
+/// The like and dislike buttons
+#[component]
+fn LikeDislike(status: RwSignal<PlayStatus>) -> impl IntoView {
+    let like_icon = Signal::derive(move || {
+        status.with(|status| {
+            match status.queue.front() {
+                Some(SongData { like_dislike: Some((true, _)), .. }) => icondata::TbThumbUpFilled,
+                _ => icondata::TbThumbUp,
+            }
+        })
+    });
+
+    let dislike_icon = Signal::derive(move || {
+        status.with(|status| {
+            match status.queue.front() {
+                Some(SongData { like_dislike: Some((_, true)), .. }) => icondata::TbThumbDownFilled,
+                _ => icondata::TbThumbDown,
+            }
+        })
+    });
+
+    let toggle_like = move |_| {
+        status.update(|status| {
+            match status.queue.front_mut() {
+                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                    *liked = !*liked;
+
+                    if *liked {
+                        *disliked = false;
+                    }
+
+                    let id = *id;
+                    let liked = *liked;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_like_song(id, liked).await {
+                            error!("Error liking song: {:?}", e);
+                        }
+                    });
+                },
+                Some(SongData { id, like_dislike, .. }) => {
+                    // This arm should only be reached if like_dislike is None
+                    // In this case, the buttons will show up not filled, indicating that the song is not
+                    // liked or disliked. Therefore, clicking the like button should like the song.
+
+                    *like_dislike = Some((true, false));
+
+                    let id = *id;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_like_song(id, true).await {
+                            error!("Error liking song: {:?}", e);
+                        }
+                    });
+                },
+                _ => {
+                    log!("Unable to like song: No song in queue");
+                    return;
+                }
+            }
+        });
+    };
+
+    let toggle_dislike = move |_| {
+        status.update(|status| {
+            match status.queue.front_mut() {
+                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                    *disliked = !*disliked;
+
+                    if *disliked {
+                        *liked = false;
+                    }
+
+                    let id = *id;
+                    let disliked = *disliked;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_dislike_song(id, disliked).await {
+                            error!("Error disliking song: {:?}", e);
+                        }
+                    });
+                },
+                Some(SongData { id, like_dislike, .. }) => {
+                    // This arm should only be reached if like_dislike is None
+                    // In this case, the buttons will show up not filled, indicating that the song is not
+                    // liked or disliked. Therefore, clicking the dislike button should dislike the song.
+                    
+                    *like_dislike = Some((false, true));
+
+                    let id = *id;
+                    spawn_local(async move { 
+                        if let Err(e) = songs::set_dislike_song(id, true).await {
+                            error!("Error disliking song: {:?}", e);
+                        }
+                    });
+                },
+                _ => {
+                    log!("Unable to dislike song: No song in queue");
+                    return;
+                }
+            }
+        });
+    };
+
+    view! {
+        <div class="like-dislike">
+            <button on:click=toggle_dislike>
+                <Icon class="controlbtn hmirror" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=dislike_icon />
+            </button>
+            <button on:click=toggle_like>
+                <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=like_icon />
+            </button>
         </div>
     }
 }
@@ -340,6 +458,21 @@ fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
         <Icon class="controlbtn" width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon=icondata::RiPlayListMediaFill />
         </button>
         </div>
+    }
+}
+
+/// Renders the title of the page based on the currently playing song
+#[component]
+pub fn CustomTitle(play_status: RwSignal<PlayStatus>) -> impl IntoView {
+    let title = create_memo(move |_| {
+        play_status.with(|play_status| {
+            play_status.queue.front().map_or("LibreTunes".to_string(), |song_data| {
+                    format!("{} - {} | {}",song_data.title.clone(),Artist::display_list(&song_data.artists), "LibreTunes")
+                })
+            })
+        });
+    view! {
+        <Title text=title />
     }
 }
 
@@ -419,6 +552,39 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         });
     });
 
+    let current_song_id = create_memo(move |_| {
+        status.with(|status| {
+            status.queue.front().map(|song| song.id)
+        })
+    });
+
+    // Track the last song that was added to the history to prevent duplicates
+    let last_history_song_id = create_rw_signal(None);
+
+    let Pausable { 
+        is_active: hist_timeout_pending,
+        resume: resume_hist_timeout,
+        pause: pause_hist_timeout,
+        ..
+    } = use_interval_fn(move || {
+        if last_history_song_id.get_untracked() == current_song_id.get_untracked() {
+            return;
+        }
+
+        if let Some(current_song_id) = current_song_id.get_untracked() {
+            last_history_song_id.set(Some(current_song_id));
+
+            spawn_local(async move {
+                if let Err(e) = crate::api::history::add_history(current_song_id).await {
+                    error!("Error adding song {} to history: {}", current_song_id, e);
+                }
+            });
+        }
+    }, HISTORY_LISTEN_THRESHOLD * 1000);
+
+    // Initially pause the timeout, since the audio starts off paused
+    pause_hist_timeout();
+
     let on_play = move |_| {
         log!("Audio playing");
         status.update(|status| status.playing = true);
@@ -427,6 +593,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
     let on_pause = move |_| {
         log!("Audio paused");
         status.update(|status| status.playing = false);
+        pause_hist_timeout();
     };
 
     let on_time_update = move |_| {
@@ -444,6 +611,11 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
                 error!("Unable to update time: Audio element not available");
             }
         });
+
+        // If time is updated, audio is playing, so make sure the history timeout is running
+        if !hist_timeout_pending.get_untracked() {
+            resume_hist_timeout();
+        }
     };
 
     let on_end = move |_| {
@@ -488,7 +660,10 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
             on:timeupdate=on_time_update on:ended=on_end type="audio/mpeg" />
         <div class="playbar">
         <ProgressBar percentage=percentage.into() status=status />
+        <div class="playbar-left-group">
         <MediaInfo status=status />
+        <LikeDislike status=status />
+        </div>
         <PlayControls status=status />
         <PlayDuration elapsed_secs=elapsed_secs.into() total_secs=total_secs.into() />
         <QueueToggle status=status />

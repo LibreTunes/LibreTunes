@@ -1,4 +1,5 @@
 use crate::playbar::PlayBar;
+use crate::playbar::CustomTitle;
 use crate::playstatus::PlayStatus;
 use crate::queue::Queue;
 use leptos::*;
@@ -24,7 +25,7 @@ pub fn App() -> impl IntoView {
         <Stylesheet id="leptos" href="/pkg/libretunes.css"/>
 
         // sets the document title
-        <Title text="LibreTunes"/>
+        <CustomTitle play_status=play_status/>
 
         // content for this welcome page
         <Router fallback=|| {
