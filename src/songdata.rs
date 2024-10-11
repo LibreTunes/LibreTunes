@@ -6,6 +6,7 @@ use time::Date;
 /// Holds information about a song
 /// 
 /// Intended to be used in the front-end, as it includes artist and album objects, rather than just their ids.
+#[derive(Clone)]
 pub struct SongData {
 	/// Song id
 	pub id: i32,
