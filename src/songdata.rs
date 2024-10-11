@@ -47,7 +47,6 @@ impl TryInto<Song> for SongData {
 			track: self.track,
 			duration: self.duration,
 			release_date: self.release_date,
-			// TODO https://gitlab.mregirouard.com/libretunes/libretunes/-/issues/35
 			storage_path: self.song_path,
 
 			// Note that if the source of the image_path was the album, the image_path
