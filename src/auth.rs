@@ -137,7 +137,7 @@ pub async fn require_auth() -> Result<(), ServerFnError> {
 /// 	Ok(())
 /// }
 /// ```
-#[cfg(feature = "ssr")]
+#[server(endpoint = "get_user")]
 pub async fn get_user() -> Result<User, ServerFnError> {
 	let auth_session = extract::<AuthSession<AuthBackend>>().await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;

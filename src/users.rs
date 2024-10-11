@@ -117,7 +117,7 @@ pub async fn validate_user(credentials: UserCredentials) -> Result<Option<User>,
 
 /// Get a user from the database by username or email
 /// Returns a Result with the user if found, None if not found, or an error if there was a problem
-#[server(endpoint = "get_user")]
+#[server(endpoint = "find_user")]
 pub async fn get_user(username_or_email: String) -> Result<Option<User>, ServerFnError> {
 	let mut user = find_user(username_or_email).await?;
 
