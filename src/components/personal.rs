@@ -18,7 +18,8 @@ pub fn Personal() -> impl IntoView {
 pub fn Profile() -> impl IntoView {
     let (dropdown_open, set_dropdown_open) = create_signal(false);
     let logged_in = create_rw_signal(false);
-    let user_signal = create_rw_signal(User::default());
+    // user signal is an option because the user may not be logged in
+    let user_signal = create_rw_signal(None);
 
     let open_dropdown = move |_| {
         spawn_local(async move {
@@ -26,7 +27,7 @@ pub fn Profile() -> impl IntoView {
             if let Ok(user) = user {
                 logged_in.set(true);
                 user_signal.update(|value| {
-                    *value = user;
+                    *value = Some(user);
                 });
             } else {
                 logged_in.set(false);
@@ -63,7 +64,7 @@ pub fn DropDownNotLoggedIn() -> impl IntoView {
     }
 }
 #[component]
-pub fn DropDownLoggedIn(user_signal: RwSignal<User>, logged_in: RwSignal<bool>) -> impl IntoView {
+pub fn DropDownLoggedIn(user_signal: RwSignal<Option<User>>, logged_in: RwSignal<bool>) -> impl IntoView {
 
     let logout = move |_| {
         spawn_local(async move {
@@ -72,7 +73,7 @@ pub fn DropDownLoggedIn(user_signal: RwSignal<User>, logged_in: RwSignal<bool>) 
                 log!("Error logging out: {:?}", err);
             } else {
                 log!("Logged out successfully");
-                user_signal.update(|value| *value = User::default());
+                user_signal.update(|value| *value = None);
                 logged_in.set(false);
             }
         });
@@ -82,7 +83,13 @@ pub fn DropDownLoggedIn(user_signal: RwSignal<User>, logged_in: RwSignal<bool>) 
         <div class="dropdown-logged">
             <h1>"Logged In"</h1>
             <div class="profile-info">
-                <h1>{move || user_signal.with(|user| user.username.clone())}</h1>
+                <h1>{move || user_signal.with(|user| 
+                    if let Some(user) = user {
+                        user.username.clone()
+                    } else {
+                        "".to_string()
+                    }
+                )}</h1>
             </div>
             <button on:click=logout class="auth-button">Log Out</button>
         </div>

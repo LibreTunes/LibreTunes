@@ -25,7 +25,7 @@ cfg_if! {
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::users))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct User {
 	/// A unique id for the user
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
