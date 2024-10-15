@@ -18,17 +18,16 @@ pub fn Personal() -> impl IntoView {
 pub fn Profile() -> impl IntoView {
     let (dropdown_open, set_dropdown_open) = create_signal(false);
     let logged_in = create_rw_signal(false);
-
     let user_signal = create_rw_signal(User::default());
-
-    
 
     let open_dropdown = move |_| {
         spawn_local(async move {
             let user = get_user().await;
             if let Ok(user) = user {
                 logged_in.set(true);
-                user_signal.update(|value| *value = user);
+                user_signal.update(|value| {
+                    *value = user;
+                });
             } else {
                 logged_in.set(false);
             }
@@ -82,6 +81,9 @@ pub fn DropDownLoggedIn(user_signal: RwSignal<User>, logged_in: RwSignal<bool>) 
     view! {
         <div class="dropdown-logged">
             <h1>"Logged In"</h1>
+            <div class="profile-info">
+                <h1>{move || user_signal.with(|user| user.username.clone())}</h1>
+            </div>
             <button on:click=logout class="auth-button">Log Out</button>
         </div>
     }

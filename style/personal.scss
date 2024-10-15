@@ -54,6 +54,17 @@
         h1 {
           font-size: 1.2rem;
         }
+        .profile-info {
+          display: flex;
+          width: 100%;
+          justify-content: center;
+          border-top: 0.2rem solid rgba(89, 89, 89, 0.199);
+          border-bottom: 0.2rem solid rgba(89, 89, 89, 0.199);
+          h1 {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+          }
+        }
         .auth-button {
           margin-top: 0.5rem;
           padding: 0.5rem;
