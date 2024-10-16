@@ -13,10 +13,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      LIBRETUNES_AUDIO_PATH: /site/assets/audio
-      LIBRETUNES_IMAGE_PATH: /site/assets/images
+      LIBRETUNES_AUDIO_PATH: /assets/audio
+      LIBRETUNES_IMAGE_PATH: /assets/images
     volumes:
-      - libretunes-audio:/site/audio
+      - libretunes-audio:/assets/audio
+      - libretunes-images:/assets/images
     depends_on:
       - redis
       - postgres
