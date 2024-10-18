@@ -17,23 +17,11 @@ pub fn Personal() -> impl IntoView {
 #[component]
 pub fn Profile() -> impl IntoView {
     let (dropdown_open, set_dropdown_open) = create_signal(false);
-    let logged_in = create_rw_signal(false);
-    // user signal is an option because the user may not be logged in
-    let user_signal = create_rw_signal(None);
+    let user = create_local_resource(move || dropdown_open.get(), |_| async move { get_user().await });
+    let logged_in = create_local_resource(move || dropdown_open.get(), |_| async move { get_user().await.is_ok() });
 
     let open_dropdown = move |_| {
-        spawn_local(async move {
-            let user = get_user().await;
-            if let Ok(user) = user {
-                logged_in.set(true);
-                user_signal.update(|value| {
-                    *value = Some(user);
-                });
-            } else {
-                logged_in.set(false);
-            }
-            set_dropdown_open.update(|value| *value = !*value);
-        });
+        set_dropdown_open.update(|value| *value = !*value);
     };
 
     view! {
@@ -43,11 +31,11 @@ pub fn Profile() -> impl IntoView {
             </div>
             <div class="dropdown-container" style={move || if dropdown_open() {"display: flex"} else {"display: none"}}>
                 <Show
-                    when=logged_in
+                    when=move || logged_in.get().unwrap_or_default()
                     fallback=|| view!{
                         <DropDownNotLoggedIn />
                     }>
-                    <DropDownLoggedIn user_signal=user_signal logged_in=logged_in></DropDownLoggedIn>
+                    <DropDownLoggedIn logged_in=logged_in />
                 </Show>
             </div>
         </div>
@@ -64,7 +52,7 @@ pub fn DropDownNotLoggedIn() -> impl IntoView {
     }
 }
 #[component]
-pub fn DropDownLoggedIn(user_signal: RwSignal<Option<User>>, logged_in: RwSignal<bool>) -> impl IntoView {
+pub fn DropDownLoggedIn(logged_in: Resource<bool, bool>) -> impl IntoView {
 
     let logout = move |_| {
         spawn_local(async move {
@@ -73,7 +61,6 @@ pub fn DropDownLoggedIn(user_signal: RwSignal<Option<User>>, logged_in: RwSignal
                 log!("Error logging out: {:?}", err);
             } else {
                 log!("Logged out successfully");
-                user_signal.update(|value| *value = None);
                 logged_in.set(false);
             }
         });
@@ -82,15 +69,6 @@ pub fn DropDownLoggedIn(user_signal: RwSignal<Option<User>>, logged_in: RwSignal
     view! {
         <div class="dropdown-logged">
             <h1>"Logged In"</h1>
-            <div class="profile-info">
-                <h1>{move || user_signal.with(|user| 
-                    if let Some(user) = user {
-                        user.username.clone()
-                    } else {
-                        "".to_string()
-                    }
-                )}</h1>
-            </div>
             <button on:click=logout class="auth-button">Log Out</button>
         </div>
     }
