@@ -3,7 +3,6 @@ use leptos::*;
 use leptos_icons::*;
 use crate::auth::get_user;
 use crate::auth::logout;
-use crate::models::User;
 
 #[component]
 pub fn Personal() -> impl IntoView {
@@ -24,10 +23,26 @@ pub fn Profile() -> impl IntoView {
         set_dropdown_open.update(|value| *value = !*value);
     };
 
+    let user_profile_picture = move || {
+        user.get().map(|user| {
+            if let Ok(user) = user {
+                return format!("/assets/images/profile/{}.webp", user.id.unwrap());
+            } else {
+                return "".to_string();
+            }
+        })
+    };
+
     view! {
         <div class="profile-container">
             <div class="profile-icon" on:click=open_dropdown>
-                <Icon icon=icondata::CgProfile />
+                <Show
+                    when=move || logged_in.get().unwrap_or_default()
+                    fallback=|| view!{
+                        <Icon icon=icondata::CgProfile />
+                    }>  
+                    <img src=user_profile_picture />
+                </Show>
             </div>
             <div class="dropdown-container" style={move || if dropdown_open() {"display: flex"} else {"display: none"}}>
                 <Show
