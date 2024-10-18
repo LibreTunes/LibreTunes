@@ -35,6 +35,15 @@ pub fn Profile() -> impl IntoView {
 
     view! {
         <div class="profile-container">
+            <div class="profile-name">
+                <Show
+                    when=move || logged_in.get().unwrap_or_default()
+                    fallback=|| view!{
+                        <h1>Not Logged In</h1>
+                    }>
+                    <h1>{move || user.get().map(|user| user.map(|user| user.username).unwrap_or_default())}</h1>
+                </Show>
+            </div>
             <div class="profile-icon" on:click=open_dropdown>
                 <Show
                     when=move || logged_in.get().unwrap_or_default()
