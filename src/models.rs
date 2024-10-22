@@ -1,13 +1,15 @@
 use std::time::SystemTime;
+use leptos::{server, ServerFnError};
 use time::Date;
 use serde::{Deserialize, Serialize};
+use crate::songdata::SongData;
 
 use cfg_if::cfg_if;
 
 cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use diesel::prelude::*;
-		use crate::database::PgPooledConn;
+		use crate::database::*;
 		use std::error::Error;
 	}
 }
@@ -499,7 +501,7 @@ impl Album {
 		Ok(())
 	}
 
-	/// Get songs by this artist from the database
+	/// Get songs by this album from the database
 	/// 
 	/// The `id` field of this album must be present (Some) to get songs
 	/// 
@@ -526,6 +528,22 @@ impl Album {
 
 		Ok(my_songs)
 	}
+}
+
+#[server(endpoint = "get_album")]
+pub async fn get_album(a_id: i32) -> Result<Vec<SongData>,ServerFnError> {
+	use crate::schema::songs::dsl::*;
+	use crate::schema::song_artists::dsl::*;
+	
+	let conn = get_db_conn();
+	
+	let songs = songs
+		.inner_join(song_artists)
+		.filter(album_id.eq(a_id))
+		.select(songs::all_columns())
+		.load(conn)?;
+
+	Ok(songs.into())
 }
 
 /// Model for a song
