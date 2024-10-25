@@ -53,5 +53,6 @@ services:
 
 volumes:
   libretunes-audio:
+  libretunes-images:
   libretunes-redis:
   libretunes-postgres:
