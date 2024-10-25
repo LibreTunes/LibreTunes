@@ -528,22 +528,28 @@ impl Album {
 
 		Ok(my_songs)
 	}
-}
 
-#[server(endpoint = "get_album")]
-pub async fn get_album(a_id: i32) -> Result<Vec<SongData>,ServerFnError> {
-	use crate::schema::songs::dsl::*;
-	use crate::schema::song_artists::dsl::*;
-	
-	let conn = get_db_conn();
-	
-	let songs = songs
-		.inner_join(song_artists)
-		.filter(album_id.eq(a_id))
-		.select(songs::all_columns())
-		.load(conn)?;
+	/// Obtain an album from its albumid
+	/// # Arguments
+	/// 
+	/// * `album_id` - The id of the album to select
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Album, Box<dyn Error>>` - A result indicating success with the desired album, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn get_album(album_id: i32, conn: &mut PgPooledConn) -> Result<Album, Box<dyn Error>> {
+		use crate::schema::albums::dsl::*;
+		use crate::database::get_db_conn;
 
-	Ok(songs.into())
+		let album = albums
+			.find(album_id)
+			.first(conn)?;
+
+		Ok(album)
+	}
 }
 
 /// Model for a song

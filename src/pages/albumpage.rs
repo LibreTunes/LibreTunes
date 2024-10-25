@@ -1,6 +1,5 @@
 use leptos::leptos_dom::*;
 use leptos::*;
-use leptos_icons::*;
 use leptos_router::*;
 use crate::models::*;
 use crate::components::song_list::*;
@@ -11,6 +10,7 @@ struct AlbumParams {
     id: i32
 }
 
+/*
 #[component]
 pub fn AlbumPage() -> impl IntoView {
     let params = use_params::<AlbumParams>();
@@ -43,7 +43,7 @@ pub fn AlbumPage() -> impl IntoView {
                             view! { <SongList songs=s.clone().into()/> }.into_view()
                         },
                         Some(Err(e)) => {
-                            view! { <div>"Error loading albums"</div> }.into_view()
+                            view! { <div>"Error loading albums: :e"</div> }.into_view()
                         },
                         None => {view! { }.into_view()}
                     }
@@ -52,3 +52,4 @@ pub fn AlbumPage() -> impl IntoView {
         </Suspense>
     }
 }
+*/

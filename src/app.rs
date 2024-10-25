@@ -7,7 +7,7 @@ use leptos_meta::*;
 use leptos_router::*;
 use crate::pages::login::*;
 use crate::pages::signup::*;
-use crate::pages::album::*;
+use crate::pages::albumpage::*;
 use crate::error_template::{AppError, ErrorTemplate};
 
 
@@ -43,7 +43,7 @@ pub fn App() -> impl IntoView {
                         <Route path="" view=Dashboard />
                         <Route path="dashboard" view=Dashboard />
                         <Route path="search" view=Search />
-                        <Route path="album/:id" view=AlbumPage />
+                        //<Route path="album/:id" view=AlbumPage />
                     </Route>
                     <Route path="/login" view=Login />
                     <Route path="/signup" view=Signup />
