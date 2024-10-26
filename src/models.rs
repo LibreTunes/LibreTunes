@@ -550,6 +550,123 @@ impl Album {
 
 		Ok(album)
 	}
+
+	/// Obtain an album from its albumid
+	/// # Arguments
+	/// 
+	/// * `album_id` - The id of the album to select
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Album, Box<dyn Error>>` - A result indicating success with the desired album, or an error
+	/// 
+	#[cfg(feature = "ssr")]
+	pub fn get_song_data(album_id: i32, conn: &mut PgPooledConn) -> Result<Album, Box<dyn Error>> {
+		use crate::schema::albums::dsl::*;
+		use crate::database::get_db_conn;
+
+		"
+		WITH R1 AS(
+			SELECT 
+				id AS album_id,
+				title AS album_title,
+				release_date AS album_release_date,
+				image_path AS album_image_path
+			FROM albums WHERE [ALBUM_ID] = id
+		), 
+		R2 AS(
+			SELECT
+				id, 
+				title,
+				track,
+				duration,
+				release_date,
+				storage_path AS song_path,
+				image_path,
+				r.album_id,
+				album_title,
+				album_release_date,
+				album_image_path
+			FROM
+				R1 r LEFT JOIN songs s ON r.album_id = s.album_id
+		),
+		R7 AS(
+			SELECT
+				song_id,
+				artist_id,
+				name AS artist_name
+			FROM
+				song_artists sa LEFT JOIN artists a ON sa.artist_id = a.id
+		),
+		R3 AS(
+			SELECT 
+				s.song_id,
+				artist_name,
+				artist_id
+			FROM
+				(SELECT id AS song_id FROM R2) s LEFT JOIN R7 a ON s.song_id = a.song_id
+		),
+		R4 AS(
+			SELECT
+				id, 
+				title,
+				track,
+				duration,
+				release_date,
+				song_path,
+				image_path,
+				r.album_id,
+				album_title,
+				album_release_date,
+				album_image_path,
+				artist_id,
+				artist_name
+			FROM
+				R2 r LEFT JOIN R3 a ON r.id = a.song_id
+		),
+		R5 AS(
+			SELECT
+				r.id,
+				count(sl.user_id) <> 0 AS liked
+			FROM
+				R4 r LEFT JOIN song_likes sl ON sl.user_id = [USER_ID] AND r.id = sl.song_id
+			GROUP BY
+				r.id
+		), 
+		R6 AS(
+			SELECT
+				r.id,
+				count(sd.user_id) <> 0 AS disliked
+			FROM 
+				R4 r LEFT JOIN song_dislikes sd ON sd.user_id = [USER_ID] AND r.id = sd.song_id
+			GROUP BY
+				r.id
+		)
+		SELECT
+			r.id, 
+			title,
+			track,
+			duration,
+			release_date,
+			song_path,
+			image_path,
+			r.album_id,
+			album_title,
+			album_release_date,
+			album_image_path,
+			artist_id,
+			artist_name,
+			liked,
+			disliked
+		FROM R4 r
+			LEFT JOIN R5 likes ON likes.id = r.id
+			LEFT JOIN R6 dislikes ON dislikes.id = r.id
+		;
+		"
+
+		Ok(album)
+	}
 }
 
 /// Model for a song
