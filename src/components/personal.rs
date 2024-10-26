@@ -16,6 +16,7 @@ pub fn Personal() -> impl IntoView {
 #[component]
 pub fn Profile() -> impl IntoView {
     let (dropdown_open, set_dropdown_open) = create_signal(false);
+    let (image_error, set_image_error) = create_signal(false);
     let user = create_local_resource(move || dropdown_open.get(), |_| async move { get_user().await });
     let logged_in = create_local_resource(move || dropdown_open.get(), |_| async move { get_user().await.is_ok() });
 
@@ -24,12 +25,8 @@ pub fn Profile() -> impl IntoView {
     };
 
     let user_profile_picture = move || {
-        user.get().map(|user| {
-            if let Ok(user) = user {
-                return format!("/assets/images/profile/{}.webp", user.id.unwrap());
-            } else {
-                return "".to_string();
-            }
+        user.get().and_then(|user| {
+            user.ok().map(|user| format!("/assets/images/profile/{}.webp", user.id.unwrap()))
         })
     };
 
@@ -42,16 +39,23 @@ pub fn Profile() -> impl IntoView {
                         <h1>Not Logged In</h1>
                     }>
                     <h1>{move || user.get().map(|user| user.map(|user| user.username).unwrap_or_default())}</h1>
-					<h2>{move || user.get().map(|user| user.map(|user| user.email).unwrap_or_default())}</h2>
+                    <h2>{move || user.get().map(|user| user.map(|user| user.email).unwrap_or_default())}</h2>
                 </Show>
             </div>
             <div class="profile-icon" on:click=open_dropdown>
-                <Show
+                <Show 
                     when=move || logged_in.get().unwrap_or_default()
-                    fallback=|| view!{
-                        <Icon icon=icondata::CgProfile />
-                    }>  
-                    <img src=user_profile_picture />
+                    fallback=|| view! { <Icon icon=icondata::CgProfile /> }
+                >
+                    <Show
+                        when=move || !image_error()
+                        fallback=|| view! { <Icon icon=icondata::CgProfile /> }
+                    >
+                        <img 
+                            src=user_profile_picture() 
+                            on:error=move |_| set_image_error.set(true)
+                        />
+                    </Show>
                 </Show>
             </div>
             <div class="dropdown-container" style={move || if dropdown_open() {"display: flex"} else {"display: none"}}>
