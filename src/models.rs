@@ -626,3 +626,24 @@ pub struct HistoryEntry {
 	/// The id of the song that was listened to
 	pub song_id: i32,
 }
+
+/// Model for a playlist
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::playlists))]
+#[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+#[derive(Serialize, Deserialize)]
+pub struct Playlist {
+	/// A unique id for the playlist
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
+	pub id: Option<i32>,
+	/// The time the playlist was created
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = SystemTime))]
+	pub created_at: Option<SystemTime>,
+	/// The time the playlist was last updated
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = SystemTime))]
+	pub updated_at: Option<SystemTime>,
+	/// The id of the user who owns the playlist
+	pub owner_id: i32,
+	/// The name of the playlist
+	pub name: String,
+}
