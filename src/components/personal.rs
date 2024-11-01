@@ -39,17 +39,16 @@ pub fn Profile() -> impl IntoView {
                         <h1>Not Logged In</h1>
                     }>
                     <h1>{move || user.get().map(|user| user.map(|user| user.username).unwrap_or_default())}</h1>
-                    <h2>{move || user.get().map(|user| user.map(|user| user.email).unwrap_or_default())}</h2>
                 </Show>
             </div>
             <div class="profile-icon" on:click=open_dropdown>
                 <Show 
                     when=move || logged_in.get().unwrap_or_default()
-                    fallback=|| view! { <Icon icon=icondata::CgProfile /> }
+                    fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
                 >
                     <Show
                         when=move || !image_error()
-                        fallback=|| view! { <Icon icon=icondata::CgProfile /> }
+                        fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
                     >
                         <img 
                             src=user_profile_picture() 
