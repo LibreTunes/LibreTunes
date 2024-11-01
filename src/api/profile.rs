@@ -128,7 +128,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(S
 
 			let image_path = song.image_path.unwrap_or(
 				album.as_ref().map(|album| album.image_path.clone()).flatten()
-					.unwrap_or("/assets/images/placeholder.jpg".to_string()));
+					.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
 
 			let songdata = SongData {
 				id: song_id,
@@ -226,7 +226,7 @@ pub async fn top_songs(for_user_id: i32, start_date: SystemTime, end_date: Syste
 
 			let image_path = song.image_path.unwrap_or(
 				album.as_ref().map(|album| album.image_path.clone()).flatten()
-					.unwrap_or("/assets/images/placeholder.jpg".to_string()));
+					.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
 
 			let songdata = SongData {
 				id: song_id,
