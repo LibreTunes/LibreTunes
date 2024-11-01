@@ -18,8 +18,10 @@ pub fn SongList(songs: MaybeSignal<Vec<SongData>>) -> impl IntoView {
 						let playing = first_song.into();
 						first_song = false;
 
+						let extra = Option::<()>::None;
+
 						view! {
-							<SongListItem song={song.clone()} song_playing=playing />
+							<SongListItem song={song.clone()} song_playing=playing extra />
 						}
 					}).collect::<Vec<_>>()
 				})
@@ -29,7 +31,33 @@ pub fn SongList(songs: MaybeSignal<Vec<SongData>>) -> impl IntoView {
 }
 
 #[component]
-pub fn SongListItem(song: SongData, song_playing: MaybeSignal<bool>) -> impl IntoView {
+pub fn SongListExtra<T>(songs: MaybeSignal<Vec<(SongData, T)>>) -> impl IntoView where 
+	T: Clone + IntoView + 'static
+{
+	view! {
+		<table class="song-list">
+			{
+				songs.with(|songs| {
+					let mut first_song = true;
+
+					songs.iter().map(|(song, extra)| {
+						let playing = first_song.into();
+						first_song = false;
+
+						view! {
+							<SongListItem song={song.clone()} song_playing=playing extra=Some(extra.clone()) />
+						}
+					}).collect::<Vec<_>>()
+				})
+			}
+		</table>
+	}
+}
+
+#[component]
+pub fn SongListItem<T>(song: SongData, song_playing: MaybeSignal<bool>, extra: Option<T>) -> impl IntoView where
+	T: IntoView + 'static
+{
 	let liked = create_rw_signal(song.like_dislike.map(|(liked, _)| liked).unwrap_or(false));
 	let disliked = create_rw_signal(song.like_dislike.map(|(_, disliked)| disliked).unwrap_or(false));
 	
@@ -44,6 +72,10 @@ pub fn SongListItem(song: SongData, song_playing: MaybeSignal<bool>) -> impl Int
 			<td class="song-list-spacer-big"></td>
 			<td class="song-like-dislike"><SongLikeDislike liked disliked/></td>
 			<td>{format!("{}:{:02}", song.duration / 60, song.duration % 60)}</td>
+			{extra.map(|extra| view! {
+				<td class="song-list-spacer"></td>
+				<td>{extra}</td>
+			})}
 		</tr>
 	}
 }
