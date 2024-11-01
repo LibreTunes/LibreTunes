@@ -85,6 +85,7 @@ pub async fn logout() -> Result<(), ServerFnError> {
 	auth_session.logout().await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
 
+	leptos_axum::redirect("/login");
 	Ok(())
 }
 
