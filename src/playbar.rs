@@ -5,6 +5,7 @@ use crate::api::songs;
 use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
+use leptos_meta::Title;
 use leptos::*;
 use leptos_icons::*;
 use leptos_use::{utils::Pausable, use_interval_fn};
@@ -457,6 +458,21 @@ fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
         <Icon class="controlbtn" width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon=icondata::RiPlayListMediaFill />
         </button>
         </div>
+    }
+}
+
+/// Renders the title of the page based on the currently playing song
+#[component]
+pub fn CustomTitle(play_status: RwSignal<PlayStatus>) -> impl IntoView {
+    let title = create_memo(move |_| {
+        play_status.with(|play_status| {
+            play_status.queue.front().map_or("LibreTunes".to_string(), |song_data| {
+                    format!("{} - {} | {}",song_data.title.clone(),Artist::display_list(&song_data.artists), "LibreTunes")
+                })
+            })
+        });
+    view! {
+        <Title text=title />
     }
 }
 
