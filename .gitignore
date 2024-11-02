@@ -24,6 +24,7 @@ playwright/.cache/
 *.jpeg
 *.png
 *.gif
+*.webp
 
 # Environment variables
 .env
