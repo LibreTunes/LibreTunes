@@ -147,6 +147,19 @@ pub async fn get_user() -> Result<User, ServerFnError> {
 	auth_session.user.ok_or(ServerFnError::<NoCustomError>::ServerError("User not logged in".to_string()))
 }
 
+#[server(endpoint = "get_logged_in_user")]
+pub async fn get_logged_in_user() -> Result<Option<User>, ServerFnError> {
+	let auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
+
+	let user = auth_session.user.map(|mut user| {
+		user.password = None;
+		user
+	});
+
+	Ok(user)
+}
+
 /// Check if a user is an admin
 /// Returns a Result with a boolean indicating if the user is logged in and an admin
 #[server(endpoint = "check_admin")]
