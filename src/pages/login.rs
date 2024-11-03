@@ -32,12 +32,12 @@ pub fn Login() -> impl IntoView {
             if let Err(err) = login_result {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error logging in: {:?}", err);
-            } else if let Ok(true) = login_result {
+            } else if let Ok(Some(_)) = login_result {
                 // Redirect to the login page
                 log!("Logged in Successfully!");
                 leptos_router::use_navigate()("/", Default::default());
                 log!("Navigated to home page after login");
-            } else if let Ok(false) = login_result {
+            } else if let Ok(None) = login_result {
                 log!("Invalid username or password");
             }
         });

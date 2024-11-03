@@ -57,7 +57,7 @@ pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 /// Takes in a username or email and a password in plaintext
 /// Returns a Result with a boolean indicating if the login was successful
 #[server(endpoint = "login")]
-pub async fn login(credentials: UserCredentials) -> Result<bool, ServerFnError> {
+pub async fn login(credentials: UserCredentials) -> Result<Option<User>, ServerFnError> {
 	use crate::users::validate_user;
 
 	let mut auth_session = extract::<AuthSession<AuthBackend>>().await
@@ -66,12 +66,14 @@ pub async fn login(credentials: UserCredentials) -> Result<bool, ServerFnError> 
 	let user = validate_user(credentials).await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error validating user: {}", e)))?;
 
-	if let Some(user) = user {
+	if let Some(mut user) = user {
 		auth_session.login(&user).await
 			.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error logging in user: {}", e)))?;
-		Ok(true)
+
+		user.password = None;
+		Ok(Some(user))
 	} else {
-		Ok(false)
+		Ok(None)
 	}
 }
 
