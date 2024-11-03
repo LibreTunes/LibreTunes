@@ -3,12 +3,16 @@ use crate::playbar::CustomTitle;
 use crate::playstatus::PlayStatus;
 use crate::queue::Queue;
 use leptos::*;
+use leptos::logging::*;
 use leptos_meta::*;
 use leptos_router::*;
 use crate::pages::login::*;
 use crate::pages::signup::*;
 use crate::error_template::{AppError, ErrorTemplate};
+use crate::auth::get_logged_in_user;
+use crate::models::User;
 
+pub type LoggedInUserResource = Resource<(), Option<User>>;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -18,6 +22,18 @@ pub fn App() -> impl IntoView {
     let play_status = PlayStatus::default();
     let play_status = create_rw_signal(play_status);
     let upload_open = create_rw_signal(false);
+
+    // A resource that fetches the logged in user
+    // This will not automatically refetch, so any login/logout related code
+    // should call `refetch` on this resource
+    let logged_in_user: LoggedInUserResource = create_resource(|| (), |_| async {
+        get_logged_in_user().await
+            .inspect_err(|e| {
+                error!("Error getting logged in user: {:?}", e);
+            })
+            .ok()
+            .flatten()
+    });
 
     view! {
         // injects a stylesheet into the document <head>
@@ -43,8 +59,8 @@ pub fn App() -> impl IntoView {
                         <Route path="dashboard" view=Dashboard />
                         <Route path="search" view=Search />
                     </Route>
-                    <Route path="/login" view=Login />
-                    <Route path="/signup" view=Signup />
+                    <Route path="/login" view=move || view!{ <Login user=logged_in_user /> } />
+                    <Route path="/signup" view=move || view!{ <Signup user=logged_in_user /> } />
                 </Routes>
             </main>
         </Router>
