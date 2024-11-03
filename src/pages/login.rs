@@ -3,9 +3,10 @@ use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
 use crate::users::UserCredentials;
+use crate::app::LoggedInUserResource;
 
 #[component]
-pub fn Login() -> impl IntoView {
+pub fn Login(user: LoggedInUserResource) -> impl IntoView {
     let (username_or_email, set_username_or_email) = create_signal("".to_string());
     let (password, set_password) = create_signal("".to_string());
 
@@ -32,13 +33,22 @@ pub fn Login() -> impl IntoView {
             if let Err(err) = login_result {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error logging in: {:?}", err);
-            } else if let Ok(Some(_)) = login_result {
+
+                // Since we're not sure what the state is, manually refetch the user
+                user.refetch();
+            } else if let Ok(Some(login_user)) = login_result {
+                // Manually set the user to the new user, avoiding a refetch
+                user.set(Some(login_user));
+
                 // Redirect to the login page
                 log!("Logged in Successfully!");
                 leptos_router::use_navigate()("/", Default::default());
                 log!("Navigated to home page after login");
             } else if let Ok(None) = login_result {
                 log!("Invalid username or password");
+
+                // User could be already logged in or not, so refetch the user
+                user.refetch();
             }
         });
     };

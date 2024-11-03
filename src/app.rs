@@ -59,8 +59,8 @@ pub fn App() -> impl IntoView {
                         <Route path="dashboard" view=Dashboard />
                         <Route path="search" view=Search />
                     </Route>
-                    <Route path="/login" view=Login />
-                    <Route path="/signup" view=Signup />
+                    <Route path="/login" view=move || view!{ <Login user=logged_in_user /> } />
+                    <Route path="/signup" view=move || view!{ <Signup user=logged_in_user /> } />
                 </Routes>
             </main>
         </Router>
