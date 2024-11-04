@@ -1,7 +1,7 @@
 use crate::models::Artist;
 use crate::components::dashboard_tile::DashboardTile;
 
-use time::Date;
+use chrono::NaiveDate;
 
 /// Holds information about an album
 /// 
@@ -14,7 +14,7 @@ pub struct AlbumData {
 	/// Album artists
 	pub artists: Vec<Artist>,
 	/// Album release date
-	pub release_date: Option<Date>,
+	pub release_date: Option<NaiveDate>,
 	/// Path to album image, relative to the root of the web server.
 	/// For example, `"/assets/images/Album.jpg"`
 	pub image_path: String,

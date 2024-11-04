@@ -1,5 +1,4 @@
 use leptos::*;
-use leptos::logging::*;
 use leptos_router::use_params_map;
 use leptos_icons::*;
 use server_fn::error::NoCustomError;
@@ -17,7 +16,7 @@ use crate::models::User;
 use crate::users::get_user_by_id;
 
 /// Duration in seconds backwards from now to aggregate history data for
-const HISTORY_SECS: u64 = 60 * 60 * 24 * 30;
+const HISTORY_SECS: i64 = 60 * 60 * 24 * 30;
 const HISTORY_MESSAGE: &str = "Last Month";
 
 /// How many top songs to show
@@ -160,19 +159,7 @@ fn UserProfile(user: User) -> impl IntoView {
 				{user.email}
 				{
 					user.created_at.map(|created_at| {
-						use time::{OffsetDateTime, macros::format_description};
-						let format = format_description!("[month repr:long] [year]");
-						let date_time = Into::<OffsetDateTime>::into(created_at).format(format);
-
-						match date_time {
-							Ok(date_time) => {
-								format!(" • Joined {}", date_time)
-							},
-							Err(e) => {
-								error!("Error formatting date: {}", e);
-								String::new()
-							}
-						}
+						format!(" • Joined {}", created_at.format("%B %Y"))
 					})
 				}
 				{
@@ -191,11 +178,10 @@ fn UserProfile(user: User) -> impl IntoView {
 #[component]
 fn TopSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 	let top_songs = create_resource(move || user_id.get(), |user_id| async move {
-		use std::time::{SystemTime, Duration};
-
-		let now = SystemTime::now();
-		let start = now - Duration::from_secs(HISTORY_SECS);
-		let top_songs = top_songs(user_id, start, now, Some(TOP_SONGS_COUNT)).await;
+		use chrono::{Local, Duration};
+		let now = Local::now();
+		let start = now - Duration::seconds(HISTORY_SECS);
+		let top_songs = top_songs(user_id, start.naive_utc(), now.naive_utc(), Some(TOP_SONGS_COUNT)).await;
 
 		top_songs.map(|top_songs| {
 			top_songs.into_iter().map(|(plays, song)| {
@@ -283,11 +269,11 @@ fn RecentSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 #[component]
 fn TopArtists(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 	let top_artists = create_resource(move || user_id.get(), |user_id| async move {
-		use std::time::{SystemTime, Duration};
+		use chrono::{Local, Duration};
 
-		let now = SystemTime::now();
-		let start = now - Duration::from_secs(HISTORY_SECS);
-		let top_artists = top_artists(user_id, start, now, Some(TOP_ARTISTS_COUNT)).await;
+		let now = Local::now();
+		let start = now - Duration::seconds(HISTORY_SECS);
+		let top_artists = top_artists(user_id, start.naive_utc(), now.naive_utc(), Some(TOP_ARTISTS_COUNT)).await;
 
 		top_artists.map(|top_artists| {
 			top_artists.into_iter().map(|(_plays, artist)| {

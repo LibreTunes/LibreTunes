@@ -378,13 +378,16 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chrono"
-version = "0.4.37"
+version = "0.4.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a0d04d43504c61aa6c7531f1871dd0d418d91130162063b789da00fd7057a5e"
+checksum = "a21f936df1771bf62b77f047b726c4625ff2e8aa607c01ec06e5a05bd8463401"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
+ "serde",
+ "wasm-bindgen",
  "windows-targets 0.52.4",
 ]
 
@@ -690,11 +693,11 @@ checksum = "03fc05c17098f21b89bc7d98fe1dd3cce2c11c2ad8e145f2a44fe08ed28eb559"
 dependencies = [
  "bitflags 2.5.0",
  "byteorder",
+ "chrono",
  "diesel_derives",
  "itoa",
  "pq-sys",
  "r2d2",
- "time",
 ]
 
 [[package]]
@@ -1834,6 +1837,7 @@ dependencies = [
  "axum",
  "axum-login",
  "cfg-if",
+ "chrono",
  "console_error_panic_hook",
  "diesel",
  "diesel_migrations",
@@ -1857,7 +1861,6 @@ dependencies = [
  "server_fn",
  "symphonia",
  "thiserror",
- "time",
  "tokio",
  "tower 0.5.1",
  "tower-http",
