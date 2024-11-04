@@ -5,7 +5,6 @@ use cfg_if::cfg_if;
 
 use crate::songdata::SongData;
 use crate::artistdata::ArtistData;
-use crate::models::Artist;
 
 use std::time::SystemTime;
 
