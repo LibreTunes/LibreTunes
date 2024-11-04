@@ -12,7 +12,7 @@ pub fn ServerError<E: Display + 'static>(
 	error: Option<ServerFnError<E>>,
 ) -> impl IntoView {
 	view! {
-		<div class="error-container home-component">
+		<div class="error-container">
 			<div class="error-header">
 				<Icon icon=icondata::BiErrorSolid />
 				<h1>{title}</h1>
