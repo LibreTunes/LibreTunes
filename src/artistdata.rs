@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 /// Holds information about an artist
 /// 
 /// Intended to be used in the front-end
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ArtistData {
 	/// Artist id
 	pub id: i32,
