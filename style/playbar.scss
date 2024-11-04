@@ -2,7 +2,7 @@
 
 .playbar {
 	width: 100%;
-	height: 75px;
+	height: $playbar-size;
 	background-color: $play-bar-background-color;
 	opacity: 0.9;
 	position: fixed;
