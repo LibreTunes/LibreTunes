@@ -4,6 +4,7 @@ use server_fn::codec::{MultipartData, MultipartFormData};
 use cfg_if::cfg_if;
 
 use crate::songdata::SongData;
+use crate::artistdata::ArtistData;
 use crate::models::Artist;
 
 use std::time::SystemTime;
@@ -260,7 +261,7 @@ pub async fn top_songs(for_user_id: i32, start_date: SystemTime, end_date: Syste
 /// Returns a list of tuples with the play count and the artist data, sorted by play count (most played first).
 #[server(endpoint = "/profile/top_artists")]
 pub async fn top_artists(for_user_id: i32, start_date: SystemTime, end_date: SystemTime, limit: Option<i64>)
-	-> Result<Vec<(i64, Artist)>, ServerFnError>
+	-> Result<Vec<(i64, ArtistData)>, ServerFnError>
 {
 	let mut db_con = get_db_conn();
 
@@ -288,5 +289,13 @@ pub async fn top_artists(for_user_id: i32, start_date: SystemTime, end_date: Sys
 				.load(&mut db_con)?
 		};
 
-	Ok(artist_counts)
+	let artist_data: Vec<(i64, ArtistData)> = artist_counts.into_iter().map(|(plays, artist)| {
+		(plays, ArtistData {
+			id: artist.id.unwrap(),
+			name: artist.name,
+			image_path: format!("/assets/images/artists/{}.webp", artist.id.unwrap()),
+		})
+	}).collect();
+
+	Ok(artist_data)
 }
