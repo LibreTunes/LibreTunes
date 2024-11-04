@@ -6,7 +6,7 @@ use cfg_if::cfg_if;
 use crate::songdata::SongData;
 use crate::artistdata::ArtistData;
 
-use std::time::SystemTime;
+use chrono::NaiveDateTime;
 
 cfg_if! {
 	if #[cfg(feature = "ssr")] {
@@ -67,7 +67,7 @@ pub async fn upload_picture(data: MultipartData) -> Result<(), ServerFnError> {
 /// Returns a list of tuples with the date the song was listened to
 /// and the song data, sorted by date (most recent first).
 #[server(endpoint = "/profile/recent_songs")]
-pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(SystemTime, SongData)>, ServerFnError> {
+pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(NaiveDateTime, SongData)>, ServerFnError> {
 	let mut db_con = get_db_conn();
 
 	// Get the ids of the most recent songs listened to
@@ -108,7 +108,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(S
 		.load(&mut db_con)?;
 
 	// Process the history data into a map of song ids to song data
-	let mut history_songs: HashMap<i32, (SystemTime, SongData)> = HashMap::with_capacity(history.len());
+	let mut history_songs: HashMap<i32, (NaiveDateTime, SongData)> = HashMap::with_capacity(history.len());
 
 	for (history, song, album, artist, like, dislike) in history {
 		let song_id = history.song_id;
@@ -148,7 +148,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(S
 	}
 
 	// Sort the songs by date
-	let mut history_songs: Vec<(SystemTime, SongData)> = history_songs.into_values().collect();
+	let mut history_songs: Vec<(NaiveDateTime, SongData)> = history_songs.into_values().collect();
 	history_songs.sort_by(|a, b| b.0.cmp(&a.0));
 	Ok(history_songs)
 }
@@ -158,7 +158,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(S
 /// If not provided, all songs listened to in the date range are returned.
 /// Returns a list of tuples with the play count and the song data, sorted by play count (most played first).
 #[server(endpoint = "/profile/top_songs")]
-pub async fn top_songs(for_user_id: i32, start_date: SystemTime, end_date: SystemTime, limit: Option<i64>)
+pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: NaiveDateTime, limit: Option<i64>)
 	-> Result<Vec<(i64, SongData)>, ServerFnError>
 {
 	let mut db_con = get_db_conn();
@@ -259,7 +259,7 @@ pub async fn top_songs(for_user_id: i32, start_date: SystemTime, end_date: Syste
 /// If not provided, all artists listened to in the date range are returned.
 /// Returns a list of tuples with the play count and the artist data, sorted by play count (most played first).
 #[server(endpoint = "/profile/top_artists")]
-pub async fn top_artists(for_user_id: i32, start_date: SystemTime, end_date: SystemTime, limit: Option<i64>)
+pub async fn top_artists(for_user_id: i32, start_date: NaiveDateTime, end_date: NaiveDateTime, limit: Option<i64>)
 	-> Result<Vec<(i64, ArtistData)>, ServerFnError>
 {
 	let mut db_con = get_db_conn();

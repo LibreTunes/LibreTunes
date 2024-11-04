@@ -2,7 +2,7 @@ use crate::models::{Album, Artist, Song};
 use crate::components::dashboard_tile::DashboardTile;
 
 use serde::{Serialize, Deserialize};
-use time::Date;
+use chrono::NaiveDate;
 
 /// Holds information about a song
 /// 
@@ -22,7 +22,7 @@ pub struct SongData {
 	/// The duration of the song in seconds
 	pub duration: i32,
 	/// The song's release date
-	pub release_date: Option<Date>,
+	pub release_date: Option<NaiveDate>,
 	/// Path to song file, relative to the root of the web server.
 	/// For example, `"/assets/audio/Song.mp3"`
 	pub song_path: String,
