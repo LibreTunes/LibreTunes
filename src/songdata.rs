@@ -1,12 +1,13 @@
 use crate::models::{Album, Artist, Song};
 use crate::components::dashboard_tile::DashboardTile;
 
+use serde::{Serialize, Deserialize};
 use time::Date;
 
 /// Holds information about a song
 /// 
 /// Intended to be used in the front-end, as it includes artist and album objects, rather than just their ids.
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SongData {
 	/// Song id
 	pub id: i32,

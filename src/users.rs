@@ -128,3 +128,15 @@ pub async fn get_user(username_or_email: String) -> Result<Option<User>, ServerF
 
 	Ok(user)
 }
+
+#[server(endpoint = "get_user_by_id")]
+pub async fn get_user_by_id(user_id: i32) -> Result<Option<User>, ServerFnError> {
+	let mut user = find_user_by_id(user_id).await?;
+
+	// Remove the password hash before returning the user
+	if let Some(user) = user.as_mut() {
+		user.password = None;
+	}
+
+	Ok(user)
+}

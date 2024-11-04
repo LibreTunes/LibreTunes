@@ -8,6 +8,7 @@ use leptos_meta::*;
 use leptos_router::*;
 use crate::pages::login::*;
 use crate::pages::signup::*;
+use crate::pages::profile::*;
 use crate::error_template::{AppError, ErrorTemplate};
 use crate::auth::get_logged_in_user;
 use crate::models::User;
@@ -58,6 +59,8 @@ pub fn App() -> impl IntoView {
                         <Route path="" view=Dashboard />
                         <Route path="dashboard" view=Dashboard />
                         <Route path="search" view=Search />
+                        <Route path="user/:id" view=move || view!{ <Profile logged_in_user /> } />
+                        <Route path="user" view=move || view!{ <Profile logged_in_user /> } />
                     </Route>
                     <Route path="/login" view=move || view!{ <Login user=logged_in_user /> } />
                     <Route path="/signup" view=move || view!{ <Signup user=logged_in_user /> } />
@@ -70,7 +73,7 @@ pub fn App() -> impl IntoView {
 use crate::components::sidebar::*;
 use crate::components::dashboard::*;
 use crate::components::search::*;
-use crate::components::personal::*;
+use crate::components::personal::Personal;
 use crate::components::upload::*;
 
 /// Renders the home page of your application.
