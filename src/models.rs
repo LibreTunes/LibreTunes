@@ -540,7 +540,7 @@ impl Album {
 	/// * `Result<Album, Box<dyn Error>>` - A result indicating success with the desired album, or an error
 	/// 
 	#[cfg(feature = "ssr")]
-	pub fn get_album(album_id: i32, conn: &mut PgPooledConn) -> Result<Album, Box<dyn Error>> {
+	pub fn get_album(album_id: i32, user_id: i32, conn: &mut PgPooledConn) -> Result<Album, Box<dyn Error>> {
 		use crate::schema::albums::dsl::*;
 		use crate::database::get_db_conn;
 
@@ -562,110 +562,62 @@ impl Album {
 	/// * `Result<Album, Box<dyn Error>>` - A result indicating success with the desired album, or an error
 	/// 
 	#[cfg(feature = "ssr")]
-	pub fn get_song_data(album_id: i32, conn: &mut PgPooledConn) -> Result<Album, Box<dyn Error>> {
-		use crate::schema::albums::dsl::*;
+	pub fn get_song_data(album_id: i32, user_like_dislike_id: i32, conn: &mut PgPooledConn) -> Result<Vec<SongData>, Box<dyn Error>> {
+		use crate::schema::*;
 		use crate::database::get_db_conn;
+		use std::collections::HashMap;
 
-		"
-		WITH R1 AS(
-			SELECT 
-				id AS album_id,
-				title AS album_title,
-				release_date AS album_release_date,
-				image_path AS album_image_path
-			FROM albums WHERE [ALBUM_ID] = id
-		), 
-		R2 AS(
-			SELECT
-				id, 
-				title,
-				track,
-				duration,
-				release_date,
-				storage_path AS song_path,
-				image_path,
-				r.album_id,
-				album_title,
-				album_release_date,
-				album_image_path
-			FROM
-				R1 r LEFT JOIN songs s ON r.album_id = s.album_id
-		),
-		R7 AS(
-			SELECT
-				song_id,
-				artist_id,
-				name AS artist_name
-			FROM
-				song_artists sa LEFT JOIN artists a ON sa.artist_id = a.id
-		),
-		R3 AS(
-			SELECT 
-				s.song_id,
-				artist_name,
-				artist_id
-			FROM
-				(SELECT id AS song_id FROM R2) s LEFT JOIN R7 a ON s.song_id = a.song_id
-		),
-		R4 AS(
-			SELECT
-				id, 
-				title,
-				track,
-				duration,
-				release_date,
-				song_path,
-				image_path,
-				r.album_id,
-				album_title,
-				album_release_date,
-				album_image_path,
-				artist_id,
-				artist_name
-			FROM
-				R2 r LEFT JOIN R3 a ON r.id = a.song_id
-		),
-		R5 AS(
-			SELECT
-				r.id,
-				count(sl.user_id) <> 0 AS liked
-			FROM
-				R4 r LEFT JOIN song_likes sl ON sl.user_id = [USER_ID] AND r.id = sl.song_id
-			GROUP BY
-				r.id
-		), 
-		R6 AS(
-			SELECT
-				r.id,
-				count(sd.user_id) <> 0 AS disliked
-			FROM 
-				R4 r LEFT JOIN song_dislikes sd ON sd.user_id = [USER_ID] AND r.id = sd.song_id
-			GROUP BY
-				r.id
-		)
-		SELECT
-			r.id, 
-			title,
-			track,
-			duration,
-			release_date,
-			song_path,
-			image_path,
-			r.album_id,
-			album_title,
-			album_release_date,
-			album_image_path,
-			artist_id,
-			artist_name,
-			liked,
-			disliked
-		FROM R4 r
-			LEFT JOIN R5 likes ON likes.id = r.id
-			LEFT JOIN R6 dislikes ON dislikes.id = r.id
-		;
-		"
+		let songs: Vec<(Album, Option<Song>, Option<Artist>, Option<(i32, i32)>, Option<(i32, i32)>)> =
+		albums::table
+			.find(album_id)
+			.left_join(songs::table.on(albums::id.nullable().eq(songs::album_id)))
+			.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
+			.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(user_like_dislike_id))))
+			.left_join(song_dislikes::table.on(songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(user_like_dislike_id))))
+			.select((
+				albums::all_columns,
+				songs::all_columns.nullable(),
+				artists::all_columns.nullable(),
+				song_likes::all_columns.nullable(),
+				song_dislikes::all_columns.nullable()
+			))
+			.load(conn)?;
 
-		Ok(album)
+		let mut album_songs: HashMap<i32, SongData> = HashMap::with_capacity(songs.len());
+		
+		for (album, song, artist, like, dislike) in songs {
+			if let Some(song) = song {				
+				let like_dislike = match (like, dislike) {
+					(Some(_), Some(_)) => Some((true, true)),
+					(Some(_), None) => Some((true, false)),
+					(None, Some(_)) => Some((false, true)),
+					_ => None,
+				};
+	
+				let image_path = song.image_path.unwrap_or(
+					album.image_path.clone().unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
+	
+				let songdata = SongData {
+					id: song.id.unwrap(),
+					title: song.title,
+					artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
+					album: Some(album),
+					track: song.track,
+					duration: song.duration,
+					release_date: song.release_date,
+					song_path: song.storage_path,
+					image_path: image_path,
+					like_dislike: like_dislike,
+				};
+	
+				album_songs.insert(song.id.unwrap(), songdata);
+			} 
+		}
+	
+		// Sort the songs by date
+		let mut songdata: Vec<SongData> = album_songs.into_values().collect();
+		songdata.sort_by(|a, b| b.track.cmp(&a.track));
+		Ok(songdata)
 	}
 }
 
