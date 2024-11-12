@@ -3,6 +3,7 @@ use leptos::*;
 use leptos_router::*;
 use crate::models::*;
 use crate::components::song_list::*;
+use crate::api::album::*;
 
 
 #[derive(Params, PartialEq)]
@@ -10,7 +11,6 @@ struct AlbumParams {
     id: i32
 }
 
-/*
 #[component]
 pub fn AlbumPage() -> impl IntoView {
     let params = use_params::<AlbumParams>();
@@ -26,8 +26,8 @@ pub fn AlbumPage() -> impl IntoView {
         id,
         |value| async move {
             match value {
-                Ok(v) => {get_album(v).await},
-                Err(e) => {Err(ServerFnError::Request("Invalid album!".into()))},
+                Ok(v) => {get_songs(v).await},
+                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e).into()))},
             }
         },
     );
@@ -40,7 +40,7 @@ pub fn AlbumPage() -> impl IntoView {
                 song_list.with( |song_list| {
                     match song_list {
                         Some(Ok(s)) => {
-                            view! { <SongList songs=s.clone().into()/> }.into_view()
+                            view! { <SongList songs=(*s).clone().into()/> }.into_view()
                         },
                         Some(Err(e)) => {
                             view! { <div>"Error loading albums: :e"</div> }.into_view()
@@ -52,4 +52,4 @@ pub fn AlbumPage() -> impl IntoView {
         </Suspense>
     }
 }
-*/
+

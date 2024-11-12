@@ -540,7 +540,7 @@ impl Album {
 	/// * `Result<Album, Box<dyn Error>>` - A result indicating success with the desired album, or an error
 	/// 
 	#[cfg(feature = "ssr")]
-	pub fn get_album(album_id: i32, user_id: i32, conn: &mut PgPooledConn) -> Result<Album, Box<dyn Error>> {
+	pub fn get_album(album_id: i32, conn: &mut PgPooledConn) -> Result<Album, Box<dyn Error>> {
 		use crate::schema::albums::dsl::*;
 		use crate::database::get_db_conn;
 
