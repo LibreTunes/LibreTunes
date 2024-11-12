@@ -636,11 +636,11 @@ pub struct Playlist {
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
 	pub id: Option<i32>,
 	/// The time the playlist was created
-	#[cfg_attr(feature = "ssr", diesel(deserialize_as = SystemTime))]
-	pub created_at: Option<SystemTime>,
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDateTime))]
+	pub created_at: Option<NaiveDateTime>,
 	/// The time the playlist was last updated
-	#[cfg_attr(feature = "ssr", diesel(deserialize_as = SystemTime))]
-	pub updated_at: Option<SystemTime>,
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDateTime))]
+	pub updated_at: Option<NaiveDateTime>,
 	/// The id of the user who owns the playlist
 	pub owner_id: i32,
 	/// The name of the playlist
