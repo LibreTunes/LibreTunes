@@ -1,11 +1,13 @@
 use crate::models::{Album, Artist, Song};
 use crate::components::dashboard_tile::DashboardTile;
 
-use time::Date;
+use serde::{Serialize, Deserialize};
+use chrono::NaiveDate;
 
 /// Holds information about a song
 /// 
 /// Intended to be used in the front-end, as it includes artist and album objects, rather than just their ids.
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SongData {
 	/// Song id
 	pub id: i32,
@@ -20,7 +22,7 @@ pub struct SongData {
 	/// The duration of the song in seconds
 	pub duration: i32,
 	/// The song's release date
-	pub release_date: Option<Date>,
+	pub release_date: Option<NaiveDate>,
 	/// Path to song file, relative to the root of the web server.
 	/// For example, `"/assets/audio/Song.mp3"`
 	pub song_path: String,
@@ -48,7 +50,6 @@ impl TryInto<Song> for SongData {
 			track: self.track,
 			duration: self.duration,
 			release_date: self.release_date,
-			// TODO https://gitlab.mregirouard.com/libretunes/libretunes/-/issues/35
 			storage_path: self.song_path,
 
 			// Note that if the source of the image_path was the album, the image_path

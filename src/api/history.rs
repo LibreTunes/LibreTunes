@@ -1,4 +1,4 @@
-use std::time::SystemTime;
+use chrono::NaiveDateTime;
 use leptos::*;
 use crate::models::HistoryEntry;
 use crate::models::Song;
@@ -25,7 +25,7 @@ pub async fn get_history(limit: Option<i64>) -> Result<Vec<HistoryEntry>, Server
 
 /// Get the listen dates and songs of the current user.
 #[server(endpoint = "history/get_songs")]
-pub async fn get_history_songs(limit: Option<i64>) -> Result<Vec<(SystemTime, Song)>, ServerFnError> {
+pub async fn get_history_songs(limit: Option<i64>) -> Result<Vec<(NaiveDateTime, Song)>, ServerFnError> {
 	let user = get_user().await?;
 	let db_con = &mut get_db_conn();
 	let songs = user.get_history_songs(limit, db_con)
