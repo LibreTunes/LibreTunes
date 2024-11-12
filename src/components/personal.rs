@@ -18,7 +18,6 @@ pub fn Profile() -> impl IntoView {
     let (dropdown_open, set_dropdown_open) = create_signal(false);
     let (image_error, set_image_error) = create_signal(false);
     let user = create_local_resource(move || dropdown_open.get(), |_| async move { get_user().await });
-    let logged_in = create_local_resource(move || dropdown_open.get(), |_| async move { get_user().await.is_ok() });
 
     let open_dropdown = move |_| {
         set_dropdown_open.update(|value| *value = !*value);
@@ -34,7 +33,7 @@ pub fn Profile() -> impl IntoView {
         <div class="profile-container">
             <div class="profile-name">
                 <Show
-                    when=move || logged_in.get().unwrap_or_default()
+                    when=move || user.get().map(|user| user.is_ok()).unwrap_or_default()
                     fallback=|| view!{
                         <h1>Not Logged In</h1>
                     }>
@@ -43,7 +42,7 @@ pub fn Profile() -> impl IntoView {
             </div>
             <div class="profile-icon" on:click=open_dropdown>
                 <Show 
-                    when=move || logged_in.get().unwrap_or_default()
+                    when=move || user.get().map(|user| user.is_ok()).unwrap_or_default()
                     fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
                 >
                     <Show
@@ -59,11 +58,11 @@ pub fn Profile() -> impl IntoView {
             </div>
             <div class="dropdown-container" style={move || if dropdown_open() {"display: flex"} else {"display: none"}}>
                 <Show
-                    when=move || logged_in.get().unwrap_or_default()
+                    when=move || user.get().map(|user| user.is_ok()).unwrap_or_default()
                     fallback=|| view!{
                         <DropDownNotLoggedIn />
                     }>
-                    <DropDownLoggedIn logged_in=logged_in />
+                    <DropDownLoggedIn />
                 </Show>
             </div>
         </div>
@@ -80,16 +79,15 @@ pub fn DropDownNotLoggedIn() -> impl IntoView {
     }
 }
 #[component]
-pub fn DropDownLoggedIn(logged_in: Resource<bool, bool>) -> impl IntoView {
-
-    let logout = move |_| {
+pub fn DropDownLoggedIn() -> impl IntoView {
+    
+	let logout = move |_| {
         spawn_local(async move {
             let result = logout().await;
             if let Err(err) = result {
                 log!("Error logging out: {:?}", err);
             } else {
                 log!("Logged out successfully");
-                logged_in.set(false);
             }
         });
     };
