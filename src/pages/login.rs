@@ -1,12 +1,12 @@
 use crate::auth::login;
+use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
 use crate::users::UserCredentials;
-use crate::app::LoggedInUserResource;
 
 #[component]
-pub fn Login(user: LoggedInUserResource) -> impl IntoView {
+pub fn Login() -> impl IntoView {
     let (username_or_email, set_username_or_email) = create_signal("".to_string());
     let (password, set_password) = create_signal("".to_string());
 
@@ -28,6 +28,8 @@ pub fn Login(user: LoggedInUserResource) -> impl IntoView {
                 username_or_email: username_or_email1,
                 password: password1
             };
+
+            let user = GlobalState::logged_in_user();
             
             let login_result = login(user_credentials).await;
             if let Err(err) = login_result {

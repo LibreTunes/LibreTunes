@@ -1,12 +1,12 @@
 use crate::auth::signup;
 use crate::models::User;
+use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use crate::app::LoggedInUserResource;
 
 #[component]
-pub fn Signup(user: LoggedInUserResource) -> impl IntoView {
+pub fn Signup() -> impl IntoView {
     let (username, set_username) = create_signal("".to_string());
     let (email, set_email) = create_signal("".to_string());
     let (password, set_password) = create_signal("".to_string());
@@ -29,6 +29,8 @@ pub fn Signup(user: LoggedInUserResource) -> impl IntoView {
             admin: false,
         };
         log!("new user: {:?}", new_user);
+
+        let user = GlobalState::logged_in_user();
 
         spawn_local(async move {
             if let Err(err) = signup(new_user.clone()).await {

@@ -11,9 +11,9 @@ use crate::components::error::*;
 
 use crate::api::profile::*;
 
-use crate::app::LoggedInUserResource;
 use crate::models::User;
 use crate::users::get_user_by_id;
+use crate::util::state::GlobalState;
 
 /// Duration in seconds backwards from now to aggregate history data for
 const HISTORY_SECS: i64 = 60 * 60 * 24 * 30;
@@ -29,7 +29,7 @@ const TOP_ARTISTS_COUNT: i64 = 10;
 /// Profile page
 /// Shows the current user's profile if no id is specified, or a user's profile if an id is specified in the path
 #[component]
-pub fn Profile(logged_in_user: LoggedInUserResource) -> impl IntoView {
+pub fn Profile() -> impl IntoView {
 	let params = use_params_map();
 
 	view! {
@@ -38,7 +38,7 @@ pub fn Profile(logged_in_user: LoggedInUserResource) -> impl IntoView {
 				match params.get("id").map(|id| id.parse::<i32>()) {
 					None => {
 						// No id specified, show the current user's profile
-						view! { <OwnProfile logged_in_user /> }.into_view()
+						view! { <OwnProfile /> }.into_view()
 					},
 					Some(Ok(id)) => {
 						// Id specified, get the user and show their profile
@@ -61,12 +61,12 @@ pub fn Profile(logged_in_user: LoggedInUserResource) -> impl IntoView {
 
 /// Show the logged in user's profile
 #[component]
-fn OwnProfile(logged_in_user: LoggedInUserResource) -> impl IntoView {
+fn OwnProfile() -> impl IntoView {
 	view! {
 		<Transition
 			fallback=move || view! { <LoadingPage /> }
 		>
-			{move || logged_in_user.get().map(|user| {
+			{move || GlobalState::logged_in_user().get().map(|user| {
 				match user {
 					Some(user) => {
 						let user_id = user.id.unwrap();
