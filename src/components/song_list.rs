@@ -1,6 +1,8 @@
 use leptos::*;
+use leptos::logging::*;
 use leptos_icons::*;
 
+use crate::api::songs::*;
 use crate::songdata::SongData;
 use crate::models::{Album, Artist};
 
@@ -70,7 +72,7 @@ pub fn SongListItem<T>(song: SongData, song_playing: MaybeSignal<bool>, extra: O
 			<td class="song-list-spacer"></td>
 			<td class="song-album"><SongAlbum album=song.album /></td>
 			<td class="song-list-spacer-big"></td>
-			<td class="song-like-dislike"><SongLikeDislike liked disliked/></td>
+			<td class="song-like-dislike"><SongLikeDislike song_id=song.id liked disliked/></td>
 			<td>{format!("{}:{:02}", song.duration / 60, song.duration % 60)}</td>
 			{extra.map(|extra| view! {
 				<td class="song-list-spacer"></td>
@@ -135,7 +137,12 @@ fn SongAlbum(album: Option<Album>) -> impl IntoView {
 
 /// Display like and dislike buttons for a song, and indicate if the song is liked or disliked
 #[component]
-fn SongLikeDislike(liked: RwSignal<bool>, disliked: RwSignal<bool>) -> impl IntoView {
+fn SongLikeDislike(
+	#[prop(into)]
+	song_id: MaybeSignal<i32>,
+	liked: RwSignal<bool>,
+	disliked: RwSignal<bool>) -> impl IntoView
+{
 	let like_icon = Signal::derive(move || {
 		if liked.get() {
 			icondata::TbThumbUpFilled
@@ -168,14 +175,48 @@ fn SongLikeDislike(liked: RwSignal<bool>, disliked: RwSignal<bool>) -> impl Into
 		}
 	});
 
+	// If an error occurs, check the like/dislike status again to ensure consistency
+	let check_like_dislike = move || {
+		spawn_local(async move {
+			match get_like_dislike_song(song_id.get_untracked()).await {
+				Ok((like, dislike)) => {
+					liked.set(like);
+					disliked.set(dislike);
+				},
+				Err(_) => {}
+			}
+		});
+	};
+
 	let toggle_like = move |_| {
-		liked.set(!liked.get_untracked());
+		let new_liked = !liked.get_untracked();
+		liked.set(new_liked);
 		disliked.set(disliked.get_untracked() && !liked.get_untracked());
+		
+		spawn_local(async move {
+			match set_like_song(song_id.get_untracked(), new_liked).await {
+				Ok(_) => {},
+				Err(e) => {
+					error!("Error setting like: {}", e);
+					check_like_dislike();
+				}
+			}
+		});
 	};
 
 	let toggle_dislike = move |_| {
 		disliked.set(!disliked.get_untracked());
 		liked.set(liked.get_untracked() && !disliked.get_untracked());
+
+		spawn_local(async move {
+			match set_dislike_song(song_id.get_untracked(), disliked.get_untracked()).await {
+				Ok(_) => {},
+				Err(e) => {
+					error!("Error setting dislike: {}", e);
+					check_like_dislike();
+				}
+			}
+		});
 	};
 
 	view! {
