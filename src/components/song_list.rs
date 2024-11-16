@@ -9,48 +9,35 @@ use crate::models::{Album, Artist};
 const LIKE_DISLIKE_BTN_SIZE: &str = "2em";
 
 #[component]
-pub fn SongList(songs: MaybeSignal<Vec<SongData>>) -> impl IntoView {
-	view! {
-		<table class="song-list">
-			{
-				songs.with(|songs| {
-					let mut first_song = true;
-
-					songs.iter().map(|song| {
-						let playing = first_song.into();
-						first_song = false;
-
-						let extra = Option::<()>::None;
-
-						view! {
-							<SongListItem song={song.clone()} song_playing=playing extra />
-						}
-					}).collect::<Vec<_>>()
-				})
-			}
-		</table>
-	}
+pub fn SongList(songs: Vec<SongData>) -> impl IntoView {
+	__SongListInner(songs.into_iter().map(|song| (song, ())).collect::<Vec<_>>(), false)
 }
 
 #[component]
-pub fn SongListExtra<T>(songs: MaybeSignal<Vec<(SongData, T)>>) -> impl IntoView where 
+pub fn SongListExtra<T>(songs: Vec<(SongData, T)>) -> impl IntoView where 
+	T: Clone + IntoView + 'static
+{
+	__SongListInner(songs, true)
+}
+
+#[component]
+fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoView where
 	T: Clone + IntoView + 'static
 {
 	view! {
 		<table class="song-list">
 			{
-				songs.with(|songs| {
-					let mut first_song = true;
+				let mut first_song = true;
 
-					songs.iter().map(|(song, extra)| {
-						let playing = first_song.into();
-						first_song = false;
+				songs.iter().map(|(song, extra)| {
+					let playing = first_song.into();
+					first_song = false;
 
-						view! {
-							<SongListItem song={song.clone()} song_playing=playing extra=Some(extra.clone()) />
-						}
-					}).collect::<Vec<_>>()
-				})
+					view! {
+						<SongListItem song={song.clone()} song_playing=playing
+							extra={if show_extra { Some(extra.clone()) } else { None }} />
+					}
+				}).collect::<Vec<_>>()
 			}
 		</table>
 	}
