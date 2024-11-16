@@ -214,7 +214,7 @@ fn TopSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 					top_songs.get().map(|top_songs| {
 						top_songs.map(|top_songs| {
 							view! {
-								<SongListExtra songs={top_songs.into()} />
+								<SongListExtra songs=top_songs />
 							}
 						})
 					})
@@ -255,7 +255,7 @@ fn RecentSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 					recent_songs.get().map(|recent_songs| {
 						recent_songs.map(|recent_songs| {
 							view! {
-								<SongList songs={recent_songs.into()} />
+								<SongList songs=recent_songs />
 							}
 						})
 					})
