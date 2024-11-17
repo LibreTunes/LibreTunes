@@ -1,8 +1,8 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use crate::auth::get_user;
 use crate::auth::logout;
+use crate::util::state::GlobalState;
 
 #[component]
 pub fn Personal() -> impl IntoView {
@@ -16,54 +16,66 @@ pub fn Personal() -> impl IntoView {
 #[component]
 pub fn Profile() -> impl IntoView {
     let (dropdown_open, set_dropdown_open) = create_signal(false);
-    let (image_error, set_image_error) = create_signal(false);
-    let user = create_local_resource(move || dropdown_open.get(), |_| async move { get_user().await });
-
-    let open_dropdown = move |_| {
+	let user = GlobalState::logged_in_user();
+    
+	let open_dropdown = move |_| {
         set_dropdown_open.update(|value| *value = !*value);
     };
 
     let user_profile_picture = move || {
         user.get().and_then(|user| {
-            user.ok().map(|user| format!("/assets/images/profile/{}.webp", user.id.unwrap()))
+            if let Some(user) = user {
+				if user.id.is_none() {
+					return None;
+				}
+				Some(format!("/assets/images/profile/{}.webp", user.id.unwrap()))
+			} else {
+				None
+			}
         })
     };
 
     view! {
         <div class="profile-container">
             <div class="profile-name">
-                <Show
-                    when=move || user.get().map(|user| user.is_ok()).unwrap_or_default()
+                <Suspense
                     fallback=|| view!{
                         <h1>Not Logged In</h1>
                     }>
-                    <h1>{move || user.get().map(|user| user.map(|user| user.username).unwrap_or_default())}</h1>
-                </Show>
+					<Show
+						when=move || user.get().map(|user| user.is_some()).unwrap_or_default()
+						fallback=|| view!{
+							<h1>Not Logged In</h1>
+						}>
+                    	<h1>{move || user.get().map(|user| user.map(|user| user.username))}</h1>
+					</Show>
+                </Suspense>
             </div>
             <div class="profile-icon" on:click=open_dropdown>
-                <Show 
-                    when=move || user.get().map(|user| user.is_ok()).unwrap_or_default()
-                    fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
-                >
-                    <Show
-                        when=move || !image_error()
-                        fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
-                    >
-                        <img 
-                            src=user_profile_picture() 
-                            on:error=move |_| set_image_error.set(true)
-                        />
-                    </Show>
-                </Show>
+				<Suspense fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }>
+					<Show 
+						when=move || user.get().map(|user| user.is_some()).unwrap_or_default()
+						fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
+					>
+						<object class="profile-image" data={user_profile_picture} type="image/webp">
+							<Icon class="profile-image" icon=icondata::CgProfile width="45" height="45"/>
+						</object>
+					</Show>
+				</Suspense>
             </div>
             <div class="dropdown-container" style={move || if dropdown_open() {"display: flex"} else {"display: none"}}>
-                <Show
-                    when=move || user.get().map(|user| user.is_ok()).unwrap_or_default()
-                    fallback=|| view!{
-                        <DropDownNotLoggedIn />
-                    }>
-                    <DropDownLoggedIn />
-                </Show>
+				<Suspense
+					fallback=|| view!{
+						<DropDownNotLoggedIn />
+					}>
+					<Show
+						when=move || user.get().map(|user| user.is_some()).unwrap_or_default()
+						fallback=|| view!{
+							<DropDownNotLoggedIn />
+						}>
+						<DropDownLoggedIn />
+					</Show>
+				</Suspense>
             </div>
         </div>
     }
@@ -87,6 +99,8 @@ pub fn DropDownLoggedIn() -> impl IntoView {
             if let Err(err) = result {
                 log!("Error logging out: {:?}", err);
             } else {
+				let user = GlobalState::logged_in_user();
+				user.refetch();
                 log!("Logged out successfully");
             }
         });
