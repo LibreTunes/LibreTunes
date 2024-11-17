@@ -1,21 +1,22 @@
 use crate::playbar::PlayBar;
-use crate::playstatus::PlayStatus;
+use crate::playbar::CustomTitle;
 use crate::queue::Queue;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 use crate::pages::login::*;
 use crate::pages::signup::*;
+use crate::pages::profile::*;
 use crate::error_template::{AppError, ErrorTemplate};
-
+use crate::util::state::GlobalState;
 
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
-    let play_status = PlayStatus::default();
-    let play_status = create_rw_signal(play_status);
+    provide_context(GlobalState::new());
+
     let upload_open = create_rw_signal(false);
 
     view! {
@@ -24,7 +25,7 @@ pub fn App() -> impl IntoView {
         <Stylesheet id="leptos" href="/pkg/libretunes.css"/>
 
         // sets the document title
-        <Title text="LibreTunes"/>
+        <CustomTitle />
 
         // content for this welcome page
         <Router fallback=|| {
@@ -37,10 +38,12 @@ pub fn App() -> impl IntoView {
         }>
             <main>
                 <Routes>
-                    <Route path="" view=move || view! { <HomePage play_status=play_status upload_open=upload_open/> }>
+                    <Route path="" view=move || view! { <HomePage upload_open=upload_open/> }>
                         <Route path="" view=Dashboard />
                         <Route path="dashboard" view=Dashboard />
                         <Route path="search" view=Search />
+                        <Route path="user/:id" view=Profile />
+                        <Route path="user" view=Profile />
                     </Route>
                     <Route path="/login" view=Login />
                     <Route path="/signup" view=Signup />
@@ -53,12 +56,12 @@ pub fn App() -> impl IntoView {
 use crate::components::sidebar::*;
 use crate::components::dashboard::*;
 use crate::components::search::*;
-use crate::components::personal::*;
+use crate::components::personal::Personal;
 use crate::components::upload::*;
 
 /// Renders the home page of your application.
 #[component]
-fn HomePage(play_status: RwSignal<PlayStatus>, upload_open: RwSignal<bool>) -> impl IntoView {
+fn HomePage(upload_open: RwSignal<bool>) -> impl IntoView {
     view! {
         <div class="home-container">
             <Upload open=upload_open/>
@@ -66,8 +69,8 @@ fn HomePage(play_status: RwSignal<PlayStatus>, upload_open: RwSignal<bool>) -> i
             // This <Outlet /> will render the child route components
             <Outlet />
             <Personal />
-            <PlayBar status=play_status/>
-            <Queue status=play_status/>
+            <PlayBar />
+            <Queue />
         </div>
     }
 }

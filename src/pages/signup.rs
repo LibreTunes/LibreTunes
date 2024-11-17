@@ -1,5 +1,6 @@
 use crate::auth::signup;
 use crate::models::User;
+use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
@@ -19,7 +20,7 @@ pub fn Signup() -> impl IntoView {
 
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
-        let new_user = User {
+        let mut new_user = User {
             id: None,
             username: username.get(),
             email: email.get(),
@@ -29,11 +30,20 @@ pub fn Signup() -> impl IntoView {
         };
         log!("new user: {:?}", new_user);
 
+        let user = GlobalState::logged_in_user();
+
         spawn_local(async move {
-            if let Err(err) = signup(new_user).await {
+            if let Err(err) = signup(new_user.clone()).await {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error signing up: {:?}", err);
+
+                // Since we're not sure what the state is, manually refetch the user
+                user.refetch();
             } else {
+                // Manually set the user to the new user, avoiding a refetch
+                new_user.password = None;
+                user.set(Some(new_user));
+
                 // Redirect to the login page
                 log!("Signed up successfully!");
                 leptos_router::use_navigate()("/", Default::default());

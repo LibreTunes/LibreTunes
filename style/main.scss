@@ -8,7 +8,13 @@
 @import 'home.scss';
 @import 'search.scss';
 @import 'personal.scss';
+@import 'dashboard_tile.scss';
+@import 'dashboard_row.scss';
 @import 'upload.scss';
+@import 'error.scss';
+@import 'song_list.scss';
+@import 'profile.scss';
+@import 'loading.scss';
 
 body {
   font-family: sans-serif;
