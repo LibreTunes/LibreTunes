@@ -489,7 +489,7 @@ pub fn PlayBar() -> impl IntoView {
 
     // Listen for key down events -- arrow keys don't seem to trigger key press events
     let _arrow_key_handle = window_event_listener(ev::keydown, move |e: ev::KeyboardEvent| {
-        if e.key() == "ArrowRight" {
+        if e.key() == "ArrowRight" && status.with_untracked(|status| status.search_active) == false {
             e.prevent_default();
             log!("Right arrow key pressed, skipping forward by {} seconds", ARROW_KEY_SKIP_TIME);
 
@@ -502,7 +502,7 @@ pub fn PlayBar() -> impl IntoView {
                 error!("Unable to skip forward: Unable to get current duration");
             }
 
-        } else if e.key() == "ArrowLeft" {
+        } else if e.key() == "ArrowLeft" && status.with_untracked(|status| status.search_active) == false {
             e.prevent_default();
             log!("Left arrow key pressed, skipping backward by {} seconds", ARROW_KEY_SKIP_TIME);
 
@@ -519,7 +519,7 @@ pub fn PlayBar() -> impl IntoView {
 
     // Listen for space bar presses to play/pause
     let _space_bar_handle = window_event_listener(ev::keypress, move |e: ev::KeyboardEvent| {
-        if e.key() == " " {
+        if e.key() == " " && status.with_untracked(|status| status.search_active) == false {
             e.prevent_default();
             log!("Space bar pressed, toggling play/pause");
 
