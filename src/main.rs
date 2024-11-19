@@ -30,7 +30,7 @@ async fn main() {
     info!("\n{}", include_str!("../ascii_art.txt"));
     info!("Starting Leptos server...");
 
-    use dotenv::dotenv;
+    use dotenvy::dotenv;
     dotenv().ok();
 
     debug!("Running database migrations...");
