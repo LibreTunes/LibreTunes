@@ -1,6 +1,5 @@
-use std::time::SystemTime;
+use chrono::{NaiveDate, NaiveDateTime};
 use leptos::{server, ServerFnError};
-use time::Date;
 use serde::{Deserialize, Serialize};
 use crate::songdata::SongData;
 
@@ -41,8 +40,8 @@ pub struct User {
 	#[cfg_attr(feature = "ssr", diesel(deserialize_as = String))]
 	pub password: Option<String>,
 	/// The time the user was created
-	#[cfg_attr(feature = "ssr", diesel(deserialize_as = SystemTime))]
-	pub created_at: Option<SystemTime>,
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDateTime))]
+	pub created_at: Option<NaiveDateTime>,
 	/// Whether the user is an admin
 	pub admin: bool,
 }
@@ -105,7 +104,7 @@ impl User {
 	/// 
 	#[cfg(feature = "ssr")]
 	pub fn get_history_songs(self: &Self, limit: Option<i64>, conn: &mut PgPooledConn) ->
-		Result<Vec<(SystemTime, Song)>, Box<dyn Error>> {
+		Result<Vec<(NaiveDateTime, Song)>, Box<dyn Error>> {
 		use crate::schema::songs::dsl::*;
 		use crate::schema::song_history::dsl::*;
 
@@ -469,7 +468,7 @@ pub struct Album {
 	/// The album's title
 	pub title: String,
 	/// The album's release date
-	pub release_date: Option<Date>,
+	pub release_date: Option<NaiveDate>,
 	/// The path to the album's image file
 	pub image_path: Option<String>,
 }
@@ -639,7 +638,7 @@ pub struct Song {
 	/// The duration of the song in seconds
 	pub duration: i32,
 	/// The song's release date
-	pub release_date: Option<Date>,
+	pub release_date: Option<NaiveDate>,
 	/// The path to the song's audio file
 	pub storage_path: String,
 	/// The path to the song's image file
@@ -715,7 +714,28 @@ pub struct HistoryEntry {
 	/// The id of the user who listened to the song
 	pub user_id: i32,
 	/// The date the song was listened to
-	pub date: SystemTime,
+	pub date: NaiveDateTime,
 	/// The id of the song that was listened to
 	pub song_id: i32,
+}
+
+/// Model for a playlist
+#[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
+#[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::playlists))]
+#[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
+#[derive(Serialize, Deserialize)]
+pub struct Playlist {
+	/// A unique id for the playlist
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = i32))]
+	pub id: Option<i32>,
+	/// The time the playlist was created
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDateTime))]
+	pub created_at: Option<NaiveDateTime>,
+	/// The time the playlist was last updated
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDateTime))]
+	pub updated_at: Option<NaiveDateTime>,
+	/// The id of the user who owns the playlist
+	pub owner_id: i32,
+	/// The name of the playlist
+	pub name: String,
 }

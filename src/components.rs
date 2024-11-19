@@ -6,3 +6,5 @@ pub mod dashboard_tile;
 pub mod dashboard_row;
 pub mod upload;
 pub mod song_list;
+pub mod loading;
+pub mod error;

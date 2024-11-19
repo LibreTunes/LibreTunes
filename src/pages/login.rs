@@ -1,4 +1,5 @@
 use crate::auth::login;
+use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
@@ -27,18 +28,29 @@ pub fn Login() -> impl IntoView {
                 username_or_email: username_or_email1,
                 password: password1
             };
+
+            let user = GlobalState::logged_in_user();
             
             let login_result = login(user_credentials).await;
             if let Err(err) = login_result {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error logging in: {:?}", err);
-            } else if let Ok(true) = login_result {
+
+                // Since we're not sure what the state is, manually refetch the user
+                user.refetch();
+            } else if let Ok(Some(login_user)) = login_result {
+                // Manually set the user to the new user, avoiding a refetch
+                user.set(Some(login_user));
+
                 // Redirect to the login page
                 log!("Logged in Successfully!");
                 leptos_router::use_navigate()("/", Default::default());
                 log!("Navigated to home page after login");
-            } else if let Ok(false) = login_result {
+            } else if let Ok(None) = login_result {
                 log!("Invalid username or password");
+
+                // User could be already logged in or not, so refetch the user
+                user.refetch();
             }
         });
     };
