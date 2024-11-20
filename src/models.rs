@@ -2,6 +2,7 @@ use chrono::{NaiveDate, NaiveDateTime};
 use leptos::{server, ServerFnError};
 use serde::{Deserialize, Serialize};
 use crate::songdata::SongData;
+use crate::albumdata::AlbumData;
 
 use cfg_if::cfg_if;
 
@@ -539,15 +540,44 @@ impl Album {
 	/// * `Result<Album, Box<dyn Error>>` - A result indicating success with the desired album, or an error
 	/// 
 	#[cfg(feature = "ssr")]
-	pub fn get_album(album_id: i32, conn: &mut PgPooledConn) -> Result<Album, Box<dyn Error>> {
-		use crate::schema::albums::dsl::*;
+	pub fn get_album_data(album_id: i32, conn: &mut PgPooledConn) -> Result<AlbumData, Box<dyn Error>> {
+		use crate::schema::*;
 		use crate::database::get_db_conn;
 
-		let album = albums
+		let album: Vec<(Album, std::option::Option<Artist>)> = albums::table
 			.find(album_id)
-			.first(conn)?;
+			.left_join(songs::table.on(albums::id.nullable().eq(songs::album_id)))
+			.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
+			.select((
+				albums::all_columns,
+				artists::all_columns.nullable()
+			))
+			.distinct()
+			.load(conn)?;
 
-		Ok(album)
+		let mut artist_list: Vec<Artist> = Vec::new();
+
+		for (_, artist) in album {
+			if let Some(artist) = artist {
+				artist_list.push(artist);
+			}
+		}
+		// Get info of album
+		let albuminfo = albums::table
+			.filter(albums::id.eq(album_id))
+			.first::<Album>(conn)?;
+
+		let img = albuminfo.image_path.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string());
+
+		let albumdata = AlbumData {
+			id: albuminfo.id.unwrap(),
+			title: albuminfo.title,
+			artists: artist_list,
+			release_date: albuminfo.release_date,
+			image_path: img
+		};
+
+		Ok(albumdata)
 	}
 
 	/// Obtain an album from its albumid

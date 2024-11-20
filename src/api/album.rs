@@ -1,5 +1,6 @@
 use leptos::*;
 use crate::models::Album;
+use crate::albumdata::AlbumData;
 use crate::songdata::SongData;
 
 use cfg_if::cfg_if;
@@ -13,9 +14,9 @@ cfg_if! {
 }
 
 #[server(endpoint = "album/get")]
-pub async fn get_album(id: i32) -> Result<Album, ServerFnError> {
+pub async fn get_album(id: i32) -> Result<AlbumData, ServerFnError> {
 	let db_con = &mut get_db_conn();
-	let album = Album::get_album(id,db_con)
+	let album = Album::get_album_data(id,db_con)
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting album: {}", e)))?;
 	Ok(album)
 }

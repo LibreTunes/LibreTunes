@@ -1,9 +1,10 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_router::*;
-use crate::models::*;
+use crate::{albumdata, models::*};
 use crate::components::song_list::*;
 use crate::api::album::*;
+use crate::components::album_info::*;
 
 
 #[derive(Params, PartialEq)]
@@ -32,7 +33,35 @@ pub fn AlbumPage() -> impl IntoView {
         },
     );
 
+    let albumdata = create_resource(
+        id,
+        |value| async move {
+            match value {
+                Ok(v) => {get_album(v).await},
+                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e).into()))},
+            }
+        },
+    );
+
     view! {
+        <Suspense
+            fallback=move || view! { <p>"Loading..."</p> }
+        >
+            {move || {
+                albumdata.with( |albumdata| {
+                    match albumdata {
+                        Some(Ok(s)) => {
+                            view! { <AlbumInfo albumdata=(*s).clone()/> }
+                        },
+                        Some(Err(e)) => {
+                            view! { <div>{format!("Error loading albums: : {}",e)}</div> }.into_view()
+                        },
+                        None => {view! { }.into_view()}
+                    }
+                })
+            }}
+        </Suspense>
+
         <Suspense
             fallback=move || view! { <p>"Loading..."</p> }
         >
@@ -40,7 +69,7 @@ pub fn AlbumPage() -> impl IntoView {
                 song_list.with( |song_list| {
                     match song_list {
                         Some(Ok(s)) => {
-                            view! { <SongList songs=(*s).clone().into()/> }.into_view()
+                            view! { <SongList songs=(*s).clone()/> }
                         },
                         Some(Err(e)) => {
                             view! { <div>{format!("Error loading albums: : {}",e)}</div> }.into_view()
