@@ -43,7 +43,7 @@ pub fn AlbumPage() -> impl IntoView {
                             view! { <SongList songs=(*s).clone().into()/> }.into_view()
                         },
                         Some(Err(e)) => {
-                            view! { <div>"Error loading albums: :e"</div> }.into_view()
+                            view! { <div>{format!("Error loading albums: : {}",e)}</div> }.into_view()
                         },
                         None => {view! { }.into_view()}
                     }

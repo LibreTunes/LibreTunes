@@ -1,6 +1,5 @@
 use leptos::*;
 use crate::models::Album;
-use crate::models::Song;
 use crate::songdata::SongData;
 
 use cfg_if::cfg_if;
@@ -23,10 +22,11 @@ pub async fn get_album(id: i32) -> Result<Album, ServerFnError> {
 
 #[server(endpoint = "album/get_songs")]
 pub async fn get_songs(id: i32) -> Result<Vec<SongData>, ServerFnError> {
-	let user = get_user().await?;
+	use crate::auth::get_logged_in_user;
+	let user = get_logged_in_user().await?;
 	let db_con = &mut get_db_conn();
 	// TODO: NEEDS SONG DATA QUERIES
-	let songdata = Album::get_song_data(id,user.id.unwrap(),db_con)
+	let songdata = Album::get_song_data(id,user,db_con)
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting song data: {}", e)))?;
 	Ok(songdata)
 }

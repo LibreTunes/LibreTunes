@@ -561,30 +561,52 @@ impl Album {
 	/// * `Result<Album, Box<dyn Error>>` - A result indicating success with the desired album, or an error
 	/// 
 	#[cfg(feature = "ssr")]
-	pub fn get_song_data(album_id: i32, user_like_dislike_id: i32, conn: &mut PgPooledConn) -> Result<Vec<SongData>, Box<dyn Error>> {
+	pub fn get_song_data(album_id: i32, user_like_dislike: Option<User>, conn: &mut PgPooledConn) -> Result<Vec<SongData>, Box<dyn Error>> {
 		use crate::schema::*;
 		use crate::database::get_db_conn;
 		use std::collections::HashMap;
-
-		let songs: Vec<(Album, Option<Song>, Option<Artist>, Option<(i32, i32)>, Option<(i32, i32)>)> =
-		albums::table
-			.find(album_id)
-			.left_join(songs::table.on(albums::id.nullable().eq(songs::album_id)))
-			.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
-			.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(user_like_dislike_id))))
-			.left_join(song_dislikes::table.on(songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(user_like_dislike_id))))
-			.select((
-				albums::all_columns,
-				songs::all_columns.nullable(),
-				artists::all_columns.nullable(),
-				song_likes::all_columns.nullable(),
-				song_dislikes::all_columns.nullable()
-			))
-			.load(conn)?;
-
-		let mut album_songs: HashMap<i32, SongData> = HashMap::with_capacity(songs.len());
 		
-		for (album, song, artist, like, dislike) in songs {
+		let song_list = if let Some(user_like_dislike) = user_like_dislike {
+			let user_like_dislike_id = user_like_dislike.id.unwrap();
+			let song_list: Vec<(Album, Option<Song>, Option<Artist>, Option<(i32, i32)>, Option<(i32, i32)>)> =
+				albums::table
+					.find(album_id)
+					.left_join(songs::table.on(albums::id.nullable().eq(songs::album_id)))
+					.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
+					.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(user_like_dislike_id))))
+					.left_join(song_dislikes::table.on(songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(user_like_dislike_id))))
+					.select((
+						albums::all_columns,
+						songs::all_columns.nullable(),
+						artists::all_columns.nullable(),
+						song_likes::all_columns.nullable(),
+						song_dislikes::all_columns.nullable()
+					))
+					.order(songs::track.asc())
+					.load(conn)?;
+			song_list
+		} else {
+			let song_list: Vec<(Album, Option<Song>, Option<Artist>)> =
+				albums::table
+					.find(album_id)
+					.left_join(songs::table.on(albums::id.nullable().eq(songs::album_id)))
+					.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
+					.select((
+						albums::all_columns,
+						songs::all_columns.nullable(),
+						artists::all_columns.nullable()
+					))
+					.order(songs::track.asc())
+					.load(conn)?;
+
+			let song_list:  Vec<(Album, Option<Song>, Option<Artist>, Option<(i32, i32)>, Option<(i32, i32)>)> =
+				song_list.into_iter().map( |(album, song, artist)| (album, song, artist, None, None) ).collect();
+			song_list
+		};
+
+		let mut album_songs: HashMap<i32, SongData> = HashMap::with_capacity(song_list.len());
+		
+		for (album, song, artist, like, dislike) in song_list {
 			if let Some(song) = song {				
 				let like_dislike = match (like, dislike) {
 					(Some(_), Some(_)) => Some((true, true)),
@@ -612,7 +634,7 @@ impl Album {
 				album_songs.insert(song.id.unwrap(), songdata);
 			} 
 		}
-	
+		
 		// Sort the songs by date
 		let mut songdata: Vec<SongData> = album_songs.into_values().collect();
 		songdata.sort_by(|a, b| b.track.cmp(&a.track));
