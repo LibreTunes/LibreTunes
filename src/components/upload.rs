@@ -124,7 +124,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 						>
 							<ul class="artist_results search-results">
 								{
-									move || filtered_artists.get().iter().enumerate().map(|(_index,filtered_artist)| view! {
+									move || filtered_artists.get().iter().enumerate().map(|(_index,(filtered_artist, _score))| view! {
 										<Artist artist=filtered_artist.clone() artists=artists set_artists=set_artists set_filtered=set_filtered_artists/>
 									}).collect::<Vec<_>>()
 								}
@@ -142,7 +142,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 						>
 							<ul class="album_results search-results">
 								{
-									move || filtered_albums.get().iter().enumerate().map(|(_index,filtered_album)| view! {
+									move || filtered_albums.get().iter().enumerate().map(|(_index,(filtered_album, _score))| view! {
 										<Album album=filtered_album.clone() _albums=albums set_albums=set_albums set_filtered=set_filtered_albums/>
 									}).collect::<Vec<_>>()
 								}
@@ -182,15 +182,15 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 }
 
 #[component]
-pub fn Artist(artist: Artist, artists: ReadSignal<String>, set_artists: WriteSignal<String>, set_filtered: WriteSignal<Vec<Artist>>) -> impl IntoView {
+pub fn Artist(artist: Artist, artists: ReadSignal<String>, set_artists: WriteSignal<String>, set_filtered: WriteSignal<Vec<(Artist, f32)>>) -> impl IntoView {
 	// Converts artist name to artist id and adds it to the artist input
 	let add_artist = move |_| {
 		//Create an empty string to hold previous artist ids
 		let mut s: String = String::from("");
 		//Get the current artist input
-		let all_artirts: String = artists.get();
+		let all_artists: String = artists.get();
 		//Split the input into a vector of artists separated by commas
-		let mut ids: Vec<&str> = all_artirts.split(",").collect();
+		let mut ids: Vec<&str> = all_artists.split(",").collect();
 		//If there is only one artist in the input, get their id equivalent and add it to the string
 		if ids.len() == 1 {
 			let value_str = match artist.id.clone() {
@@ -227,7 +227,7 @@ pub fn Artist(artist: Artist, artists: ReadSignal<String>, set_artists: WriteSig
 	}
 }
 #[component]
-pub fn Album(album: Album, _albums: ReadSignal<String>, set_albums: WriteSignal<String>, set_filtered: WriteSignal<Vec<Album>>) -> impl IntoView {
+pub fn Album(album: Album, _albums: ReadSignal<String>, set_albums: WriteSignal<String>, set_filtered: WriteSignal<Vec<(Album, f32)>>) -> impl IntoView {
 	//Converts album title to album id to upload a song
 	let add_album = move |_| {
 		let value_str = match album.id.clone() {
