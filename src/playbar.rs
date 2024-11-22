@@ -450,7 +450,7 @@ fn QueueToggle() -> impl IntoView {
 		log!("queue button pressed, queue status: {:?}",
             GlobalState::play_status().with_untracked(|status| status.queue_open));
     };
-
+    
 	// We use this to prevent the buttons from being focused when clicked
     // If buttons were focused on clicks, then pressing space bar to play/pause would "click" the button
     // and trigger unwanted behavior

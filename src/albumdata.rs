@@ -1,11 +1,14 @@
 use crate::models::Artist;
 use crate::components::dashboard_tile::DashboardTile;
+use serde::{Serialize, Deserialize};
 
 use chrono::NaiveDate;
 
 /// Holds information about an album
 /// 
 /// Intended to be used in the front-end
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct AlbumData {
 	/// Album id
 	pub id: i32,
