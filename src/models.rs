@@ -638,30 +638,37 @@ impl Album {
 		
 		for (album, song, artist, like, dislike) in song_list {
 			if let Some(song) = song {				
-				let like_dislike = match (like, dislike) {
-					(Some(_), Some(_)) => Some((true, true)),
-					(Some(_), None) => Some((true, false)),
-					(None, Some(_)) => Some((false, true)),
-					_ => None,
-				};
-	
-				let image_path = song.image_path.unwrap_or(
-					album.image_path.clone().unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
-	
-				let songdata = SongData {
-					id: song.id.unwrap(),
-					title: song.title,
-					artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
-					album: Some(album),
-					track: song.track,
-					duration: song.duration,
-					release_date: song.release_date,
-					song_path: song.storage_path,
-					image_path: image_path,
-					like_dislike: like_dislike,
-				};
-	
-				album_songs.insert(song.id.unwrap(), songdata);
+				if let Some(stored_songdata) = album_songs.get_mut(&song.id.unwrap()) {
+					// If the song is already in the map, update the artists
+					if let Some(artist) = artist {
+						stored_songdata.artists.push(artist);
+					}
+				} else {
+					let like_dislike = match (like, dislike) {
+						(Some(_), Some(_)) => Some((true, true)),
+						(Some(_), None) => Some((true, false)),
+						(None, Some(_)) => Some((false, true)),
+						_ => None,
+					};
+		
+					let image_path = song.image_path.unwrap_or(
+						album.image_path.clone().unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
+		
+					let songdata = SongData {
+						id: song.id.unwrap(),
+						title: song.title,
+						artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
+						album: Some(album),
+						track: song.track,
+						duration: song.duration,
+						release_date: song.release_date,
+						song_path: song.storage_path,
+						image_path: image_path,
+						like_dislike: like_dislike,
+					};
+		
+					album_songs.insert(song.id.unwrap(), songdata);
+				}
 			} 
 		}
 		
