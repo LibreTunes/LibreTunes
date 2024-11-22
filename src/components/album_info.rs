@@ -5,17 +5,15 @@ use crate::albumdata::AlbumData;
 #[component]
 pub fn AlbumInfo(albumdata: AlbumData) -> impl IntoView {
 	view! {
-		<div>
-			<div>
-				<img src={albumdata.image_path} alt="dashboard-tile" />
-			</div>
-			<div>
-				<p>{albumdata.title}</p>
-				<div>
+		<div class="album-info">
+			<img class="album-image" src={albumdata.image_path} alt="dashboard-tile" />
+			<div class="album-body">
+				<p class="album-title">{albumdata.title}</p>
+				<div class="album-artists">
 					{
 						albumdata.artists.iter().map(|artist| {
 							view! {
-								<p>{artist.name.clone()}</p>
+								<p class="album-artist">{artist.name.clone()}</p>
 							}
 						}).collect::<Vec<_>>()
 					}

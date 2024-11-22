@@ -44,41 +44,45 @@ pub fn AlbumPage() -> impl IntoView {
     );
 
     view! {
-        <Suspense
-            fallback=move || view! { <p>"Loading..."</p> }
-        >
-            {move || {
-                albumdata.with( |albumdata| {
-                    match albumdata {
-                        Some(Ok(s)) => {
-                            view! { <AlbumInfo albumdata=(*s).clone()/> }
-                        },
-                        Some(Err(e)) => {
-                            view! { <div>{format!("Error loading albums: : {}",e)}</div> }.into_view()
-                        },
-                        None => {view! { }.into_view()}
-                    }
-                })
-            }}
-        </Suspense>
-
-        <Suspense
-            fallback=move || view! { <p>"Loading..."</p> }
-        >
-            {move || {
-                song_list.with( |song_list| {
-                    match song_list {
-                        Some(Ok(s)) => {
-                            view! { <SongList songs=(*s).clone()/> }
-                        },
-                        Some(Err(e)) => {
-                            view! { <div>{format!("Error loading albums: : {}",e)}</div> }.into_view()
-                        },
-                        None => {view! { }.into_view()}
-                    }
-                })
-            }}
-        </Suspense>
+        <div class="album-page-container">
+            <div class="album-header">
+                <Suspense
+                    fallback=move || view! { <p class="loading">"Loading..."</p> }
+                >
+                    {move || {
+                        albumdata.with( |albumdata| {
+                            match albumdata {
+                                Some(Ok(s)) => {
+                                    view! { <AlbumInfo albumdata=(*s).clone() /> }
+                                },
+                                Some(Err(e)) => {
+                                    view! { <div class="error">{format!("Error loading album : {}",e)}</div> }.into_view()
+                                },
+                                None => {view! { }.into_view()}
+                            }
+                        })
+                    }}
+                </Suspense>
+            </div>
+        
+            <Suspense
+                fallback=move || view! { <p class="loading">"Loading..."</p> }
+            >
+                {move || {
+                    song_list.with( |song_list| {
+                        match song_list {
+                            Some(Ok(s)) => {
+                                view! { <SongList songs=(*s).clone()/> }
+                            },
+                            Some(Err(e)) => {
+                                view! { <div class="error">{format!("Error loading albums: : {}",e)}</div> }.into_view()
+                            },
+                            None => {view! { }.into_view()}
+                        }
+                    })
+                }}
+            </Suspense>
+        </div>
     }
 }
 
