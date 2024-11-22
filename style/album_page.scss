@@ -1,7 +1,5 @@
 @import 'theme.scss';
 
-
-
 .album-page-container {
 	width: 90vw;
 
@@ -65,4 +63,18 @@
 		}
 	}
 
+	a {
+		color: $text-controls-color;
+	}
+	a:visited {
+		color: $text-controls-color;
+	  }
+	a:hover {
+		color: $controls-hover-color;
+	}
+
+	a:active {
+		color: $controls-click-color;
+	}
+	
 }

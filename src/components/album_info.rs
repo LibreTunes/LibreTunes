@@ -13,7 +13,7 @@ pub fn AlbumInfo(albumdata: AlbumData) -> impl IntoView {
 					{
 						albumdata.artists.iter().map(|artist| {
 							view! {
-								<p class="album-artist">{artist.name.clone()}</p>
+								<a class="album-artist" href={format!("/artist/{}", artist.id.unwrap())}>{artist.name.clone()}</a>
 							}
 						}).collect::<Vec<_>>()
 					}
