@@ -1,6 +1,5 @@
 use crate::models::Artist;
 use crate::components::dashboard_tile::DashboardTile;
-use crate::components::album_info::AlbumInfo;
 use serde::{Serialize, Deserialize};
 
 use chrono::NaiveDate;

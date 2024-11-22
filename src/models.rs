@@ -1,8 +1,5 @@
 use chrono::{NaiveDate, NaiveDateTime};
-use leptos::{server, ServerFnError};
 use serde::{Deserialize, Serialize};
-use crate::songdata::SongData;
-use crate::albumdata::AlbumData;
 
 use cfg_if::cfg_if;
 
@@ -11,6 +8,8 @@ cfg_if! {
 		use diesel::prelude::*;
 		use crate::database::*;
 		use std::error::Error;
+		use crate::songdata::SongData;
+		use crate::albumdata::AlbumData;
 	}
 }
 
@@ -542,7 +541,6 @@ impl Album {
 	#[cfg(feature = "ssr")]
 	pub fn get_album_data(album_id: i32, conn: &mut PgPooledConn) -> Result<AlbumData, Box<dyn Error>> {
 		use crate::schema::*;
-		use crate::database::get_db_conn;
 
 		let album: Vec<(Album, std::option::Option<Artist>)> = albums::table
 			.find(album_id)
@@ -593,7 +591,6 @@ impl Album {
 	#[cfg(feature = "ssr")]
 	pub fn get_song_data(album_id: i32, user_like_dislike: Option<User>, conn: &mut PgPooledConn) -> Result<Vec<SongData>, Box<dyn Error>> {
 		use crate::schema::*;
-		use crate::database::get_db_conn;
 		use std::collections::HashMap;
 		
 		let song_list = if let Some(user_like_dislike) = user_like_dislike {
