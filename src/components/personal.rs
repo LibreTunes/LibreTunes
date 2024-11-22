@@ -43,7 +43,7 @@ pub fn Profile() -> impl IntoView {
                         <h1>Not Logged In</h1>
                     }>
 					<Show
-						when=move || user.get().map(|user| user.is_some()).unwrap_or_default()
+						when=move || user.get().map(|user| user.is_some()).unwrap_or(false)
 						fallback=|| view!{
 							<h1>Not Logged In</h1>
 						}>
@@ -54,7 +54,7 @@ pub fn Profile() -> impl IntoView {
             <div class="profile-icon" on:click=open_dropdown>
 				<Suspense fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }>
 					<Show 
-						when=move || user.get().map(|user| user.is_some()).unwrap_or_default()
+						when=move || user.get().map(|user| user.is_some()).unwrap_or(false)
 						fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
 					>
 						<object class="profile-image" data={user_profile_picture} type="image/webp">
@@ -69,7 +69,7 @@ pub fn Profile() -> impl IntoView {
 						<DropDownNotLoggedIn />
 					}>
 					<Show
-						when=move || user.get().map(|user| user.is_some()).unwrap_or_default()
+						when=move || user.get().map(|user| user.is_some()).unwrap_or(false)
 						fallback=|| view!{
 							<DropDownNotLoggedIn />
 						}>
