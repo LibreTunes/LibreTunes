@@ -3,7 +3,7 @@ name: libretunes
 services:
   libretunes:
     container_name: libretunes
-    # image: registry.mregirouard.com/libretunes/libretunes:latest
+    # image: git.libretunes.xyz/libretunes/libretunes:latest
     build: .
     ports:
       - "3000:3000"
