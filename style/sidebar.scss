@@ -2,13 +2,15 @@
 
 .sidebar-container {
   background-color: transparent;
-  width: 22rem;
-  height: calc(100% - 75px);
+  width: $sidebar-width;
+  height: $center-viewport-height;
+  margin: 2px;
+
   .sidebar-top-container {
     border-radius: 1rem;
     background-color: #1c1c1c;
     height: 9rem;
-    margin: 3px;
+    margin: 2px 0px;
     padding: 0.1rem 1rem 1rem 1rem;
     position: relative;
     .header {
@@ -68,7 +70,7 @@
   .sidebar-bottom-container {
     border-radius: 1rem;
     background-color: #1c1c1c;
-    margin: 3px;
+    margin: 2px 0px;
     margin-top: 6px;
     padding: 0.2rem 1rem 1rem 1rem;
     height: calc(100% - 9rem);

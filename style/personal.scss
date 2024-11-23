@@ -1,9 +1,9 @@
 @import "theme.scss";
 
 .personal-container {
-  width: 16rem;
+  width: $personal-width;
   background: #1c1c1c;
-  margin: 2px;
+  margin: $personal-margin;
   border-radius: 0.5rem;
 
   .profile-container {

@@ -1,15 +1,23 @@
 @import 'theme.scss';
 
 .album-page-container {
-	width: 90vw;
+	$album-header-height: calc(40% - 2px);
+	
+	width: $center-viewport-width;
+	max-height: $center-viewport-height;
+
+	overflow: hidden;
+
+	margin-top:2px;
 
 	.album-header {
-		height: 40vh;
-		width: 65vw;
-		margin: auto;
-		
+		$album-header-padding: 20px;
 
-		padding:20px;
+		height: $album-header-height;
+		width: calc(100% - 2*$album-header-padding);
+		margin: 2px;
+		
+		padding: $album-header-padding;
 
 		background-image: linear-gradient($accent-color, $background-color);
 		border-radius: 15px;
@@ -18,6 +26,13 @@
 			width: 100%;
 			height: 100%;
 		}
+	}
+
+	.album-songs {
+		width: 100%;
+		max-height: calc(100% - $album-header-height);
+		overflow-x: hidden;
+		overflow-y: scroll;
 	}
 }
 

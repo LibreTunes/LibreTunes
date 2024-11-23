@@ -1,6 +1,9 @@
 @import "theme.scss";
 
 .dashboard-container {
+  max-width: $center-viewport-width;
+  max-height: $center-viewport-height;
+
   .dashboard-header {
     font-size: 1.2rem;
     font-weight: 300;

@@ -63,7 +63,7 @@ pub fn AlbumPage() -> impl IntoView {
                     }}
                 </Suspense>
             </div>
-        
+            <div class="album-songs">
             <Suspense
                 fallback=move || view! { <p class="loading">"Loading..."</p> }
             >
@@ -81,6 +81,7 @@ pub fn AlbumPage() -> impl IntoView {
                     })
                 }}
             </Suspense>
+            </div>
         </div>
     }
 }

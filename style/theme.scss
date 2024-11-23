@@ -13,8 +13,20 @@ $play-grad-end: $accent-color;
 $border-color: #7851ed;
 $queue-background-color: $play-bar-background-color;
 
+$scrollbar-background-color: #101010;
+$scrollbar-handle-color:#292929;
+$scrollbar-handle-hover-color:#5c5b5b;
+
 $auth-inputs: #796dd4;
 $auth-containers: white;
 
 $dashboard-tile-size: 200px;
 $playbar-size: 75px;
+$personal-width: 16rem;
+$sidebar-width: 22rem;
+
+$personal-margin: 2px;
+$sidebar-margin: 2px;
+
+$center-viewport-width: calc(100vw - $personal-width - $sidebar-width - 2*$personal-margin - 2*$sidebar-margin);
+$center-viewport-height: calc(100vh - $playbar-size);
