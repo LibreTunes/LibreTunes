@@ -19,6 +19,11 @@ use crate::users::UserCredentials;
 /// Returns a Result with the error message if the user could not be created
 #[server(endpoint = "signup")]
 pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
+	// Check LIBRETUNES_DISABLE_SIGNUP env var
+	if std::env::var("LIBRETUNES_DISABLE_SIGNUP").is_ok_and(|v| v == "true") {
+		return Err(ServerFnError::<NoCustomError>::ServerError("Signup is disabled".to_string()));
+	}
+
 	use crate::users::create_user;
 
 	// Ensure the user has no id, and is not a self-proclaimed admin
