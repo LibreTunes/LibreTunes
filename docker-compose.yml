@@ -15,6 +15,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       LIBRETUNES_AUDIO_PATH: /assets/audio
       LIBRETUNES_IMAGE_PATH: /assets/images
+      LIBRETUNES_DISABLE_SIGNUP: "true"
     volumes:
       - libretunes-audio:/assets/audio
       - libretunes-images:/assets/images
