@@ -9,4 +9,4 @@ pub mod song_list;
 pub mod loading;
 pub mod error;
 pub mod album_info;
-pub mod user_row;
+pub mod friend_list;

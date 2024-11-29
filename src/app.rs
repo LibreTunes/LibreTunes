@@ -8,6 +8,7 @@ use crate::pages::login::*;
 use crate::pages::signup::*;
 use crate::pages::profile::*;
 use crate::pages::albumpage::*;
+use crate::pages::friends::*;
 use crate::error_template::{AppError, ErrorTemplate};
 use crate::util::state::GlobalState;
 
@@ -45,6 +46,7 @@ pub fn App() -> impl IntoView {
                         <Route path="search" view=Search />
                         <Route path="user/:id" view=Profile />
                         <Route path="user" view=Profile />
+                        <Route path="user/:id/friends" view=Friends />
                         <Route path="album/:id" view=AlbumPage />
                     </Route>
                     <Route path="/login" view=Login />
