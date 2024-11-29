@@ -3,6 +3,7 @@ pub mod auth;
 pub mod songdata;
 pub mod albumdata;
 pub mod artistdata;
+pub mod frienddata;
 pub mod playstatus;
 pub mod playbar;
 pub mod database;

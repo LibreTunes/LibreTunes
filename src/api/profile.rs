@@ -5,7 +5,7 @@ use cfg_if::cfg_if;
 
 use crate::songdata::SongData;
 use crate::artistdata::ArtistData;
-use crate::models::User;
+use crate::frienddata::FriendData;
 
 use chrono::NaiveDateTime;
 
@@ -303,7 +303,7 @@ pub async fn top_artists(for_user_id: i32, start_date: NaiveDateTime, end_date: 
 /// Get a user's list of friends from the database
 #[server(endpoint = "/profile/friends")]
 pub async fn friends(for_user_id: i32)
-	-> Result<Vec<User>, ServerFnError>
+	-> Result<Vec<FriendData>, ServerFnError>
 {
 	let mut db_con = get_db_conn();
 
@@ -311,25 +311,26 @@ pub async fn friends(for_user_id: i32)
 		.filter(friendships::friend_1_id.eq(for_user_id))
 		.filter(friendships::friend_1_id.ne(friendships::friend_2_id))
 		.inner_join(users::table.on(users::id.eq(friendships::friend_2_id)))
-		.select(users::all_columns)
+		.select((users::all_columns, friendships::created_at))
+		.order(friendships::created_at.desc())
+		.order(users::username.asc())
 		.union(
 			friendships::table
 			.filter(friendships::friend_2_id.eq(for_user_id))
 			.filter(friendships::friend_1_id.ne(friendships::friend_2_id))
 			.inner_join(users::table.on(users::id.eq(friendships::friend_1_id)))
-			.select(users::all_columns)
+			.select((users::all_columns, friendships::created_at))
+			.order(friendships::created_at.desc())
+			.order(users::username.asc())
 		)
 		.load(&mut db_con)?;
 	
 	// leave out the password field for security
-	let friend_list: Vec<User> = friends.into_iter().map(|user: User| {
-		User {
-			id: user.id,
+	let friend_list: Vec<FriendData> = friends.into_iter().map(|(user, created_at): (User, NaiveDateTime)| {
+		FriendData {
 			username: user.username,
-			email: user.email,
-			password: None,
-			created_at: user.created_at,
-			admin: user.admin
+			created_at: created_at.into(),
+			user_id: user.id.unwrap()
 		}
 	}).collect();
 
