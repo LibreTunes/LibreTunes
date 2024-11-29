@@ -5,6 +5,7 @@ use cfg_if::cfg_if;
 
 use crate::songdata::SongData;
 use crate::artistdata::ArtistData;
+use crate::models::User;
 
 use chrono::NaiveDateTime;
 
@@ -297,4 +298,40 @@ pub async fn top_artists(for_user_id: i32, start_date: NaiveDateTime, end_date: 
 	}).collect();
 
 	Ok(artist_data)
+}
+
+/// Get a user's list of friends from the database
+#[server(endpoint = "/profile/friends")]
+pub async fn friends(for_user_id: i32)
+	-> Result<Vec<User>, ServerFnError>
+{
+	let mut db_con = get_db_conn();
+
+	let friends = friendships::table
+		.filter(friendships::friend_1_id.eq(for_user_id))
+		.filter(friendships::friend_1_id.ne(friendships::friend_2_id))
+		.inner_join(users::table.on(users::id.eq(friendships::friend_2_id)))
+		.select(users::all_columns)
+		.union(
+			friendships::table
+			.filter(friendships::friend_2_id.eq(for_user_id))
+			.filter(friendships::friend_1_id.ne(friendships::friend_2_id))
+			.inner_join(users::table.on(users::id.eq(friendships::friend_1_id)))
+			.select(users::all_columns)
+		)
+		.load(&mut db_con)?;
+	
+	// leave out the password field for security
+	let friend_list: Vec<User> = friends.into_iter().map(|user: User| {
+		User {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			password: None,
+			created_at: user.created_at,
+			admin: user.admin
+		}
+	}).collect();
+
+	Ok(friend_list)
 }
