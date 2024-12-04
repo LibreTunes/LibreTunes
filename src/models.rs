@@ -542,24 +542,14 @@ impl Album {
 	pub fn get_album_data(album_id: i32, conn: &mut PgPooledConn) -> Result<AlbumData, Box<dyn Error>> {
 		use crate::schema::*;
 
-		let album: Vec<(Album, std::option::Option<Artist>)> = albums::table
-			.find(album_id)
-			.left_join(songs::table.on(albums::id.nullable().eq(songs::album_id)))
-			.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
-			.select((
-				albums::all_columns,
-				artists::all_columns.nullable()
-			))
-			.distinct()
+		let artist_list: Vec<Artist> = album_artists::table
+			.filter(album_artists::album_id.eq(album_id))
+			.inner_join(artists::table.on(album_artists::artist_id.eq(artists::id)))
+			.select(
+				artists::all_columns
+			)
 			.load(conn)?;
 
-		let mut artist_list: Vec<Artist> = Vec::new();
-
-		for (_, artist) in album {
-			if let Some(artist) = artist {
-				artist_list.push(artist);
-			}
-		}
 		// Get info of album
 		let albuminfo = albums::table
 			.filter(albums::id.eq(album_id))
@@ -671,7 +661,7 @@ impl Album {
 		
 		// Sort the songs by date
 		let mut songdata: Vec<SongData> = album_songs.into_values().collect();
-		songdata.sort_by(|a, b| b.track.cmp(&a.track));
+		songdata.sort_by(|a, b| a.track.cmp(&b.track));
 		Ok(songdata)
 	}
 }
