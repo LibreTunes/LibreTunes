@@ -47,6 +47,7 @@ pub fn App() -> impl IntoView {
                         <Route path="user/:id" view=Profile />
                         <Route path="user" view=Profile />
                         <Route path="user/:id/friends" view=Friends />
+                        <Route path="user/:id/friendrequests" view=FriendRequests />
                         <Route path="album/:id" view=AlbumPage />
                     </Route>
                     <Route path="/login" view=Login />

@@ -1,7 +1,7 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_router::*;
-use crate::api::profile::*;
+use crate::api::friends::*;
 use crate::components::friend_list::*;
 use crate::components::loading::Loading;
 
@@ -62,3 +62,73 @@ pub fn Friends() -> impl IntoView {
     }
 }
 
+#[component]
+pub fn FriendRequests() -> impl IntoView {
+    let params = use_params::<FriendParams>();
+
+    let id = move || {params.with(|params| {
+            params.as_ref()
+                .map(|params| params.id)
+                .map_err(|e| e.clone())
+        })
+    };
+
+    let friend_list_incoming = create_resource(
+        id,
+        |value| async move {
+            match value {
+                Ok(v) => {friend_requests_incoming(v).await},
+                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e).into()))},
+            }
+        },
+    );
+
+    let friend_list_outgoing = create_resource(
+        id,
+        |value| async move {
+            send_friend_request(1).await;
+            match value {
+                Ok(v) => {friend_requests_outgoing(v).await},
+                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e).into()))},
+            }
+        },
+    );
+
+    view! {
+        <div class="friend-page-container">
+            <h1 class="friend-header"> "Friend Requests:" </h1>
+            <Transition
+                fallback=move || view! {
+                    <Loading />
+                }
+            >
+                <ErrorBoundary
+                    fallback=|errors| view! {
+                        {move || errors.get()
+                            .into_iter()
+                            .map(|(_, e)| view! { <p>{e.to_string()}</p>})
+                            .collect_view()
+                        }
+                    }
+                >
+                    <h2>Sent: </h2>
+                    {
+                        friend_list_outgoing.get().map(|friend_list| {
+                            friend_list.map(|friend_list| {
+                                view! {<FriendList friends={friend_list} />}
+                            })
+                        })
+                    }
+                    <h2>Received: </h2>
+                    {
+                        friend_list_incoming.get().map(|friend_list| {
+                            friend_list.map(|friend_list| {
+                                view! {<FriendList friends={friend_list} />}
+                            })
+                        })
+                    }
+                </ErrorBoundary>
+            </Transition>
+        </div>
+    }
+}
