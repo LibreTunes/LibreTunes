@@ -32,15 +32,6 @@ pub fn Search() -> impl IntoView {
 
         spawn_local(async move {
             log!("Searching for: {:?}", search_query.get_untracked());
-            // let results = search(search_query.get_untracked(), search_limit).await;
-            // match results {
-            //     Ok((albums, artists, songs)) => {
-            //         search_results.set((albums, artists, songs));
-            //     }
-            //     Err(err) => {
-            //         log!("Error searching: {:?}", err);
-            //     }
-            // }
 			let albums = search_albums(search_query.get_untracked(), search_limit).await;
 			let artists = search_artists(search_query.get_untracked(), search_limit).await;
 			let songs = search_songs(search_query.get_untracked(), search_limit).await;
@@ -98,8 +89,9 @@ pub fn Search() -> impl IntoView {
 				<input type="search" placeholder="Search" on:input=on_input on:blur=on_disabled on:focus=on_enabled/>
 			</div>
 			<div class="search-results">
+				// Display 3 columns of search results: songs, albums, and artists
 				<ul class="search-result-list">
-					{song_search_results.with(|songs| -> Vec<leptos::HtmlElement<Li>> {
+					{move || song_search_results.with(|songs| -> Vec<leptos::HtmlElement<Li>> {
 						let mut song_list = Vec::new();
 						log!("Songs: {:?}", songs);
 						for (song, _) in songs {
@@ -122,12 +114,11 @@ pub fn Search() -> impl IntoView {
 								</li>
 							});
 						}
-
 						song_list
 					})}
 				</ul>
 				<ul class="search-result-list">
-					{album_search_results.with(|albums| -> Vec<leptos::HtmlElement<Li>> {
+					{move || album_search_results.with(|albums| -> Vec<leptos::HtmlElement<Li>> {
 						let mut album_list = Vec::new();
 						log!("Albums: {:?}", albums);
 						for (album, _) in albums {
@@ -153,12 +144,11 @@ pub fn Search() -> impl IntoView {
 								</li>
 							});
 						}
-
 						album_list
 					})}
 				</ul>
 				<ul class="search-result-list">
-					{artist_search_results.with(|artists| -> Vec<leptos::HtmlElement<Li>> {
+					{move || artist_search_results.with(|artists| -> Vec<leptos::HtmlElement<Li>> {
 						let mut artist_list = Vec::new();
 						log!("Artists: {:?}", artists);
 						for (artist, _) in artists {
@@ -180,104 +170,9 @@ pub fn Search() -> impl IntoView {
 								</li>
 							});
 						}
-
 						artist_list
 					})}
 				</ul>
-				/* {
-					move || search_results.with(|(albums, artists, songs)| -> (leptos::HtmlElement<Ul>, leptos::HtmlElement<Ul>, leptos::HtmlElement<Ul>) {
-						// log the search results
-						log!("Albums: {:?}", albums);
-						log!("Artists: {:?}", artists);
-						log!("Songs: {:?}", songs);
-						
-						// We need 3 uls, one for songs, one for albums, and one for artists, each in ascending order of score (distance)
-						let mut song_list = Vec::new();
-
-						for (song, score) in songs {
-							song_list.push(view! {
-								<li class="search-result">
-									<div class="result-container">
-										<Song song_image_path=match song.image_path.clone() {
-											Some(path) => path,
-											None => "".to_string()
-										} song_title=song.title.clone() song_artist="".to_string() />
-										<div class="right-side-result">
-											<div class="search-item-type">
-												"(Song)"
-											</div>
-											<button class="search-result-options" on:mousedown=prevent_focus>
-												<Icon class="search-result-options-icon" width=OPTIONS_BTN_SIZE height=OPTIONS_BTN_SIZE icon=icondata::BsThreeDotsVertical />
-											</button>
-										</div>
-									</div>
-								</li>
-							});
-						}
-
-						let mut album_list = Vec::new();
-
-						for (album, score) in albums {
-							album_list.push(view! {
-								<li class="search-result">
-								<div class="result-container">
-									<div class="search-result-album">
-										{album.title.clone()}
-										{match album.release_date {
-											Some(date) => format!(" ({})", date),
-											None => "".to_string()
-										}}
-									</div>
-									<div class="right-side-result">
-										<div class="search-item-type">
-											"(Album)"
-										</div>
-										<button class="search-result-options" on:mousedown=prevent_focus>
-											<Icon class="search-result-options-icon" width=OPTIONS_BTN_SIZE height=OPTIONS_BTN_SIZE icon=icondata::BsThreeDotsVertical />
-										</button>
-									</div>
-								</div>
-							</li>
-							});
-						}
-
-						let mut artist_list = Vec::new();
-
-						for (artist, score) in artists {
-							artist_list.push(view! {
-								<li class="search-result">
-									<div class="result-container">
-										<div class="search-result-artist">
-											{artist.name.clone()}
-										</div>
-										<div class="right-side-result">
-											<div class="search-item-type">
-												"(Artist)"
-											</div>
-											<button class="search-result-options" on:mousedown=prevent_focus>
-												<Icon class="search-result-options-icon" width=OPTIONS_BTN_SIZE height=OPTIONS_BTN_SIZE icon=icondata::BsThreeDotsVertical />
-											</button>
-										</div>
-									</div>
-								</li>
-							});
-						}
-
-						(view! {
-							<ul class="search-result-list">
-								{song_list}
-							</ul>
-						}, view! {
-							<ul class="search-result-list">
-								{album_list}
-							</ul>
-						}, view! {
-							<ul class="search-result-list">
-								{artist_list}
-							</ul>
-						})
-					}) */
-				// }
 			</div>
 		</div>
 	}
