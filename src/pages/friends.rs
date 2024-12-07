@@ -86,7 +86,6 @@ pub fn FriendRequests() -> impl IntoView {
     let friend_list_outgoing = create_resource(
         id,
         |value| async move {
-            send_friend_request(1).await;
             match value {
                 Ok(v) => {friend_requests_outgoing(v).await},
                 Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e).into()))},

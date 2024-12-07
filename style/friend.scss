@@ -1,0 +1,60 @@
+@import 'theme.scss';
+
+.friend-page-container {
+    width: 100%;
+}
+
+.friend-container {
+	width: 100%;
+	border-collapse: collapse;
+
+    .friend-row {
+        border: solid;
+		border-width: 1px 0;
+		border-color: #303030;
+		position: relative;
+
+        min-width: 100%;
+        height: 50px;
+
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+
+        .friend-info {
+            display: flex;
+            flex-flow: row nowrap;
+        }
+
+        .friend-item {
+            max-width: max-content;
+            margin: 0 20px;
+
+            .friend-image {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+            }
+
+        }
+
+        .friend-created-date {
+            margin-right: 50px;
+        }
+        a {
+            color: $text-controls-color;
+        }
+        a:visited {
+            color: $text-controls-color;
+        }
+        a:hover {
+            color: $controls-hover-color;
+        }
+        
+        a:active {
+            color: $controls-click-color;
+        }
+    }
+
+}
