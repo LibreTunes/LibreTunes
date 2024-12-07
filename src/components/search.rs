@@ -1,8 +1,6 @@
 use html::Li;
 use leptos::*;
-use crate::search::search_albums;
-use crate::search::search_artists;
-use crate::search::search_songs;
+use crate::search::search;
 use crate::song::Song;
 use crate::models::Album;
 use crate::models::Artist;
@@ -20,9 +18,7 @@ pub fn Search() -> impl IntoView {
 	let status = GlobalState::play_status();
 
     let search_query = create_rw_signal(String::new());
-    let album_search_results = create_rw_signal(Vec::<(Album, f32)>::new());
-	let artist_search_results = create_rw_signal(Vec::<(Artist, f32)>::new());
-	let song_search_results = create_rw_signal(Vec::<(Song, f32)>::new());
+	let search_results = create_rw_signal((Vec::<(Album, f32)>::new(), Vec::<(Artist, f32)>::new(), Vec::<(Song, f32)>::new()));
     let search_limit = 10;
 
     let on_input = move |e: Event| {
@@ -32,34 +28,14 @@ pub fn Search() -> impl IntoView {
 
         spawn_local(async move {
             log!("Searching for: {:?}", search_query.get_untracked());
-			let albums = search_albums(search_query.get_untracked(), search_limit).await;
-			let artists = search_artists(search_query.get_untracked(), search_limit).await;
-			let songs = search_songs(search_query.get_untracked(), search_limit).await;
+			let results = search(search_query.get_untracked(), search_limit).await;
 
-			match albums {
-				Ok(albums) => {
-					album_search_results.set(albums);
+			match results {
+				Ok((albums, artists, songs)) => {
+					search_results.set((albums, artists, songs));
 				}
 				Err(err) => {
 					log!("Error searching albums: {:?}", err);
-				}
-			}
-
-			match artists {
-				Ok(artists) => {
-					artist_search_results.set(artists);
-				}
-				Err(err) => {
-					log!("Error searching artists: {:?}", err);
-				}
-			}
-
-			match songs {
-				Ok(songs) => {
-					song_search_results.set(songs);
-				}
-				Err(err) => {
-					log!("Error searching songs: {:?}", err);
 				}
 			}
         });
@@ -91,10 +67,9 @@ pub fn Search() -> impl IntoView {
 			<div class="search-results">
 				// Display 3 columns of search results: songs, albums, and artists
 				<ul class="search-result-list">
-					{move || song_search_results.with(|songs| -> Vec<leptos::HtmlElement<Li>> {
+					{move || search_results.with(|results| -> Vec<leptos::HtmlElement<Li>> {
 						let mut song_list = Vec::new();
-						log!("Songs: {:?}", songs);
-						for (song, _) in songs {
+						for (song, _) in results.2.clone() {
 							song_list.push(view! {
 								<li class="search-result">
 									<div class="result-container">
@@ -118,10 +93,9 @@ pub fn Search() -> impl IntoView {
 					})}
 				</ul>
 				<ul class="search-result-list">
-					{move || album_search_results.with(|albums| -> Vec<leptos::HtmlElement<Li>> {
+					{move || search_results.with(|results| -> Vec<leptos::HtmlElement<Li>> {
 						let mut album_list = Vec::new();
-						log!("Albums: {:?}", albums);
-						for (album, _) in albums {
+						for (album, _) in results.0.clone() {
 							album_list.push(view! {
 								<li class="search-result">
 									<div class="result-container">
@@ -148,10 +122,9 @@ pub fn Search() -> impl IntoView {
 					})}
 				</ul>
 				<ul class="search-result-list">
-					{move || artist_search_results.with(|artists| -> Vec<leptos::HtmlElement<Li>> {
+					{move || search_results.with(|results| -> Vec<leptos::HtmlElement<Li>> {
 						let mut artist_list = Vec::new();
-						log!("Artists: {:?}", artists);
-						for (artist, _) in artists {
+						for (artist, _) in results.1.clone() {
 							artist_list.push(view! {
 								<li class="search-result">
 									<div class="result-container">
