@@ -10,6 +10,7 @@ cfg_if! {
 		use std::error::Error;
 		use crate::songdata::SongData;
 		use crate::albumdata::AlbumData;
+		use crate::playlistdata::PlaylistData;
 	}
 }
 
@@ -794,4 +795,45 @@ pub struct Playlist {
 	pub owner_id: i32,
 	/// The name of the playlist
 	pub name: String,
+}
+
+impl Playlist {
+	/// Obtain a playlist from its playlistid
+	/// # Arguments
+	/// 
+	/// * `playlist_id` - The id of the playlist to select
+	/// * `conn` - A mutable reference to a database connection
+	/// 
+	/// # Returns
+	/// 
+	/// * `Result<Playlist, Box<dyn Error>>` - A result indicating success with the desired playlist, or an error
+	///
+	#[cfg(feature = "ssr")]
+	pub fn get_playlist_data(playlist_id: i32, conn: &mut PgPooledConn) -> Result<PlaylistData, Box<dyn Error>> {
+		use crate::schema::*;
+
+		let playlist: (Playlist, User) = playlists::table
+			.find(playlist_id)
+			.inner_join(users::table.on(playlists::owner_id.eq(users::id)))
+			.select((playlists::all_columns, users::all_columns))
+			.first(conn)?;
+
+		let playlistdata = PlaylistData {
+			id: playlist.0.id.unwrap(),
+			title: playlist.0.name,
+			owner: User {
+				id: playlist.1.id,
+				username: playlist.1.username,
+				email: playlist.1.email,
+				password: None,
+				created_at: playlist.1.created_at,
+				admin: playlist.1.admin,
+			},
+			created_at: playlist.0.created_at.unwrap(),
+			updated_at: playlist.0.updated_at.unwrap(),
+			image_path: "/assets/images/placeholders/MusicPlaceholder.svg".to_string(),
+		};
+
+		Ok(playlistdata)
+	}
 }
