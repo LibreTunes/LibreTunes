@@ -87,3 +87,33 @@ fn ArtistDetails(artist: Artist) -> impl IntoView {
         </div>
     }
 }
+
+#[component]
+fn TopSongsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
+    let top_songs = create_resource(move || artist_id.get(), |artist_id| async move {
+        top_songs_by_artist(artist_id, Some(10)).await
+    });
+
+    view! {
+        <h2>"Top Songs"</h2>
+        <Transition
+            fallback=move || view! { <Loading /> }
+        >
+            <ErrorBoundary
+                fallback=|errors| view! {
+                    {move || errors.get()
+                        .into_iter()
+                        .map(|(_, e)| view! { <p>{e.to_string()}</p>})
+                        .collect_view()
+                    }
+                }
+            >
+                {move || top_songs.get().map(|top_songs| {
+                    top_songs.map(|top_songs| {
+                        view! { <SongListExtra songs=top_songs /> }
+                    })
+                })}
+            </ErrorBoundary>
+        </Transition>
+    }
+}
