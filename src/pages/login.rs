@@ -10,6 +10,7 @@ use crate::components::loading::Loading;
 pub fn Login() -> impl IntoView {
     let (username_or_email, set_username_or_email) = create_signal("".to_string());
     let (password, set_password) = create_signal("".to_string());
+    let (two_fa_code, set_two_fa_code) = create_signal("".to_string());
 
     let (show_password, set_show_password) = create_signal(false);
 
@@ -26,6 +27,8 @@ pub fn Login() -> impl IntoView {
 
         let username_or_email1 = username_or_email.get();
         let password1 = password.get();
+
+        let two_fa_code1 = two_fa_code.get();
 
         spawn_local(async move {
             loading.set(true);
@@ -105,6 +108,16 @@ pub fn Login() -> impl IntoView {
                             </button>
 
                         </Show>
+                    </div>
+                    <div class="input-box">
+                        <input class="login-2fa" type="text" required
+                        on:input = move |ev| {
+                            set_two_fa_code(event_target_value(&ev));
+                            log!("2FA code changed to: {}", two_fa_code.get());
+                        }
+                        />
+                        <span>2FA Code</span>
+                        <i></i>
                     </div>
                     <a href="" class="forgot-pw">Forgot Password?</a>
                     <div class="error-msg" >{ move || error_msg.get() }</div>
