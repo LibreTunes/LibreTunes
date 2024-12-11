@@ -1,124 +1,115 @@
 table.song-list {
 	width: 100%;
 	border-collapse: collapse;
-
+  
 	tr.song-list-item {
-		border: solid;
-		border-width: 1px 0;
-		border-color: #303030;
-		position: relative;
-
-		td {
-			color: $text-controls-color;
-			white-space: nowrap;
-			padding-left: 10px;
-			padding-right: 10px;
-			
-			a {
-				text-decoration: none;
-				color: $text-controls-color;
-			}
+	  border: 1px solid #303030; /* Simplified border shorthand */
+	  position: relative;
+  
+	  td {
+		color: $text-controls-color;
+		white-space: nowrap;
+		padding: 0.6rem; /* Adjusted padding for consistency */
+  
+		a {
+		  text-decoration: none;
+		  color: $text-controls-color;
 		}
-
-		a:hover {
-			text-decoration: underline $controls-hover-color;
+	  }
+  
+	  a:hover {
+		text-decoration: underline $controls-hover-color;
+	  }
+  
+	  td.song-image {
+		width: 2.2rem; /* Replaced static px with rem */
+		display: flex;
+  
+		img.song-image {
+		  position: absolute;
+		  top: 50%;
+		  transform: translateY(-50%);
+		  width: 2.2rem; /* Adjusted to rem */
+		  height: 2.2rem; /* Adjusted to rem */
+		  border-radius: 0.3rem; /* Adjusted radius */
 		}
-		
-		td.song-image {
-			width: 35px;
-			display: flex;
-
-			img.song-image {
-				position: absolute;
-				top: 50%;
-				-ms-transform: translateY(-50%);
-				transform: translateY(-50%);
-				width: 35px;
-				height: 35px;
-				border-radius: 5px;
-			}
-
-			svg.song-image-overlay {
-				position: absolute;
-				top: 50%;
-				-ms-transform: translateY(-50%);
-				transform: translateY(-50%);
-				width: 35px;
-				height: 35px;
-				border-radius: 5px;
-				fill: $text-controls-color;
-			}
-
-			svg.song-image-overlay:hover {
-				fill: $controls-hover-color;
-			}
-
-			svg.song-image-overlay:active {
-				fill: $controls-click-color;
-			}
+  
+		svg.song-image-overlay {
+		  position: absolute;
+		  top: 50%;
+		  transform: translateY(-50%);
+		  width: 2.2rem; /* Adjusted to rem */
+		  height: 2.2rem; /* Adjusted to rem */
+		  border-radius: 0.3rem; /* Adjusted radius */
+		  fill: $text-controls-color;
 		}
-
-		td.song-list-spacer {
-			width: 20%;
+  
+		svg.song-image-overlay:hover {
+		  fill: $controls-hover-color;
 		}
-
-		td.song-list-spacer-big {
-			width: 40%;
+  
+		svg.song-image-overlay:active {
+		  fill: $controls-click-color;
 		}
-
-		button {
-			svg.hmirror {
-				-moz-transform: scale(-1, 1);
-				-webkit-transform: scale(-1, 1);
-				-o-transform: scale(-1, 1);
-				-ms-transform: scale(-1, 1);
-				transform: scale(-1, 1);
-			}
-	
-			.controlbtn {
-				color: $text-controls-color;
-			}
-	
-			.controlbtn:hover {
-				color: $controls-hover-color;
-			}
-	
-			.controlbtn:active {
-				color: $controls-click-color;
-			}
-	
-			background-color: transparent;
-			border: transparent;
+	  }
+  
+	  td.song-list-spacer {
+		width: 20%;
+	  }
+  
+	  td.song-list-spacer-big {
+		width: 40%;
+	  }
+  
+	  button {
+		svg.hmirror {
+		  transform: scale(-1, 1); /* Removed redundant prefixes */
 		}
-
-		.hide-until-hover {
-			visibility: hidden;
+  
+		.controlbtn {
+		  color: $text-controls-color;
 		}
-
-		.song-playing-overlay {
-			background-color: rgba(0, 0, 0, 0.8);
+  
+		.controlbtn:hover {
+		  color: $controls-hover-color;
 		}
+  
+		.controlbtn:active {
+		  color: $controls-click-color;
+		}
+  
+		background-color: transparent;
+		border: none; /* Simplified border */
+	  }
+  
+	  .hide-until-hover {
+		visibility: hidden;
+	  }
+  
+	  .song-playing-overlay {
+		background-color: rgba(0, 0, 0, 0.8);
+	  }
 	}
-
+  
 	tr.song-list-item:first-child {
-		border-top: none;
+	  border-top: none;
 	}
-
+  
 	tr.song-list-item:last-child {
-		border-bottom: none;
+	  border-bottom: none;
 	}
-
+  
 	tr.song-list-item:hover {
-		background-color: #303030;
-
-		.hide-until-hover {
-			visibility: visible;
+	  background-color: #303030;
+  
+	  .hide-until-hover {
+		visibility: visible;
+	  }
+  
+	  td.song-image {
+		svg.song-image-overlay {
+		  background-color: rgba(0, 0, 0, 0.8);
 		}
-
-		td.song-image {
-			svg.song-image-overlay {
-				background-color: rgba(0, 0, 0, 0.8);
-			}
-		}
+	  }
 	}
-}
+  }
