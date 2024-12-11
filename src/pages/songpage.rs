@@ -78,3 +78,15 @@ fn SongDetails(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
         </Transition>
     }
 }
+
+#[component]
+fn SongOverview(song: Song) -> impl IntoView {
+    view! {
+        <div class="song-header">
+            <h1>{song.title}</h1>
+            <p>{format!("Artist: {}", song.artist)}</p>
+            <p>{format!("Album: {}", song.album.unwrap_or_else(|| "Unknown".to_string()))}</p>
+            <p>{format!("Duration: {}", song.duration)}</p>
+        </div>
+    }
+}
