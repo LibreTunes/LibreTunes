@@ -151,3 +151,28 @@ fn RelatedArtists(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
         </Transition>
     }
 }
+
+pub async fn get_artist_by_id(artist_id: i32) -> Result<Option<Artist>, NoCustomError> {
+    // todo
+    Ok(Some(Artist {
+        id: Some(artist_id),
+        name: "Example Artist".to_string(),
+        bio: Some("A great artist!".to_string()),
+    }))
+}
+
+pub async fn get_related_artists(artist_id: i32) -> Result<Vec<Artist>, NoCustomError> {
+    // todo
+    Ok(vec![
+        Artist {
+            id: Some(artist_id + 1),
+            name: "Related Artist 1".to_string(),
+            bio: None,
+        },
+        Artist {
+            id: Some(artist_id + 2),
+            name: "Related Artist 2".to_string(),
+            bio: None,
+        },
+    ])
+}
