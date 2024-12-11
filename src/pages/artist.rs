@@ -38,3 +38,34 @@ pub fn ArtistPage() -> impl IntoView {
         </div>
     }
 }
+
+#[component]
+fn ArtistProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
+    let artist_info = create_resource(move || id.get(), move |id| {
+        get_artist_by_id(id)
+    });
+
+    view! {
+        <Transition
+            fallback=move || view! { <LoadingPage /> }
+        >
+            {move || artist_info.get().map(|artist| {
+                match artist {
+                    Ok(Some(artist)) => view! { <ArtistDetails artist /> }.into_view(),
+                    Ok(None) => view! {
+                        <Error<String>
+                            title="Artist Not Found"
+                            message=format!("Artist with ID {} not found", id.get())
+                        />
+                    }.into_view(),
+                    Err(error) => view! {
+                        <ServerError<NoCustomError>
+                            title="Error Getting Artist"
+                            error
+                        />
+                    }.into_view(),
+                }
+            })}
+        </Transition>
+    }
+}
