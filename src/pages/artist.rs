@@ -117,3 +117,37 @@ fn TopSongsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView 
         </Transition>
     }
 }
+
+#[component]
+fn RelatedArtists(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
+    let related_artists = create_resource(move || artist_id.get(), |artist_id| async move {
+        get_related_artists(artist_id).await
+    });
+
+    view! {
+        <h2>"Related Artists"</h2>
+        <Transition
+            fallback=move || view! { <Loading /> }
+        >
+            <ErrorBoundary
+                fallback=|errors| view! {
+                    {move || errors.get()
+                        .into_iter()
+                        .map(|(_, e)| view! { <p>{e.to_string()}</p>})
+                        .collect_view()
+                    }
+                }
+            >
+                {move || related_artists.get().map(|related_artists| {
+                    related_artists.map(|artists| {
+                        let tiles = artists.into_iter().map(|artist| {
+                            Box::new(artist) as Box<dyn DashboardTile>
+                        }).collect::<Vec<_>>();
+
+                        DashboardRow::new("Related Artists", tiles)
+                    })
+                })}
+            </ErrorBoundary>
+        </Transition>
+    }
+}
