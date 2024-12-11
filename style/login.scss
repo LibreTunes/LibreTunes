@@ -8,155 +8,56 @@
   top: 50%;
   left: 50%;
   width: 27rem;
-  height: 31rem;
+  height: 30rem; /* Slightly adjusted height for better layout */
   transform: translate(-50%, -50%);
   background: $auth-containers;
-  z-index: 1;
-  border-radius: 8px;
+  z-index: 10; /* Increased z-index for better stacking context */
+  border-radius: 0.5rem; /* Adjusted unit */
   overflow: hidden;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
 }
 
 .login-container .header h1 {
-  margin-top: 3rem;
-  font-size: 2.5rem;
+  margin-top: 2.5rem; /* Adjusted margin for alignment */
+  font-size: 2.4rem; /* Slightly smaller for consistency */
   color: $accent-color;
-}
-.login-container .login-form {
-  width: 75%;
-}
-.login-form .input-box:first-child {
-  margin-top: 1rem;
-}
-.login-form .input-box {
-  position: relative;
-  margin-top: 3rem;
-}
-.login-form .input-box input {
-  position: relative;
-  width: 100%;
-  max-width: 34vw;
-  padding: 17px 0px 10px;
-  background: transparent;
-  outline: none;
-  border: none;
-  box-shadow: none;
-  color: #23242a;
-  font-size: 1.1em;
-  font-family: "Roboto", sans-serif;
-  font-weight: 400;
-  letter-spacing: 0px;
-  text-indent: 10px;
-  vertical-align: middle;
-  z-index: 10;
-  color: #fff;
-}
-.login-form .input-box span {
-  position: absolute;
-  left: 0;
-  padding: 15px 0px 10px;
-  pointer-events: none;
-  color: black;
-  font-size: 1.19em;
-  letter-spacing: 0.5px;
-  transition: 0.5s;
-}
-.login-form .input-box input:valid ~ span,
-.login-form .input-box input:focus ~ span {
-  color: rgb(94, 93, 93);
-  font-size: 0.9rem;
-  transform: translateY(-30px);
-  font-weight: 400;
-}
-.login-form .input-box i {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 2px;
-  background: $auth-inputs;
-  border-radius: 4px;
-  overflow: hidden;
-  transition: 0.5s;
-  pointer-events: none;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2); /* Added slight text shadow */
 }
 
-.login-form .input-box input:valid ~ i,
-.login-form .input-box input:focus ~ i {
-  height: 2.6rem;
+.login-container .login-form {
+  width: 80%; /* Adjusted width for responsiveness */
 }
-.login-form .forgot-pw {
-  display: inline-flex;
-  margin-top: 3px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  color: #8f8f8f;
-  text-decoration: underline;
+
+.login-form .input-box {
+  position: relative;
+  margin-top: 2.5rem; /* Adjusted spacing */
 }
-.login-form .forgot-pw:hover {
-  color: #fff;
-  transition: all 0.2s;
-}
-.login-form .error-msg {
-  color: $error-color;
-  margin-top: 1rem;
-  height: 1rem;
-}
-.login-form .loading {
-  margin-top: 4.5rem;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: calc(1.5rem - 10px);
-}
-.login-form input[type="submit"] {
-  margin-top: 3rem;
+
+.login-form .input-box input {
   width: 100%;
+  padding: 1.1rem 0 0.6rem; /* Adjusted padding */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Added subtle border */
+  border-radius: 0.3rem; /* Added border radius */
+}
+
+.login-form .input-box span {
+  padding: 0.8rem 0 0.5rem; /* Adjusted padding */
+}
+
+.login-form .input-box i {
+  height: 0.2rem; /* Adjusted height for better visual hierarchy */
+}
+
+.login-form input[type="submit"] {
+  margin-top: 2.5rem; /* Adjusted spacing */
   height: 3rem;
-  border: none;
-  border-radius: 8px;
-  color: rgb(210, 207, 207);
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 600;
   background-color: $accent-color;
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Added border for consistency */
 }
-.login-form .go-to-signup {
-  color: #8f8f8f;
-  font-size: 0.9rem;
-}
-.login-form .go-to-signup a {
-  cursor: pointer;
-  color: #8f8f8f;
-  text-decoration: underline;
-}
-.login-form .go-to-signup a:hover {
-  color: black;
-  transition: all 0.2s;
-}
+
 .login-container .return {
-  position: absolute;
-  left: 10px;
-  top: 10px;
-  font-size: 1.8rem;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.3rem;
-}
-.login-container .return:hover {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-.login-password-visibility {
-  position: absolute;
-  font-size: 1.7rem;
-  top: 28%;
-  right: 5px;
-  z-index: 5;
-  cursor: pointer;
-  border: none;
-  background-color: transparent;
-  color: white;
+  top: 15px; /* Adjusted position for better alignment */
+  left: 15px; /* Adjusted position for better alignment */
+  padding: 0.4rem; /* Adjusted padding */
+  background-color: rgba(255, 255, 255, 0.1); /* Added subtle background */
 }
