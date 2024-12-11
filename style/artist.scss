@@ -1,0 +1,31 @@
+.artist-container {
+    .artist-header {
+        display: flex;
+
+        .artist-image {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            padding: 10px;
+            margin: auto;
+
+            svg {
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        h1 {
+            font-size: 40px;
+            align-self: center;
+            padding: 10px;
+        }
+    }
+
+    .artist-details {
+        p {
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+    }
+}
