@@ -69,3 +69,21 @@ fn ArtistProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
         </Transition>
     }
 }
+
+#[component]
+fn ArtistDetails(artist: Artist) -> impl IntoView {
+    let artist_id = artist.id.unwrap();
+    let profile_image_path = format!("/assets/images/artist/{}.webp", artist_id);
+
+    view! {
+        <div class="artist-header">
+            <object class="artist-image" data={profile_image_path.clone()} type="image/webp">
+                <Icon class="artist-image" icon=icondata::CgProfile width="75" height="75"/>
+            </object>
+            <h1>{artist.name}</h1>
+        </div>
+        <div class="artist-details">
+            <p>{artist.bio.unwrap_or_else(|| "No bio available.".to_string())}</p>
+        </div>
+    }
+}
