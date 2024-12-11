@@ -41,3 +41,40 @@ pub fn SongPage() -> impl IntoView {
         </div>
     }
 }
+
+#[component]
+fn SongDetails(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
+    let song_info = create_resource(move || id.get(), move |id| {
+        get_song_by_id(id)
+    });
+
+    view! {
+        <Transition
+            fallback=move || view! { <LoadingPage /> }
+        >
+            {move || song_info.get().map(|song| {
+                match song {
+                    Ok(Some(song)) => {
+                        view! { <SongOverview song /> }.into_view()
+                    },
+                    Ok(None) => {
+                        view! {
+                            <Error<String>
+                                title="Song Not Found"
+                                message=format!("Song with ID {} not found", id.get())
+                            />
+                        }.into_view()
+                    },
+                    Err(error) => {
+                        view! {
+                            <ServerError<NoCustomError>
+                                title="Error Fetching Song"
+                                error
+                            />
+                        }.into_view()
+                    }
+                }
+            })}
+        </Transition>
+    }
+}
