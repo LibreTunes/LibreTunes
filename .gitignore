@@ -31,3 +31,7 @@ playwright/.cache/
 
 # Sass cache
 .sass-cache
+
+# Nix-related files
+.direnv/
+result
