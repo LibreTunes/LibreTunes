@@ -73,3 +73,15 @@ jobs:
         with:
           name: docs
           path: target/doc
+
+  nix-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Package Lists
+        run: apt update
+      - name: Install Nix
+        run: apt install -y nix-bin
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build project with Nix
+        run: nix build --experimental-features 'nix-command flakes' .#default
