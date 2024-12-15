@@ -31,6 +31,8 @@ pub struct SongData {
 	pub image_path: String,
 	/// Whether the song is liked by the user
 	pub like_dislike: Option<(bool, bool)>,
+	/// The date the song was added to the database
+	pub added_date: NaiveDate,
 }
 
 
@@ -59,6 +61,8 @@ impl TryInto<Song> for SongData {
 			} else {
 				Some(self.image_path)
 			},
+
+			added_date: Some(self.added_date),
 		})
 	}
 }
