@@ -96,6 +96,7 @@ diesel::table! {
         release_date -> Nullable<Date>,
         storage_path -> Varchar,
         image_path -> Nullable<Varchar>,
+        added_date -> Date,
     }
 }
 

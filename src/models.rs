@@ -652,6 +652,7 @@ impl Album {
 						song_path: song.storage_path,
 						image_path: image_path,
 						like_dislike: like_dislike,
+						added_date: song.added_date.unwrap(),
 					};
 		
 					album_songs.insert(song.id.unwrap(), songdata);
@@ -689,6 +690,9 @@ pub struct Song {
 	pub storage_path: String,
 	/// The path to the song's image file
 	pub image_path: Option<String>,
+	/// The date the song was added to the database
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDate))]
+	pub added_date: Option<NaiveDate>,
 }
 
 impl Song {

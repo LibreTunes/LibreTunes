@@ -141,6 +141,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 				song_path: song.storage_path,
 				image_path: image_path,
 				like_dislike: like_dislike,
+				added_date: song.added_date.unwrap(),
 			};
 
 			history_songs.insert(song_id, (history.date, songdata));
@@ -239,6 +240,7 @@ pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: Na
 				song_path: song.storage_path,
 				image_path: image_path,
 				like_dislike: like_dislike,
+				added_date: song.added_date.unwrap(),
 			};
 
 			let plays = history_counts.get(&song_id)
