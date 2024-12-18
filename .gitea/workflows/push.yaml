@@ -81,7 +81,5 @@ jobs:
         run: apt update
       - name: Install Nix
         run: apt install -y nix-bin
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: Build project with Nix
-        run: nix build --experimental-features 'nix-command flakes' .#default
+        run: nix build --experimental-features 'nix-command flakes' git+$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git?ref=$GITHUB_REF_NAME#default
