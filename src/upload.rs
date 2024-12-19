@@ -253,6 +253,7 @@ pub async fn upload(data: MultipartData) -> Result<(), ServerFnError> {
 		release_date,
 		storage_path: file_name,
 		image_path: None,
+		added_date: None, // Defaults to current date
 	};
 
 	// Save the song to the database

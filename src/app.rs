@@ -19,6 +19,8 @@ pub fn App() -> impl IntoView {
     provide_context(GlobalState::new());
 
     let upload_open = create_rw_signal(false);
+    let add_artist_open = create_rw_signal(false);
+    let add_album_open = create_rw_signal(false);
 
     view! {
         // injects a stylesheet into the document <head>
@@ -39,7 +41,7 @@ pub fn App() -> impl IntoView {
         }>
             <main>
                 <Routes>
-                    <Route path="" view=move || view! { <HomePage upload_open=upload_open/> }>
+                    <Route path="" view=move || view! { <HomePage upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/> }>
                         <Route path="" view=Dashboard />
                         <Route path="dashboard" view=Dashboard />
                         <Route path="search" view=Search />
@@ -60,14 +62,18 @@ use crate::components::dashboard::*;
 use crate::components::search::*;
 use crate::components::personal::Personal;
 use crate::components::upload::*;
+use crate::components::add_artist::AddArtist;
+use crate::components::add_album::AddAlbum;
 
 /// Renders the home page of your application.
 #[component]
-fn HomePage(upload_open: RwSignal<bool>) -> impl IntoView {
+fn HomePage(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add_album_open: RwSignal<bool>) -> impl IntoView {
     view! {
         <div class="home-container">
             <Upload open=upload_open/>
-            <Sidebar upload_open=upload_open/>
+            <AddArtist open=add_artist_open/>
+            <AddAlbum open=add_album_open/>
+            <Sidebar upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/>
             // This <Outlet /> will render the child route components
             <Outlet />
             <Personal />

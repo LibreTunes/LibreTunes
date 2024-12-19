@@ -542,24 +542,14 @@ impl Album {
 	pub fn get_album_data(album_id: i32, conn: &mut PgPooledConn) -> Result<AlbumData, Box<dyn Error>> {
 		use crate::schema::*;
 
-		let album: Vec<(Album, std::option::Option<Artist>)> = albums::table
-			.find(album_id)
-			.left_join(songs::table.on(albums::id.nullable().eq(songs::album_id)))
-			.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
-			.select((
-				albums::all_columns,
-				artists::all_columns.nullable()
-			))
-			.distinct()
+		let artist_list: Vec<Artist> = album_artists::table
+			.filter(album_artists::album_id.eq(album_id))
+			.inner_join(artists::table.on(album_artists::artist_id.eq(artists::id)))
+			.select(
+				artists::all_columns
+			)
 			.load(conn)?;
 
-		let mut artist_list: Vec<Artist> = Vec::new();
-
-		for (_, artist) in album {
-			if let Some(artist) = artist {
-				artist_list.push(artist);
-			}
-		}
 		// Get info of album
 		let albuminfo = albums::table
 			.filter(albums::id.eq(album_id))
@@ -662,6 +652,7 @@ impl Album {
 						song_path: song.storage_path,
 						image_path: image_path,
 						like_dislike: like_dislike,
+						added_date: song.added_date.unwrap(),
 					};
 		
 					album_songs.insert(song.id.unwrap(), songdata);
@@ -671,7 +662,7 @@ impl Album {
 		
 		// Sort the songs by date
 		let mut songdata: Vec<SongData> = album_songs.into_values().collect();
-		songdata.sort_by(|a, b| b.track.cmp(&a.track));
+		songdata.sort_by(|a, b| a.track.cmp(&b.track));
 		Ok(songdata)
 	}
 }
@@ -699,6 +690,9 @@ pub struct Song {
 	pub storage_path: String,
 	/// The path to the song's image file
 	pub image_path: Option<String>,
+	/// The date the song was added to the database
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDate))]
+	pub added_date: Option<NaiveDate>,
 }
 
 impl Song {

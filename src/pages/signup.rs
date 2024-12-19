@@ -4,6 +4,7 @@ use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
+use crate::components::loading::Loading;
 
 #[component]
 pub fn Signup() -> impl IntoView {
@@ -12,6 +13,9 @@ pub fn Signup() -> impl IntoView {
     let (password, set_password) = create_signal("".to_string());
 
     let (show_password, set_show_password) = create_signal(false);
+
+    let loading = create_rw_signal(false);
+    let error_msg = create_rw_signal(None);
 
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);
@@ -30,12 +34,16 @@ pub fn Signup() -> impl IntoView {
         };
         log!("new user: {:?}", new_user);
 
+        loading.set(true);
+        error_msg.set(None);
+
         let user = GlobalState::logged_in_user();
 
         spawn_local(async move {
             if let Err(err) = signup(new_user.clone()).await {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error signing up: {:?}", err);
+                error_msg.set(Some(err.to_string()));
 
                 // Since we're not sure what the state is, manually refetch the user
                 user.refetch();
@@ -49,6 +57,8 @@ pub fn Signup() -> impl IntoView {
                 leptos_router::use_navigate()("/", Default::default());
                 log!("Navigated to home page after signup")
             }
+
+            loading.set(false);
         });
     };
 
@@ -99,7 +109,13 @@ pub fn Signup() -> impl IntoView {
                             </button>
                         </Show>
                     </div>
-                    <input type="submit" value="Sign Up"  />
+                    <div class="error-msg">{ move || error_msg.get() }</div>
+                    <Show
+                        when=move || !loading.get()
+                        fallback=move || view!{ <Loading /> }
+                    >
+                        <input type="submit" value="Sign Up" />
+                    </Show>
                     <span class="go-to-login">
                         Already Have an Account? <a href="/login" class="link" >Go to Login</a>
                     </span>

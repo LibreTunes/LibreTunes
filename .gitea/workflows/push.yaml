@@ -13,7 +13,7 @@ jobs:
         run: cargo-leptos build
 
   docker-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-docker
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -73,3 +73,13 @@ jobs:
         with:
           name: docs
           path: target/doc
+
+  nix-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Package Lists
+        run: apt update
+      - name: Install Nix
+        run: apt install -y nix-bin
+      - name: Build project with Nix
+        run: nix build --experimental-features 'nix-command flakes' git+$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git?ref=$GITHUB_REF_NAME#default
