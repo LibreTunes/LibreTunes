@@ -11,35 +11,71 @@
     margin: 3px;
     padding: 0.1rem 1rem 1rem 1rem;
     position: relative;
+    .upload-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
     .header {
       font-size: 1.2rem;
     }
-    .upload-btn {
+    .upload-dropdown-container {
       position: absolute;
       top: 10px;
       right: 7px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      border-radius: 50px;
-      border: none;
-      height: 2.2rem;
-      padding-right: 1rem;
-      padding-left: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      .add-sign {
-        font-size: 1.5rem;
-        margin-top: auto;
-        margin-right: 5px;
-        color: white;
+      .upload-dropdown-btn {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        font-size: 0.9rem;
+        border-radius: 50px;
+        border: none;
+        height: 2.2rem;
+        padding-right: 1rem;
+        padding-left: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        .add-sign {
+          font-size: 1.5rem;
+          margin-top: auto;
+        }
+      }
+      .upload-dropdown-btn:hover {
+        background-color: #9e9e9e;
+      }
+      .upload-dropdown-btn-active {
+        border-radius: 12.5px 12.5px 0 0;
+        width: 110px;
+      }
+      .upload-dropdown {
+        background-color: #f0ecec;
+        color: black;
+        width: 110px;
+        border-radius: 0 0 5px 5px;
+        .add-btns {
+          border: none;
+          border-bottom: 1px solid black;
+          width: 100%;
+          padding: 0.25rem;
+          cursor: pointer;
+        }
+        .add-btns:first-child {
+          border-top: 1px solid black;
+        }
+        .add-btns:last-child {
+          border-radius: 0 0 5px 5px;
+        }
       }
     }
-    .upload-btn:hover {
-      background-color: #9e9e9e;
-    }
+    
     .buttons {
       display: flex;
       flex-direction: row;
