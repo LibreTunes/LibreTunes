@@ -6,7 +6,7 @@ cfg_if! {
     if #[cfg(feature = "ssr")] {
         use crate::database::get_db_conn;
         use diesel::prelude::*;
-        use time::Date;
+        use chrono::NaiveDate;
     }
 }
 
@@ -27,10 +27,9 @@ pub async fn add_album(album_title: String, release_date: Option<String>, image_
     use crate::models::Album;
     use leptos::server_fn::error::NoCustomError;
     
-    let date_format = time::macros::format_description!("[year]-[month]-[day]");
     let parsed_release_date = match release_date {
         Some(date) => {
-            match Date::parse(&date, &date_format) {
+            match NaiveDate::parse_from_str(&date.trim(), "%Y-%m-%d") {
                 Ok(parsed_date) => Some(parsed_date),
                 Err(_e) => return Err(ServerFnError::<NoCustomError>::ServerError("Invalid release date".to_string()))
             }
