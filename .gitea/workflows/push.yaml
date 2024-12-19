@@ -13,7 +13,7 @@ jobs:
         run: cargo-leptos build
 
   docker-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-docker
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
