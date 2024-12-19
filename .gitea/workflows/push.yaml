@@ -7,6 +7,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Use Cache
+        uses: Swatinem/rust-cache@v2
       - name: Build project
         env:
           RUSTFLAGS: "-D warnings"
@@ -50,6 +52,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Use Cache
+        uses: Swatinem/rust-cache@v2
       - name: Test project
         run: cargo test --all-targets --all-features
 
@@ -58,6 +62,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Use Cache
+        uses: Swatinem/rust-cache@v2
       - name: Run Leptos tests
         run: cargo-leptos test
 
@@ -66,6 +72,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Use Cache
+        uses: Swatinem/rust-cache@v2
       - name: Generate docs
         run: cargo doc --no-deps
       - name: Upload docs
