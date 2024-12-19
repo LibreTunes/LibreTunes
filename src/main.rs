@@ -1,10 +1,10 @@
 // Needed for building in Docker container
 // See https://github.com/clux/muslrust?tab=readme-ov-file#diesel-and-pq-builds
 // See https://github.com/sgrif/pq-sys/issues/25
-#[cfg(target = "x86_64-unknown-linux-musl")]
+#[cfg(target_env = "musl")]
 extern crate openssl;
 
-#[cfg(target = "x86_64-unknown-linux-musl")]
+#[cfg(target_env = "musl")]
 #[macro_use]
 extern crate diesel;
 
@@ -14,11 +14,12 @@ extern crate diesel_migrations;
 #[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
-    use axum::{routing::get, Router};
+    use axum::{routing::get, Router, extract::Path, middleware::from_fn};
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use libretunes::app::*;
-    use libretunes::fileserv::{file_and_error_handler, get_static_file};
+    use libretunes::util::require_auth::require_auth_middleware;
+    use libretunes::fileserv::{file_and_error_handler, get_asset_file, get_static_file, AssetType};
     use axum_login::tower_sessions::SessionManagerLayer;
     use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
     use axum_login::AuthManagerLayerBuilder;
@@ -30,7 +31,7 @@ async fn main() {
     info!("\n{}", include_str!("../ascii_art.txt"));
     info!("Starting Leptos server...");
 
-    use dotenv::dotenv;
+    use dotenvy::dotenv;
     dotenv().ok();
 
     debug!("Running database migrations...");
@@ -60,7 +61,10 @@ async fn main() {
 
     let app = Router::new()
         .leptos_routes(&leptos_options, routes, App)
+        .route("/assets/audio/:song", get(|Path(song) : Path<String>| get_asset_file(song, AssetType::Audio)))
+        .route("/assets/images/:image", get(|Path(image) : Path<String>| get_asset_file(image, AssetType::Image)))
         .route("/assets/*uri", get(|uri| get_static_file(uri, "")))
+        .layer(from_fn(require_auth_middleware))
         .layer(auth_layer)
         .fallback(file_and_error_handler)
         .with_state(leptos_options);

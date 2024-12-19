@@ -1,21 +1,36 @@
-FROM registry.mregirouard.com/libretunes/ops/docker-leptos/musl:latest as builder
+FROM rust:slim AS builder
 
 WORKDIR /app
+
+RUN rustup default nightly
+RUN rustup target add wasm32-unknown-unknown
+RUN cargo install cargo-leptos@0.2.22
 
 # Install a few dependencies
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-		npm; \
+		pkg-config \
+		clang \
+		build-essential \
+		libssl-dev \
+		libpq-dev \
+		wget; \
 	rm -rf /var/lib/apt/lists/*
 
-RUN npm install tailwindcss@3.1.8 -g
+# Install ImageMagick
+RUN cd / && \
+	wget https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.1-38.tar.gz && \
+	tar xf 7.1.1-38.tar.gz && \
+	rm 7.1.1-38.tar.gz && \
+	cd ImageMagick-7.1.1-38 && \
+	./configure && \
+	make install -j $(nproc) && \
+	cd .. && \
+	rm -rf ImageMagick-7.1.1-38
 
 # Copy project dependency manifests
 COPY Cargo.toml Cargo.lock /app/
-
-# Add the target to Cargo.toml so we can statically link:
-RUN echo 'bin-target-triple = "x86_64-unknown-linux-musl"' >> Cargo.toml
 
 # Create dummy files to force cargo to build the dependencies
 RUN mkdir /app/src && mkdir /app/style && mkdir /app/assets && \
@@ -27,21 +42,23 @@ RUN mkdir /app/src && mkdir /app/style && mkdir /app/assets && \
 RUN cargo-leptos build --release --precompress
 
 RUN rm -rf /app/src /app/style /app/assets
-COPY style /app/style
-
-# Minify CSS
-RUN npx tailwindcss -i /app/style/main.scss -o /app/style/main.scss --minify
 
 COPY ascii_art.txt /app/ascii_art.txt
 COPY assets /app/assets
 COPY src /app/src
 COPY migrations /app/migrations
+COPY style /app/style
 
 # Touch files to force rebuild
 RUN touch /app/src/main.rs && touch /app/src/lib.rs && touch /app/src/build.rs
 
 # Actually build the binary
 RUN cargo-leptos build --release --precompress
+
+# Use ldd to list all dependencies of /app/target/release/libretunes, then copy them to /app/libs
+# Setting LD_LIBRARY_PATH is necessary to find the ImageMagick libraries
+RUN mkdir /app/libs && LD_LIBRARY_PATH=/usr/local/lib ldd /app/target/release/libretunes | grep "=> /" | \
+	awk '{print $3}' | xargs -I '{}' cp '{}' /app/libs
 
 # Build the final image
 FROM scratch
@@ -51,8 +68,14 @@ LABEL description="LibreTunes, an open-source browser audio player and \
 library manager built for collaborative listening."
 
 # Copy the binary and the compressed assets to the "site root"
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/libretunes /libretunes
+COPY --from=builder /app/target/release/libretunes /libretunes
 COPY --from=builder /app/target/site /site
+
+# Copy libraries to /lib64
+COPY --from=builder /app/libs /lib64
+COPY --from=builder /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
+
+ENV LD_LIBRARY_PATH=/lib64
 
 # Configure Leptos settings
 ENV LEPTOS_SITE_ADDR=0.0.0.0:3000

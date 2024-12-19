@@ -1,0 +1,85 @@
+name: Push Workflows
+on: push
+
+jobs:
+  build:
+    runs-on: libretunes-cicd
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build project
+        env:
+          RUSTFLAGS: "-D warnings"
+        run: cargo-leptos build
+
+  docker-build:
+    runs-on: ubuntu-latest-docker
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Gitea container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.registry }}
+          username: ${{ env.actions_user }}
+          password: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
+      - name: Get Image Name
+        id: get-image-name
+        run: |
+          echo "IMAGE_NAME=$(echo ${{ env.registry }}/${{ gitea.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: "${{ steps.get-image-name.outputs.IMAGE_NAME }}:${{ gitea.sha }}"
+          cache-from: type=registry,ref=${{ steps.get-image-name.outputs.IMAGE_NAME }}:${{ gitea.sha }}
+          cache-to: type=inline
+      - name: Build and push Docker image with "latest" tag
+        uses: docker/build-push-action@v5
+        if: gitea.ref == 'refs/heads/main'
+        with:
+          push: true
+          tags: "${{ steps.get-image-name.outputs.IMAGE_NAME }}:latest"
+          cache-from: type=registry,ref=${{ steps.get-image-name.outputs.IMAGE_NAME }}:latest
+          cache-to: type=inline
+
+  test:
+    runs-on: libretunes-cicd
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Test project
+        run: cargo test --all-targets --all-features
+
+  leptos-test:
+    runs-on: libretunes-cicd
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Leptos tests
+        run: cargo-leptos test
+
+  docs:
+    runs-on: libretunes-cicd
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Generate docs
+        run: cargo doc --no-deps
+      - name: Upload docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: target/doc
+
+  nix-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Package Lists
+        run: apt update
+      - name: Install Nix
+        run: apt install -y nix-bin
+      - name: Build project with Nix
+        run: nix build --experimental-features 'nix-command flakes' git+$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git?ref=$GITHUB_REF_NAME#default

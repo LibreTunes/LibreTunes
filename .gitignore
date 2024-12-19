@@ -24,9 +24,14 @@ playwright/.cache/
 *.jpeg
 *.png
 *.gif
+*.webp
 
 # Environment variables
 .env
 
 # Sass cache
 .sass-cache
+
+# Nix-related files
+.direnv/
+result

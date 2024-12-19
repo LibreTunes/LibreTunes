@@ -1,9 +1,14 @@
-use crate::playstatus::PlayStatus;
+use crate::models::Artist;
+use crate::songdata::SongData;
+use crate::api::songs;
+use crate::util::state::GlobalState;
 use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
+use leptos_meta::Title;
 use leptos::*;
 use leptos_icons::*;
+use leptos_use::{utils::Pausable, use_interval_fn};
 
 /// Width and height of the forward/backward skip buttons
 const SKIP_BTN_SIZE: &str = "3.5em";
@@ -19,6 +24,9 @@ const MIN_SKIP_BACK_TIME: f64 = 5.0;
 /// How many seconds to skip forward/backward when the user presses the arrow keys
 const ARROW_KEY_SKIP_TIME: f64 = 5.0;
 
+/// Threshold in seconds for considering when the user has listened to a song, for adding it to the history
+const HISTORY_LISTEN_THRESHOLD: u64 = MIN_SKIP_BACK_TIME as u64;
+
 // TODO Handle errors better, when getting audio HTML element and when playing/pausing audio
 
 /// Get the current time and duration of the current song, if available
@@ -32,8 +40,8 @@ const ARROW_KEY_SKIP_TIME: f64 = 5.0;
 /// * `None` if the audio element is not available
 /// * `Some((current_time, duration))` if the audio element is available
 /// 
-pub fn get_song_time_duration(status: impl SignalWithUntracked<Value = PlayStatus>) -> Option<(f64, f64)> {
-	status.with_untracked(|status| {
+pub fn get_song_time_duration() -> Option<(f64, f64)> {
+	GlobalState::play_status().with_untracked(|status| {
 		if let Some(audio) = status.get_audio() {
 			Some((audio.current_time(), audio.duration()))
 		} else {
@@ -53,13 +61,13 @@ pub fn get_song_time_duration(status: impl SignalWithUntracked<Value = PlayStatu
 /// * `status` - The `PlayStatus` to get the audio element from, as a signal
 /// * `time` - The time to skip to, in seconds
 /// 
-pub fn skip_to(status: impl SignalUpdate<Value = PlayStatus>, time: f64) {
+pub fn skip_to(time: f64) {
     if time.is_infinite() || time.is_nan() {
         error!("Unable to skip to non-finite time: {}", time);
         return
     }
 
-    status.update(|status| {
+    GlobalState::play_status().update(|status| {
         if let Some(audio) = status.get_audio() {
             audio.set_current_time(time);
             log!("Player skipped to time: {}", time);
@@ -77,8 +85,8 @@ pub fn skip_to(status: impl SignalUpdate<Value = PlayStatus>, time: f64) {
 /// * `status` - The `PlayStatus` to get the audio element from, as a signal
 /// * `play` - `true` to play the song, `false` to pause it
 /// 
-pub fn set_playing(status: impl SignalUpdate<Value = PlayStatus>, play: bool) {
-    status.update(|status| {
+pub fn set_playing(play: bool) {
+    GlobalState::play_status().update(|status| {
         if let Some(audio) = status.get_audio() {
             if play {
                 if let Err(e) = audio.play() {
@@ -101,8 +109,8 @@ pub fn set_playing(status: impl SignalUpdate<Value = PlayStatus>, play: bool) {
     });
 }
 
-fn toggle_queue(status: impl SignalUpdate<Value = PlayStatus>) {
-	status.update(|status| {
+fn toggle_queue() {
+	GlobalState::play_status().update(|status| {
 		status.queue_open = !status.queue_open;
 	});
 
@@ -118,8 +126,8 @@ fn toggle_queue(status: impl SignalUpdate<Value = PlayStatus>) {
 /// * `status` - The `PlayStatus` to get the audio element from, as a signal
 /// * `src` - The source to set the audio player to
 /// 
-fn set_play_src(status: impl SignalUpdate<Value = PlayStatus>, src: String) {
-    status.update(|status| {
+fn set_play_src(src: String) {
+    GlobalState::play_status().update(|status| {
         if let Some(audio) = status.get_audio() {
             audio.set_src(&src);
             log!("Player set src to: {}", src);
@@ -131,11 +139,13 @@ fn set_play_src(status: impl SignalUpdate<Value = PlayStatus>, src: String) {
 
 /// The play, pause, and skip buttons
 #[component]
-fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
+fn PlayControls() -> impl IntoView {
+    let status = GlobalState::play_status();
+
     // On click handlers for the skip and play/pause buttons
 
     let skip_back = move |_| {
-        if let Some(duration) = get_song_time_duration(status) {
+        if let Some(duration) = get_song_time_duration() {
             // Skip to previous song if the current song is near the start
             // Also skip to the previous song if we're at the end of the current song
             // This is because after running out of songs in the queue, the current song will be at the end
@@ -152,8 +162,8 @@ fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
                     // Push the popped song to the front of the queue, and play it
                     let next_src = last_played_song.song_path.clone();
                     status.update(|status| status.queue.push_front(last_played_song));
-                    set_play_src(status, next_src);
-                    set_playing(status, true);
+                    set_play_src(next_src);
+                    set_playing(true);
                 } else {
                     warn!("Unable to skip back: No previous song");
                 }
@@ -162,14 +172,14 @@ fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
 
         // Default to skipping to start of current song, and playing
         log!("Skipping to start of current song");
-        skip_to(status, 0.0);
-        set_playing(status, true);
+        skip_to(0.0);
+        set_playing(true);
     };
 
     let skip_forward = move |_| {
-		if let Some(duration) = get_song_time_duration(status) {
-            skip_to(status, duration.1);
-            set_playing(status, true);
+		if let Some(duration) = get_song_time_duration() {
+            skip_to(duration.1);
+            set_playing(true);
 		} else {
 			error!("Unable to skip forward: Unable to get current duration");
 		}
@@ -177,7 +187,7 @@ fn PlayControls(status: RwSignal<PlayStatus>) -> impl IntoView {
 
     let toggle_play = move |_| {
         let playing = status.with_untracked(|status| { status.playing });
-		set_playing(status, !playing);
+		set_playing(!playing);
     };
 
     // We use this to prevent the buttons from being focused when clicked
@@ -240,47 +250,163 @@ fn PlayDuration(elapsed_secs: MaybeSignal<i64>, total_secs: MaybeSignal<i64>) ->
 
 /// The name, artist, and album of the current song
 #[component]
-fn MediaInfo(status: RwSignal<PlayStatus>) -> impl IntoView {
+fn MediaInfo() -> impl IntoView {
+    let status = GlobalState::play_status();
+
     let name = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("No media playing".into(), |song| song.name.clone())
+			status.queue.front().map_or("No media playing".into(), |song| song.title.clone())
 		})
     });
 
 	let artist = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("".into(), |song| song.artist.clone())
+			status.queue.front().map_or("".into(), |song| format!("{}", Artist::display_list(&song.artists)))
 		})
 	});
 
 	let album = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("".into(), |song| song.album.clone())
+			status.queue.front().map_or("".into(), |song|
+                song.album.as_ref().map_or("".into(), |album| album.title.clone()))
 		})
 	});
 
 	let image = Signal::derive(move || {
 		status.with(|status| {
-			// TODO Use some default / unknown image?
-			status.queue.front().map_or("".into(), |song| song.image_path.clone())
+			status.queue.front().map_or("/images/placeholders/MusicPlaceholder.svg".into(),
+                |song| song.image_path.clone())
 		})
 	});
 
     view! {
-        <div class="media-info">
         <img class="media-info-img" align="left" src={image}/>
         <div class="media-info-text">
             {name}
             <br/>
             {artist} - {album}
         </div>
+    }
+}
+
+/// The like and dislike buttons
+#[component]
+fn LikeDislike() -> impl IntoView {
+    let status = GlobalState::play_status();
+
+    let like_icon = Signal::derive(move || {
+        status.with(|status| {
+            match status.queue.front() {
+                Some(SongData { like_dislike: Some((true, _)), .. }) => icondata::TbThumbUpFilled,
+                _ => icondata::TbThumbUp,
+            }
+        })
+    });
+
+    let dislike_icon = Signal::derive(move || {
+        status.with(|status| {
+            match status.queue.front() {
+                Some(SongData { like_dislike: Some((_, true)), .. }) => icondata::TbThumbDownFilled,
+                _ => icondata::TbThumbDown,
+            }
+        })
+    });
+
+    let toggle_like = move |_| {
+        status.update(|status| {
+            match status.queue.front_mut() {
+                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                    *liked = !*liked;
+
+                    if *liked {
+                        *disliked = false;
+                    }
+
+                    let id = *id;
+                    let liked = *liked;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_like_song(id, liked).await {
+                            error!("Error liking song: {:?}", e);
+                        }
+                    });
+                },
+                Some(SongData { id, like_dislike, .. }) => {
+                    // This arm should only be reached if like_dislike is None
+                    // In this case, the buttons will show up not filled, indicating that the song is not
+                    // liked or disliked. Therefore, clicking the like button should like the song.
+
+                    *like_dislike = Some((true, false));
+
+                    let id = *id;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_like_song(id, true).await {
+                            error!("Error liking song: {:?}", e);
+                        }
+                    });
+                },
+                _ => {
+                    log!("Unable to like song: No song in queue");
+                    return;
+                }
+            }
+        });
+    };
+
+    let toggle_dislike = move |_| {
+        status.update(|status| {
+            match status.queue.front_mut() {
+                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                    *disliked = !*disliked;
+
+                    if *disliked {
+                        *liked = false;
+                    }
+
+                    let id = *id;
+                    let disliked = *disliked;
+                    spawn_local(async move {
+                        if let Err(e) = songs::set_dislike_song(id, disliked).await {
+                            error!("Error disliking song: {:?}", e);
+                        }
+                    });
+                },
+                Some(SongData { id, like_dislike, .. }) => {
+                    // This arm should only be reached if like_dislike is None
+                    // In this case, the buttons will show up not filled, indicating that the song is not
+                    // liked or disliked. Therefore, clicking the dislike button should dislike the song.
+                    
+                    *like_dislike = Some((false, true));
+
+                    let id = *id;
+                    spawn_local(async move { 
+                        if let Err(e) = songs::set_dislike_song(id, true).await {
+                            error!("Error disliking song: {:?}", e);
+                        }
+                    });
+                },
+                _ => {
+                    log!("Unable to dislike song: No song in queue");
+                    return;
+                }
+            }
+        });
+    };
+
+    view! {
+        <div class="like-dislike">
+            <button on:click=toggle_dislike>
+                <Icon class="controlbtn hmirror" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=dislike_icon />
+            </button>
+            <button on:click=toggle_like>
+                <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=like_icon />
+            </button>
         </div>
     }
 }
 
 /// The play progress bar, and click handler for skipping to a certain time in the song
 #[component]
-fn ProgressBar(percentage: MaybeSignal<f64>, status: RwSignal<PlayStatus>) -> impl IntoView {
+fn ProgressBar(percentage: MaybeSignal<f64>) -> impl IntoView {
     // Keep a reference to the progress bar div so we can get its width and calculate the time to skip to
     let progress_bar_ref = create_node_ref::<Div>();
 
@@ -292,10 +418,10 @@ fn ProgressBar(percentage: MaybeSignal<f64>, status: RwSignal<PlayStatus>) -> im
             let width = progress_bar.offset_width() as f64;
             let percentage = x_click_pos / width * 100.0;
 
-			if let Some(duration) = get_song_time_duration(status) {
+			if let Some(duration) = get_song_time_duration() {
 				let time = duration.1 * percentage / 100.0;
-				skip_to(status, time);
-                set_playing(status, true);
+				skip_to(time);
+                set_playing(true);
 			} else {
                 error!("Unable to skip to time: Unable to get current duration");
             }
@@ -318,13 +444,13 @@ fn ProgressBar(percentage: MaybeSignal<f64>, status: RwSignal<PlayStatus>) -> im
 }
 
 #[component]
-fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
-
+fn QueueToggle() -> impl IntoView {
     let update_queue = move |_| {
-        toggle_queue(status);
-		log!("queue button pressed, queue status: {:?}", status.with_untracked(|status| status.queue_open));
+        toggle_queue();
+		log!("queue button pressed, queue status: {:?}",
+            GlobalState::play_status().with_untracked(|status| status.queue_open));
     };
-
+    
 	// We use this to prevent the buttons from being focused when clicked
     // If buttons were focused on clicks, then pressing space bar to play/pause would "click" the button
     // and trigger unwanted behavior
@@ -341,20 +467,37 @@ fn QueueToggle(status: RwSignal<PlayStatus>) -> impl IntoView {
     }
 }
 
+/// Renders the title of the page based on the currently playing song
+#[component]
+pub fn CustomTitle() -> impl IntoView {
+    let title = create_memo(move |_| {
+        GlobalState::play_status().with(|play_status| {
+            play_status.queue.front().map_or("LibreTunes".to_string(), |song_data| {
+                    format!("{} - {} | {}",song_data.title.clone(),Artist::display_list(&song_data.artists), "LibreTunes")
+                })
+            })
+        });
+    view! {
+        <Title text=title />
+    }
+}
+
 /// The main play bar component, containing the progress bar, media info, play controls, and play duration
 #[component]
-pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
+pub fn PlayBar() -> impl IntoView {
+    let status = GlobalState::play_status();
+
     // Listen for key down events -- arrow keys don't seem to trigger key press events
     let _arrow_key_handle = window_event_listener(ev::keydown, move |e: ev::KeyboardEvent| {
         if e.key() == "ArrowRight" {
             e.prevent_default();
             log!("Right arrow key pressed, skipping forward by {} seconds", ARROW_KEY_SKIP_TIME);
 
-            if let Some(duration) = get_song_time_duration(status) {
+            if let Some(duration) = get_song_time_duration() {
                 let mut time = duration.0 + ARROW_KEY_SKIP_TIME;
                 time = time.clamp(0.0, duration.1);
-                skip_to(status, time);
-                set_playing(status, true);
+                skip_to(time);
+                set_playing(true);
             } else {
                 error!("Unable to skip forward: Unable to get current duration");
             }
@@ -363,11 +506,11 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
             e.prevent_default();
             log!("Left arrow key pressed, skipping backward by {} seconds", ARROW_KEY_SKIP_TIME);
 
-            if let Some(duration) = get_song_time_duration(status) {
+            if let Some(duration) = get_song_time_duration() {
                 let mut time = duration.0 - ARROW_KEY_SKIP_TIME;
                 time = time.clamp(0.0, duration.1);
-                skip_to(status, time);
-                set_playing(status, true);
+                skip_to(time);
+                set_playing(true);
             } else {
                 error!("Unable to skip backward: Unable to get current duration");
             }
@@ -381,7 +524,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
             log!("Space bar pressed, toggling play/pause");
 
             let playing = status.with_untracked(|status| status.playing);
-            set_playing(status, !playing);
+            set_playing(!playing);
         }
     });
 
@@ -400,7 +543,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         status.with_untracked(|status| {
             // Start playing the first song in the queue, if available
             if let Some(song) = status.queue.front() {
-                log!("Starting playing with song: {}", song.name);
+                log!("Starting playing with song: {}", song.title);
 
                 // Don't use the set_play_src / set_playing helper function
                 // here because we already have access to the audio element
@@ -417,6 +560,39 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         });
     });
 
+    let current_song_id = create_memo(move |_| {
+        status.with(|status| {
+            status.queue.front().map(|song| song.id)
+        })
+    });
+
+    // Track the last song that was added to the history to prevent duplicates
+    let last_history_song_id = create_rw_signal(None);
+
+    let Pausable { 
+        is_active: hist_timeout_pending,
+        resume: resume_hist_timeout,
+        pause: pause_hist_timeout,
+        ..
+    } = use_interval_fn(move || {
+        if last_history_song_id.get_untracked() == current_song_id.get_untracked() {
+            return;
+        }
+
+        if let Some(current_song_id) = current_song_id.get_untracked() {
+            last_history_song_id.set(Some(current_song_id));
+
+            spawn_local(async move {
+                if let Err(e) = crate::api::history::add_history(current_song_id).await {
+                    error!("Error adding song {} to history: {}", current_song_id, e);
+                }
+            });
+        }
+    }, HISTORY_LISTEN_THRESHOLD * 1000);
+
+    // Initially pause the timeout, since the audio starts off paused
+    pause_hist_timeout();
+
     let on_play = move |_| {
         log!("Audio playing");
         status.update(|status| status.playing = true);
@@ -425,6 +601,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
     let on_pause = move |_| {
         log!("Audio paused");
         status.update(|status| status.playing = false);
+        pause_hist_timeout();
     };
 
     let on_time_update = move |_| {
@@ -442,6 +619,11 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
                 error!("Unable to update time: Audio element not available");
             }
         });
+
+        // If time is updated, audio is playing, so make sure the history timeout is running
+        if !hist_timeout_pending.get_untracked() {
+            resume_hist_timeout();
+        }
     };
 
     let on_end = move |_| {
@@ -453,7 +635,7 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
             let prev_song = status.queue.pop_front();
 
             if let Some(prev_song) = prev_song {
-                log!("Adding song to history: {}", prev_song.name);
+                log!("Adding song to history: {}", prev_song.title);
                 status.history.push_back(prev_song);
             } else {
                 log!("Queue empty, no previous song to add to history");
@@ -485,11 +667,14 @@ pub fn PlayBar(status: RwSignal<PlayStatus>) -> impl IntoView {
         <audio _ref=audio_ref on:play=on_play on:pause=on_pause
             on:timeupdate=on_time_update on:ended=on_end type="audio/mpeg" />
         <div class="playbar">
-        <ProgressBar percentage=percentage.into() status=status />
-        <MediaInfo status=status />
-        <PlayControls status=status />
+        <ProgressBar percentage=percentage.into() />
+        <div class="playbar-left-group">
+        <MediaInfo />
+        <LikeDislike />
+        </div>
+        <PlayControls />
         <PlayDuration elapsed_secs=elapsed_secs.into() total_secs=total_secs.into() />
-        <QueueToggle status=status />
+        <QueueToggle />
         </div>
     }
 }

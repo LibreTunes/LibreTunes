@@ -1,6 +1,8 @@
 pub mod app;
 pub mod auth;
 pub mod songdata;
+pub mod albumdata;
+pub mod artistdata;
 pub mod playstatus;
 pub mod playbar;
 pub mod database;
@@ -13,9 +15,9 @@ pub mod users;
 pub mod search;
 pub mod fileserv;
 pub mod error_template;
+pub mod api;
 pub mod upload;
 pub mod util;
-pub mod api;
 
 use cfg_if::cfg_if;
 

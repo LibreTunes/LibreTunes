@@ -1,5 +1,6 @@
-use crate::playstatus::PlayStatus;
+use crate::models::Artist;
 use crate::song::Song;
+use crate::util::state::GlobalState;
 use leptos::ev::MouseEvent;
 use leptos::leptos_dom::*;
 use leptos::*;
@@ -8,22 +9,23 @@ use leptos::ev::DragEvent;
 
 const RM_BTN_SIZE: &str = "2.5rem";
 
-fn remove_song_fn(index: usize, status: RwSignal<PlayStatus>) {
+fn remove_song_fn(index: usize) {
 	if index == 0 {
 		log!("Error: Trying to remove currently playing song (index 0) from queue");
 	} else {
 		log!("Remove Song from Queue: Song is not currently playing, deleting song from queue and not adding to history");
-		status.update(|status| {
+		GlobalState::play_status().update(|status| {
 			status.queue.remove(index);
 		});
 	}
 }
 
 #[component]
-pub fn Queue(status: RwSignal<PlayStatus>) -> impl IntoView {
+pub fn Queue() -> impl IntoView {
+	let status = GlobalState::play_status();
 
 	let remove_song = move |index: usize| {
-		remove_song_fn(index, status);
+		remove_song_fn(index);
 		log!("Removed song {}", index + 1);
 	};
 
@@ -98,7 +100,7 @@ pub fn Queue(status: RwSignal<PlayStatus>) -> impl IntoView {
 									on:dragenter=move |e: DragEvent| on_drag_enter(e, index)
 									on:dragover=on_drag_over
 								>
-									<Song song_image_path=song.image_path.clone() song_title=song.name.clone() song_artist=song.artist.clone() />
+									<Song song_image_path=song.image_path.clone() song_title=song.title.clone() song_artist=Artist::display_list(&song.artists) />
 									<Show
 										when=move || index != 0
 										fallback=|| view!{

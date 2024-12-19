@@ -15,21 +15,19 @@ leptos = { version = "0.6", default-features = false, features = ["nightly"] }
 leptos_meta = { version = "0.6", features = ["nightly"] }
 leptos_axum = { version = "0.6", optional = true }
 leptos_router = { version = "0.6", features = ["nightly"] }
-wasm-bindgen = { version = "=0.2.92", default-features = false, optional = true }
+wasm-bindgen = { version = "=0.2.96", default-features = false, optional = true }
 leptos_icons = { version = "0.3.0" }
 icondata = { version = "0.3.0" }
-dotenv = { version = "0.15.0", optional = true }
-diesel = { version = "2.1.4", features = ["postgres", "r2d2", "time"], default-features = false, optional = true }
+diesel = { version = "2.1.4", features = ["postgres", "r2d2", "chrono"], default-features = false, optional = true }
 lazy_static = { version = "1.4.0", optional = true }
 serde = { version = "1.0.195", features = ["derive"], default-features = false }
 openssl = { version = "0.10.63", optional = true }
-time = { version = "0.3.34", features = ["serde"], default-features = false }
 diesel_migrations = { version = "2.1.0", optional = true }
 pbkdf2 = { version = "0.12.2", features = ["simple"], optional = true }
 tokio = { version = "1", optional = true, features = ["rt-multi-thread"] }
 axum = { version = "0.7.5", features = ["tokio", "http1"], default-features = false, optional = true }
-tower = { version = "0.4.13", optional = true }
-tower-http = { version = "0.5", optional = true, features = ["fs"] }
+tower = { version = "0.5.1", optional = true, features = ["util"] }
+tower-http = { version = "0.6.1", optional = true, features = ["fs"] }
 thiserror = "1.0.57"
 tower-sessions-redis-store = { version = "0.11", optional = true }
 async-trait = { version = "0.1.79", optional = true }
@@ -40,9 +38,10 @@ multer = { version = "3.0.0", optional = true }
 log = { version = "0.4.21", optional = true }
 flexi_logger = { version = "0.28.0", optional = true, default-features = false }
 web-sys = "0.3.69"
-
-[patch.crates-io]
-gloo-net = { git = "https://github.com/rustwasm/gloo.git", rev = "a823fab7ecc4068e9a28bd669da5eaf3f0a56380" }
+leptos-use = "0.13.5"
+image-convert = { version = "0.18.0", optional = true, default-features = false }
+chrono = { version = "0.4.38", default-features = false, features = ["serde", "clock"] }
+dotenvy = { version = "0.15.7", optional = true }
 
 [features]
 hydrate = [
@@ -51,13 +50,14 @@ hydrate = [
   "leptos_router/hydrate",
   "console_error_panic_hook",
   "wasm-bindgen",
+  "chrono/wasmbind",
 ]
 ssr = [
   "dep:leptos_axum",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
-  "dotenv",
+  "dotenvy",
   "diesel",
   "lazy_static",
   "openssl",
@@ -74,6 +74,8 @@ ssr = [
   "multer",
   "log",
   "flexi_logger",
+  "leptos-use/ssr",
+  "image-convert",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode

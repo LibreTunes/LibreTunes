@@ -3,7 +3,7 @@ name: libretunes
 services:
   libretunes:
     container_name: libretunes
-    # image: registry.mregirouard.com/libretunes/libretunes:latest
+    # image: git.libretunes.xyz/libretunes/libretunes:latest
     build: .
     ports:
       - "3000:3000"
@@ -13,8 +13,12 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      LIBRETUNES_AUDIO_PATH: /assets/audio
+      LIBRETUNES_IMAGE_PATH: /assets/images
+      LIBRETUNES_DISABLE_SIGNUP: "true"
     volumes:
-      - libretunes-audio:/site/audio
+      - libretunes-audio:/assets/audio
+      - libretunes-images:/assets/images
     depends_on:
       - redis
       - postgres
@@ -50,5 +54,6 @@ services:
 
 volumes:
   libretunes-audio:
+  libretunes-images:
   libretunes-redis:
   libretunes-postgres:

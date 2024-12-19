@@ -19,6 +19,11 @@ use crate::users::UserCredentials;
 /// Returns a Result with the error message if the user could not be created
 #[server(endpoint = "signup")]
 pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
+	// Check LIBRETUNES_DISABLE_SIGNUP env var
+	if std::env::var("LIBRETUNES_DISABLE_SIGNUP").is_ok_and(|v| v == "true") {
+		return Err(ServerFnError::<NoCustomError>::ServerError("Signup is disabled".to_string()));
+	}
+
 	use crate::users::create_user;
 
 	// Ensure the user has no id, and is not a self-proclaimed admin
@@ -57,7 +62,7 @@ pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 /// Takes in a username or email and a password in plaintext
 /// Returns a Result with a boolean indicating if the login was successful
 #[server(endpoint = "login")]
-pub async fn login(credentials: UserCredentials) -> Result<bool, ServerFnError> {
+pub async fn login(credentials: UserCredentials) -> Result<Option<User>, ServerFnError> {
 	use crate::users::validate_user;
 
 	let mut auth_session = extract::<AuthSession<AuthBackend>>().await
@@ -66,12 +71,14 @@ pub async fn login(credentials: UserCredentials) -> Result<bool, ServerFnError> 
 	let user = validate_user(credentials).await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error validating user: {}", e)))?;
 
-	if let Some(user) = user {
+	if let Some(mut user) = user {
 		auth_session.login(&user).await
 			.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error logging in user: {}", e)))?;
-		Ok(true)
+
+		user.password = None;
+		Ok(Some(user))
 	} else {
-		Ok(false)
+		Ok(None)
 	}
 }
 
@@ -85,6 +92,7 @@ pub async fn logout() -> Result<(), ServerFnError> {
 	auth_session.logout().await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
 
+	leptos_axum::redirect("/login");
 	Ok(())
 }
 
@@ -120,6 +128,42 @@ pub async fn require_auth() -> Result<(), ServerFnError> {
 			Err(ServerFnError::<NoCustomError>::ServerError(format!("Unauthorized")))
 		}
 	})
+}
+
+/// Get the current logged-in user
+/// Returns a Result with the user if they are logged in
+/// Returns an error if the user is not logged in, or if there is an error getting the user
+/// Intended to be used in a route to get the current user:
+/// ```rust
+/// use leptos::*;
+/// use libretunes::auth::get_user;
+/// #[server(endpoint = "user_route")]
+/// pub async fn user_route() -> Result<(), ServerFnError> {
+/// 	let user = get_user().await?;
+/// 	println!("Logged in as: {}", user.username);
+/// 	// Do something with the user
+/// 	Ok(())
+/// }
+/// ```
+#[cfg(feature = "ssr")]
+pub async fn get_user() -> Result<User, ServerFnError> {
+	let auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
+
+	auth_session.user.ok_or(ServerFnError::<NoCustomError>::ServerError("User not logged in".to_string()))
+}
+
+#[server(endpoint = "get_logged_in_user")]
+pub async fn get_logged_in_user() -> Result<Option<User>, ServerFnError> {
+	let auth_session = extract::<AuthSession<AuthBackend>>().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
+
+	let user = auth_session.user.map(|mut user| {
+		user.password = None;
+		user
+	});
+
+	Ok(user)
 }
 
 /// Check if a user is an admin
