@@ -1,8 +1,10 @@
 use crate::auth::login;
+use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
 use crate::users::UserCredentials;
+use crate::components::loading::Loading;
 
 #[component]
 pub fn Login() -> impl IntoView {
@@ -10,6 +12,9 @@ pub fn Login() -> impl IntoView {
     let (password, set_password) = create_signal("".to_string());
 
     let (show_password, set_show_password) = create_signal(false);
+
+    let loading = create_rw_signal(false);
+    let error_msg = create_rw_signal(None);
 
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);
@@ -23,23 +28,41 @@ pub fn Login() -> impl IntoView {
         let password1 = password.get();
 
         spawn_local(async move {
+            loading.set(true);
+            error_msg.set(None);
+
             let user_credentials = UserCredentials {
                 username_or_email: username_or_email1,
                 password: password1
             };
+
+            let user = GlobalState::logged_in_user();
             
             let login_result = login(user_credentials).await;
             if let Err(err) = login_result {
                 // Handle the error here, e.g., log it or display to the user
                 log!("Error logging in: {:?}", err);
-            } else if let Ok(true) = login_result {
+                error_msg.set(Some(err.to_string()));
+
+                // Since we're not sure what the state is, manually refetch the user
+                user.refetch();
+            } else if let Ok(Some(login_user)) = login_result {
+                // Manually set the user to the new user, avoiding a refetch
+                user.set(Some(login_user));
+
                 // Redirect to the login page
                 log!("Logged in Successfully!");
                 leptos_router::use_navigate()("/", Default::default());
                 log!("Navigated to home page after login");
-            } else if let Ok(false) = login_result {
+            } else if let Ok(None) = login_result {
                 log!("Invalid username or password");
+                error_msg.set(Some("Invalid username or password".to_string()));
+
+                // User could be already logged in or not, so refetch the user
+                user.refetch();
             }
+
+            loading.set(false);
         });
     };
 
@@ -84,7 +107,13 @@ pub fn Login() -> impl IntoView {
                         </Show>
                     </div>
                     <a href="" class="forgot-pw">Forgot Password?</a>
-                    <input type="submit" value="Login" />
+                    <div class="error-msg" >{ move || error_msg.get() }</div>
+                    <Show
+                        when=move || !loading.get()
+                        fallback=move || view! { <Loading /> }
+                    >
+                        <input type="submit" value="Login" />
+                    </Show>
                     <span class="go-to-signup">
                         New here? <a href="/signup">Create an Account</a>
                     </span>

@@ -15,6 +15,7 @@
     display: flex;
     flex-direction: column;
     background-color: #1c1c1c;
+    z-index: 11;
     .close-button {
         position: absolute;
         top: 5px;
@@ -27,9 +28,7 @@
         font-size: 1.6rem;
         transition: all 0.3s;
         border: none;
-
     }
-
     .close-button:hover {
     transform: scale(1.1);
     background-color: rgba(255, 255, 255, 0.1);
@@ -48,6 +47,9 @@
         padding: .1rem;
         display: flex;
         flex-direction: column;
+        width: 100%;
+        height: 100%;
+        position: relative;
         .input-bx{
             margin-top: 1rem;
             position: relative;
@@ -126,6 +128,9 @@
             }
         }
         .upload-button {
+            position: absolute;
+            bottom: 5px;
+            width: 100%;
             margin-top: 1rem;
             padding: 10px;
             background-color: #7f8fa6;

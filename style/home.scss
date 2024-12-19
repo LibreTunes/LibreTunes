@@ -6,11 +6,13 @@
   height: 100vh;
   display: flex;
   flex-direction: row;
+  overflow: hidden;
 }
 .home-component {
   background: #1c1c1c;
-  height: 100vh;
+  width: calc(100% - 22rem - 16rem);
   margin: 2px;
-  padding: 0.2rem 1.5rem 1.5rem 1rem;
+  padding: 0.2rem 1.5rem $playbar-size 1rem;
   border-radius: 0.5rem;
+  overflow: scroll;
 }

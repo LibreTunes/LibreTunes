@@ -10,7 +10,7 @@ cfg_if! {
 		use diesel::prelude::*;
 		use log::*;
 		use server_fn::error::NoCustomError;
-		use time::Date;
+		use chrono::NaiveDate;
 	}
 }
 
@@ -124,15 +124,14 @@ async fn validate_track_number(track_number: Field<'static>) -> Result<Option<i3
 /// Validate the release date in a multipart field
 /// Expects a field with a release date, and ensures it is a valid date in the format [year]-[month]-[day]
 #[cfg(feature = "ssr")]
-async fn validate_release_date(release_date: Field<'static>) -> Result<Option<Date>, ServerFnError> {
+async fn validate_release_date(release_date: Field<'static>) -> Result<Option<NaiveDate>, ServerFnError> {
 	match release_date.text().await {
 		Ok(release_date) => {
 			if release_date.trim().is_empty() {
 				return Ok(None);
 			}
 
-			let date_format = time::macros::format_description!("[year]-[month]-[day]");
-			let release_date = Date::parse(&release_date.trim(), date_format);
+			let release_date = NaiveDate::parse_from_str(&release_date.trim(), "%Y-%m-%d");
 
 			match release_date {
 				Ok(release_date) => Ok(Some(release_date)),
@@ -181,8 +180,7 @@ pub async fn upload(data: MultipartData) -> Result<(), ServerFnError> {
 					ServerError("Title field required and must precede file field".to_string()))?;
 
 				let clean_title = title.replace(" ", "_").replace("/", "_");
-				let date_format = time::macros::format_description!("[year]-[month]-[day]_[hour]:[minute]:[second]");
-				let date_str = time::OffsetDateTime::now_utc().format(date_format).unwrap_or_default();
+				let date_str = chrono::Utc::now().format("%Y-%m-%d_%H:%M:%S").to_string();
 				let upload_path = format!("assets/audio/upload-{}_{}.mp3", date_str, clean_title);
 				file_name = Some(format!("upload-{}_{}.mp3", date_str, clean_title));
 
@@ -255,6 +253,7 @@ pub async fn upload(data: MultipartData) -> Result<(), ServerFnError> {
 		release_date,
 		storage_path: file_name,
 		image_path: None,
+		added_date: None, // Defaults to current date
 	};
 
 	// Save the song to the database
