@@ -1,10 +1,8 @@
 use leptos::*;
 
 use cfg_if::cfg_if;
-use server_fn::error::NoCustomError;
 
 use crate::albumdata::AlbumData;
-use crate::models::Album;
 use crate::models::Artist;
 use crate::songdata::SongData;
 
@@ -13,6 +11,8 @@ cfg_if! {
         use crate::database::get_db_conn;
         use diesel::prelude::*;
         use std::collections::HashMap;
+        use server_fn::error::NoCustomError;
+        use crate::models::Album;
     }
 }
 
