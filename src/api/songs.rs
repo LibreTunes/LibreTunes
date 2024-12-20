@@ -2,12 +2,16 @@ use leptos::*;
 
 use cfg_if::cfg_if;
 
+use crate::songdata::SongData;
+
 
 cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use leptos::server_fn::error::NoCustomError;
 		use crate::database::get_db_conn;
 		use crate::auth::get_user;
+		use crate::models::{Song, Album, Artist};
+		use diesel::prelude::*;
 	}
 }
 
@@ -52,4 +56,96 @@ pub async fn get_like_dislike_song(song_id: i32) -> Result<(bool, bool), ServerF
 		ServerError(format!("Error getting song disliked: {}", e)))?;
 
 	Ok((like, dislike))
+}
+
+#[server(endpoint = "songs/get")]
+pub async fn get_song_by_id(song_id: i32) -> Result<Option<SongData>, ServerFnError> {
+	use crate::schema::*;
+
+	let user_id: i32 = get_user().await.map_err(|e| ServerFnError::<NoCustomError>::
+		ServerError(format!("Error getting user: {}", e)))?.id.unwrap();
+
+	let db_con = &mut get_db_conn();
+
+	let song_parts: Vec<(Song, Option<Album>, Option<Artist>, Option<(i32, i32)>, Option<(i32, i32)>)>
+	= songs::table
+	.find(song_id)
+	.left_join(albums::table.on(songs::album_id.eq(albums::id.nullable())))
+	.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
+	.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(user_id))))
+	.left_join(song_dislikes::table.on(
+		songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(user_id))))
+	.select((
+		songs::all_columns,
+		albums::all_columns.nullable(),
+		artists::all_columns.nullable(),
+		song_likes::all_columns.nullable(),
+		song_dislikes::all_columns.nullable(),
+	))
+	.load(db_con)?;
+
+	let song = song_parts.first().cloned();
+	let artists = song_parts.into_iter().map(|(_, _, artist, _, _)| artist)
+		.filter_map(|artist| artist).collect::<Vec<_>>();
+
+	match song {
+		Some((song, album, _artist, like, dislike)) => {
+			// Use song image path, or fall back to album image path, or fall back to placeholder
+			let image_path = song.image_path.clone().unwrap_or_else(|| {
+				album.as_ref().and_then(|album| album.image_path.clone()).unwrap_or(
+					"/assets/images/placeholders/MusicPlaceholder.svg".to_string()
+				)
+			});
+
+			Ok(Some(SongData {
+				id: song.id.unwrap(),
+				title: song.title.clone(),
+				artists: artists,
+				album: album.clone().map(|album| album.into()),
+				track: song.track,
+				duration: song.duration,
+				release_date: song.release_date,
+				song_path: song.storage_path.clone(),
+				image_path: image_path,
+				like_dislike: Some((like.is_some(), dislike.is_some())),
+				added_date: song.added_date.unwrap(),
+			}))
+		},
+		None => Ok(None)
+	}
+}
+
+#[server(endpoint = "songs/plays")]
+pub async fn get_song_plays(song_id: i32) -> Result<i64, ServerFnError> {
+	use crate::schema::*;
+
+	let db_con = &mut get_db_conn();
+
+	let plays = song_history::table
+		.filter(song_history::song_id.eq(song_id))
+		.count()
+		.get_result::<i64>(db_con)
+		.map_err(|e| ServerFnError::<NoCustomError>::
+			ServerError(format!("Error getting song plays: {}", e)))?;
+
+	Ok(plays)
+}
+
+#[server(endpoint = "songs/my-plays")]
+pub async fn get_my_song_plays(song_id: i32) -> Result<i64, ServerFnError> {
+	use crate::schema::*;
+
+	let user_id: i32 = get_user().await.map_err(|e| ServerFnError::<NoCustomError>::
+		ServerError(format!("Error getting user: {}", e)))?.id.unwrap();
+
+	let db_con = &mut get_db_conn();
+
+	let plays = song_history::table
+		.filter(song_history::song_id.eq(song_id).and(song_history::user_id.eq(user_id)))
+		.count()
+		.get_result::<i64>(db_con)
+		.map_err(|e| ServerFnError::<NoCustomError>::
+			ServerError(format!("Error getting song plays: {}", e)))?;
+
+	Ok(plays)
 }
