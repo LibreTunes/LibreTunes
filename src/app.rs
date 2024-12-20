@@ -8,6 +8,7 @@ use crate::pages::login::*;
 use crate::pages::signup::*;
 use crate::pages::profile::*;
 use crate::pages::albumpage::*;
+use crate::pages::artist::*;
 use crate::error_template::{AppError, ErrorTemplate};
 use crate::util::state::GlobalState;
 
@@ -19,6 +20,8 @@ pub fn App() -> impl IntoView {
     provide_context(GlobalState::new());
 
     let upload_open = create_rw_signal(false);
+    let add_artist_open = create_rw_signal(false);
+    let add_album_open = create_rw_signal(false);
 
     view! {
         // injects a stylesheet into the document <head>
@@ -39,13 +42,14 @@ pub fn App() -> impl IntoView {
         }>
             <main>
                 <Routes>
-                    <Route path="" view=move || view! { <HomePage upload_open=upload_open/> }>
+                    <Route path="" view=move || view! { <HomePage upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/> }>
                         <Route path="" view=Dashboard />
                         <Route path="dashboard" view=Dashboard />
                         <Route path="search" view=Search />
                         <Route path="user/:id" view=Profile />
                         <Route path="user" view=Profile />
                         <Route path="album/:id" view=AlbumPage />
+                        <Route path="artist/:id" view=ArtistPage />
                     </Route>
                     <Route path="/login" view=Login />
                     <Route path="/signup" view=Signup />
@@ -60,14 +64,18 @@ use crate::components::dashboard::*;
 use crate::components::search::*;
 use crate::components::personal::Personal;
 use crate::components::upload::*;
+use crate::components::add_artist::AddArtist;
+use crate::components::add_album::AddAlbum;
 
 /// Renders the home page of your application.
 #[component]
-fn HomePage(upload_open: RwSignal<bool>) -> impl IntoView {
+fn HomePage(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add_album_open: RwSignal<bool>) -> impl IntoView {
     view! {
         <div class="home-container">
             <Upload open=upload_open/>
-            <Sidebar upload_open=upload_open/>
+            <AddArtist open=add_artist_open/>
+            <AddAlbum open=add_album_open/>
+            <Sidebar upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/>
             // This <Outlet /> will render the child route components
             <Outlet />
             <Personal />

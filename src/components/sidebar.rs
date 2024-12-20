@@ -1,12 +1,14 @@
 use leptos::leptos_dom::*;
 use leptos::*;
 use leptos_icons::*;
-use crate::components::upload::*;
+use crate::components::upload_dropdown::*;
 
 #[component]
-pub fn Sidebar(upload_open: RwSignal<bool>) -> impl IntoView {
+pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add_album_open: RwSignal<bool>) -> impl IntoView {
     use leptos_router::use_location;
     let location = use_location();
+
+    let dropdown_open = create_rw_signal(false);
 
     let on_dashboard = Signal::derive(
         move || location.pathname.get().starts_with("/dashboard") || location.pathname.get() == "/",
@@ -19,8 +21,26 @@ pub fn Sidebar(upload_open: RwSignal<bool>) -> impl IntoView {
     view! {
         <div class="sidebar-container">
             <div class="sidebar-top-container">
+                <Show
+                    when=move || {upload_open.get() || add_artist_open.get() || add_album_open.get()}
+                    fallback=move || view! {}
+                >
+                    <div class="upload-overlay" on:click=move |_| {
+                        upload_open.set(false);
+                        add_artist_open.set(false);
+                        add_album_open.set(false);
+                    }></div>
+                </Show>
                 <h2 class="header">LibreTunes</h2>
-                <UploadBtn dialog_open=upload_open />
+                <div class="upload-dropdown-container">
+                    <UploadDropdownBtn dropdown_open=dropdown_open/>
+                    <Show
+                        when= move || dropdown_open()
+                        fallback=move || view! {}
+                    >
+                        <UploadDropdown dropdown_open=dropdown_open upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/>
+                    </Show>
+                </div>
                 <a class="buttons" href="/dashboard" style={move || if on_dashboard() {"color: #e1e3e1"} else {""}} >
                     <Icon icon=icondata::OcHomeFillLg />
                     <h1>Dashboard</h1>

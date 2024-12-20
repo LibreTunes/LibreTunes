@@ -15,7 +15,7 @@ leptos = { version = "0.6", default-features = false, features = ["nightly"] }
 leptos_meta = { version = "0.6", features = ["nightly"] }
 leptos_axum = { version = "0.6", optional = true }
 leptos_router = { version = "0.6", features = ["nightly"] }
-wasm-bindgen = { version = "=0.2.95", default-features = false, optional = true }
+wasm-bindgen = { version = "=0.2.96", default-features = false, optional = true }
 leptos_icons = { version = "0.3.0" }
 icondata = { version = "0.3.0" }
 diesel = { version = "2.1.4", features = ["postgres", "r2d2", "chrono"], default-features = false, optional = true }
