@@ -62,11 +62,14 @@ pub async fn get_artist_by_id(artist_id: i32) -> Result<Option<Artist>, ServerFn
 }
 
 #[server(endpoint = "artists/top_songs")]
-pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>, for_user_id: i32) -> Result<Vec<(SongData, i64)>, ServerFnError> {
+pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<(SongData, i64)>, ServerFnError> {
     use crate::models::Song;
+    use crate::auth::get_user;
+    use crate::schema::*;
     use leptos::server_fn::error::NoCustomError;
 
-    use crate::schema::*;
+    let user_id = get_user().await
+        .map_err(|e| ServerFnError::ServerError::<NoCustomError>(format!("Error getting user: {}", e)))?.id.unwrap();
 
     let db = &mut get_db_conn();
     let song_play_counts: Vec<(i32, i64)> = 
@@ -99,9 +102,9 @@ pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>, for_user_id
         .filter(songs::id.eq_any(top_song_ids))
 		.left_join(albums::table.on(songs::album_id.eq(albums::id.nullable())))
 		.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
-		.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(for_user_id))))
+		.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(user_id))))
 		.left_join(song_dislikes::table.on(
-			songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(for_user_id))))
+			songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(user_id))))
 		.select((
 			songs::all_columns,
 			albums::all_columns.nullable(),
