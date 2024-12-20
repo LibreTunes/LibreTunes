@@ -104,7 +104,7 @@ fn ArtistProfile(artist: Artist) -> impl IntoView {
 #[component]
 fn TopSongsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
     let top_songs = create_resource(move || artist_id.get(), |artist_id| async move {
-        let top_songs = top_songs_by_artist(artist_id, Some(10), 1).await;
+        let top_songs = top_songs_by_artist(artist_id, Some(10)).await;
 
         top_songs.map(|top_songs| {
             top_songs.into_iter().map(|(song, plays)| {
