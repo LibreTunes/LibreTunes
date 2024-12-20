@@ -111,7 +111,7 @@ pub fn SongListItem<T>(song: SongData, song_playing: MaybeSignal<bool>, extra: O
 /// Display the song's image, with an overlay if the song is playing
 /// When the song list item is hovered, the overlay will show the play button
 #[component]
-fn SongImage(image_path: String, song_playing: MaybeSignal<bool>, list_index: usize,
+pub fn SongImage(image_path: String, song_playing: MaybeSignal<bool>, list_index: usize,
 	do_queue_remaining: WriteSignal<Option<usize>>) -> impl IntoView
 {
 	let play_song = move |_| {
@@ -138,7 +138,7 @@ fn SongImage(image_path: String, song_playing: MaybeSignal<bool>, list_index: us
 
 /// Displays a song's artists, with links to their artist pages
 #[component]
-fn SongArtists(artists: Vec<Artist>) -> impl IntoView {
+pub fn SongArtists(artists: Vec<Artist>) -> impl IntoView {
 	let num_artists = artists.len() as isize;
 
 	artists.iter().enumerate().map(|(i, artist)| {
@@ -159,7 +159,7 @@ fn SongArtists(artists: Vec<Artist>) -> impl IntoView {
 
 /// Display a song's album, with a link to the album page
 #[component]
-fn SongAlbum(album: Option<Album>) -> impl IntoView {
+pub fn SongAlbum(album: Option<Album>) -> impl IntoView {
 	album.as_ref().map(|album| {
 		view! {
 			<span>
@@ -177,7 +177,7 @@ fn SongAlbum(album: Option<Album>) -> impl IntoView {
 
 /// Display like and dislike buttons for a song, and indicate if the song is liked or disliked
 #[component]
-fn SongLikeDislike(
+pub fn SongLikeDislike(
 	#[prop(into)]
 	song_id: MaybeSignal<i32>,
 	liked: RwSignal<bool>,
