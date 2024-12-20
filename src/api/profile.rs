@@ -68,6 +68,9 @@ pub async fn upload_picture(data: MultipartData) -> Result<(), ServerFnError> {
 /// and the song data, sorted by date (most recent first).
 #[server(endpoint = "/profile/recent_songs")]
 pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(NaiveDateTime, SongData)>, ServerFnError> {
+	let viewing_user_id = get_user().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting user: {}", e)))?.id.unwrap();
+
 	let mut db_con = get_db_conn();
 
 	// Get the ids of the most recent songs listened to
@@ -94,9 +97,9 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 		.inner_join(songs::table)
 		.left_join(albums::table.on(songs::album_id.eq(albums::id.nullable())))
 		.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
-		.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(for_user_id))))
+		.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(viewing_user_id))))
 		.left_join(song_dislikes::table.on(
-			songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(for_user_id))))
+			songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(viewing_user_id))))
 		.select((
 			song_history::all_columns,
 			songs::all_columns,
@@ -161,7 +164,9 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 #[server(endpoint = "/profile/top_songs")]
 pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: NaiveDateTime, limit: Option<i64>)
 	-> Result<Vec<(i64, SongData)>, ServerFnError>
-{
+{	let viewing_user_id = get_user().await
+		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting user: {}", e)))?.id.unwrap();
+
 	let mut db_con = get_db_conn();
 
 	// Get the play count and ids of the songs listened to in the date range
@@ -193,9 +198,9 @@ pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: Na
 		.filter(songs::id.eq_any(history_song_ids))
 		.left_join(albums::table.on(songs::album_id.eq(albums::id.nullable())))
 		.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
-		.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(for_user_id))))
+		.left_join(song_likes::table.on(songs::id.eq(song_likes::song_id).and(song_likes::user_id.eq(viewing_user_id))))
 		.left_join(song_dislikes::table.on(
-			songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(for_user_id))))
+			songs::id.eq(song_dislikes::song_id).and(song_dislikes::user_id.eq(viewing_user_id))))
 		.select((
 			songs::all_columns,
 			albums::all_columns.nullable(),
