@@ -16,11 +16,8 @@ pub fn UploadBtn(dialog_open: RwSignal<bool>) -> impl IntoView {
 	};
 
 	view! {
-		<button class="upload-btn" on:click=open_dialog>
-			<div class="add-sign">
-				<Icon icon=icondata::IoAddSharp />
-			</div>
-			Upload
+		<button class="upload-btn add-btns" on:click=open_dialog>
+			Upload Song
 		</button>
 	}
 }

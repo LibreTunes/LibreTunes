@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN rustup default nightly
 RUN rustup target add wasm32-unknown-unknown
-RUN cargo install cargo-leptos
+RUN cargo install cargo-leptos@0.2.22
 
 # Install a few dependencies
 RUN set -eux; \

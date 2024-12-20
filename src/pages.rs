@@ -3,3 +3,5 @@ pub mod signup;
 pub mod profile;
 pub mod albumpage;
 pub mod friends;
+pub mod artist;
+pub mod songpage;
