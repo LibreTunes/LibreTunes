@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use leptos::text_prop::TextProp;
 use leptos_icons::*;
 use std::fmt::Display;
 
