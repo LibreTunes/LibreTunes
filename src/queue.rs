@@ -107,7 +107,7 @@ pub fn Queue() -> impl IntoView {
 											<p>Playing</p>
 										}>
 										<button on:click=move |_| remove_song(index) on:mousedown=prevent_focus>
-											<Icon class="remove-song" width=RM_BTN_SIZE height=RM_BTN_SIZE icon=icondata::CgTrash />
+											<Icon width=RM_BTN_SIZE height=RM_BTN_SIZE icon={icondata::CgTrash} {..} class="remove-song" />
 										</button>
 									</Show>
 								</div>

@@ -50,7 +50,7 @@ pub fn AddAlbum(open: RwSignal<bool>) -> impl IntoView {
                 <div class="upload-header">
                     <h1>Add Album</h1>
                 </div>
-                <div class="close-button" on:click=close_dialog><Icon icon=icondata::IoClose /></div>
+                <div class="close-button" on:click=close_dialog><Icon icon={icondata::IoClose} /></div>
                 <form class="create-album-form" action="POST" on:submit=on_add_album>
                     <div class="input-bx">
                         <input type="text" required class="text-input" 

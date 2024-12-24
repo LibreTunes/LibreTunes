@@ -150,7 +150,7 @@ fn UserProfile(user: User) -> impl IntoView {
 	view! {
 		<div class="profile-header">
 			<object class="profile-image" data={profile_image_path.clone()} type="image/webp">
-				<Icon class="profile-image" icon=icondata::CgProfile width="75" height="75"/>
+				<Icon icon={icondata::CgProfile} width="75" height="75" {..} class="profile-image" />
 			</object>
 			<h1>{user.username}</h1>
 		</div>

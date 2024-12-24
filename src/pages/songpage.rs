@@ -133,7 +133,7 @@ fn SongOverview(song: SongData) -> impl IntoView {
         </div>
         <div class="song-actions">
             <button on:click=toggle_play_song>
-                <Icon class="controlbtn" width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon />
+                <Icon width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon {..} class="controlbtn" />
             </button>
             <SongLikeDislike song_id=song.id liked disliked /><br/>
         </div>

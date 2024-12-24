@@ -65,7 +65,7 @@ pub fn Signup() -> impl IntoView {
     view! {
         <div class="auth-page-container">
             <div class="signup-container">
-                <a class="return" href="/"><Icon icon=icondata::IoReturnUpBackSharp /></a>
+                <a class="return" href="/"><Icon icon={icondata::IoReturnUpBackSharp} /></a>
                 <div class="header">
                     <h1>LibreTunes</h1>
                 </div>
@@ -102,10 +102,10 @@ pub fn Signup() -> impl IntoView {
                         <i></i>
                         <Show
                             when=move || {show_password() == false}
-                            fallback=move || view!{ <button on:click=toggle_password class="password-visibility"> <Icon icon=icondata::AiEyeInvisibleFilled /></button> /> }
+                            fallback=move || view!{ <button on:click=toggle_password class="password-visibility"> <Icon icon={icondata::AiEyeInvisibleFilled} /></button> /> }
                         >
                             <button on:click=toggle_password class="password-visibility">
-                                <Icon icon=icondata::AiEyeFilled />
+                                <Icon icon={icondata::AiEyeFilled} />
                             </button>
                         </Show>
                     </div>

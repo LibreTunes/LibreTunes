@@ -127,11 +127,11 @@ pub fn SongImage(image_path: String, song_playing: MaybeSignal<bool>, list_index
 	view! {
 		<img class="song-image" src={image_path}/>
 		{move || if song_playing.get() {
-			view! { <Icon class="song-image-overlay song-playing-overlay"
-				icon=icondata::BsPauseFill on:click=pause_song /> }.into_view()
+			view! { <Icon icon={icondata::BsPauseFill} on:click={pause_song}
+					{..} class="song-image-overlay song-playing-overlay" /> }.into_view()
 		} else {
-			view! { <Icon class="song-image-overlay hide-until-hover"
-				icon=icondata::BsPlayFill on:click=play_song /> }.into_view()
+			view! { <Icon icon={icondata::BsPlayFill} on:click={play_song}
+				{..} class="song-image-overlay hide-until-hover" /> }.into_view()
 		}}
 	}
 }
@@ -261,10 +261,10 @@ pub fn SongLikeDislike(
 
 	view! {
 		<button on:click=toggle_dislike>
-			<Icon class=dislike_class width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon=dislike_icon />
+			<Icon width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon={dislike_icon} {..} class=dislike_class />
 		</button>
 		<button on:click=toggle_like>
-			<Icon class=like_class width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon=like_icon />
+			<Icon width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon={like_icon} {..} class=like_class />
 		</button>
 	}
 }

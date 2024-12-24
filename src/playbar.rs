@@ -212,15 +212,15 @@ fn PlayControls() -> impl IntoView {
         <div class="playcontrols" align="center">
 
         <button on:click=skip_back on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=icondata::BsSkipStartFill />
+        <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipStartFill} {..} class="controlbtn" />
         </button>
 
         <button on:click=toggle_play on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon={icon} />
+        <Icon width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon={icon} {..} class="controlbtn" />
         </button>
 
         <button on:click=skip_forward on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=icondata::BsSkipEndFill />
+        <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipEndFill} {..} class="controlbtn" />
         </button>
 
         </div>
@@ -395,10 +395,10 @@ fn LikeDislike() -> impl IntoView {
     view! {
         <div class="like-dislike">
             <button on:click=toggle_dislike>
-                <Icon class="controlbtn hmirror" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=dislike_icon />
+                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={dislike_icon} {..} class="controlbtn hmirror" />
             </button>
             <button on:click=toggle_like>
-                <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=like_icon />
+                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={like_icon} {..} class="controlbtn" />
             </button>
         </div>
     }
@@ -461,7 +461,7 @@ fn QueueToggle() -> impl IntoView {
     view! {
         <div class="queue-toggle">
         <button on:click=update_queue on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon=icondata::RiPlayListMediaFill />
+        <Icon width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon={icondata::RiPlayListMediaFill} {..} class="controlbtn" />
         </button>
         </div>
     }

@@ -94,7 +94,7 @@ fn ArtistProfile(artist: Artist) -> impl IntoView {
     view! {
         <div class="artist-header">
             <object class="artist-image" data={profile_image_path.clone()} type="image/webp">
-                <Icon class="artist-image" icon=icondata::CgProfile width="100" height="100"/>
+                <Icon icon={icondata::CgProfile} width="100" height="100" {..} class="artist-image" />
             </object>
             <h1>{artist.name}</h1>
         </div>

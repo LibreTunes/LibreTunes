@@ -42,11 +42,11 @@ pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add
                     </Show>
                 </div>
                 <a class="buttons" href="/dashboard" style={move || if on_dashboard() {"color: #e1e3e1"} else {""}} >
-                    <Icon icon=icondata::OcHomeFillLg />
+                    <Icon icon={icondata::OcHomeFillLg} />
                     <h1>Dashboard</h1>
                 </a>
                 <a class="buttons" href="/search" style={move || if on_search() {"color: #e1e3e1"} else {""}}>
-                    <Icon icon=icondata::BiSearchRegular />
+                    <Icon icon={icondata::BiSearchRegular} />
                     <h1>Search</h1>
                 </a>
             </div>
@@ -64,7 +64,7 @@ pub fn Bottom() -> impl IntoView {
                 <h1 class="header">Playlists</h1>
                 <button class="add-playlist">
                     <div class="add-sign">
-                        <Icon icon=icondata::IoAddSharp />
+                        <Icon icon={icondata::IoAddSharp} />
                     </div>
                     New Playlist
                 </button>

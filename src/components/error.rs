@@ -14,7 +14,7 @@ pub fn ServerError<E: Display + 'static>(
 	view!{
 		<div class="error-container">
 			<div class="error-header">
-				<Icon icon=icondata::BiErrorSolid />
+				<Icon icon={icondata::BiErrorSolid} />
 				<h1>{title}</h1>
 			</div>
 			<p>{message}</p>
@@ -35,7 +35,7 @@ pub fn Error<E: Display + 'static>(
 	view! {
 		<div class="error-container">
 			<div class="error-header">
-				<Icon icon=icondata::BiErrorSolid />
+				<Icon icon={icondata::BiErrorSolid} />
 				<h1>{title}</h1>
 			</div>
 			<p>{message}</p>

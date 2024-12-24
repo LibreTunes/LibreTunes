@@ -52,13 +52,13 @@ pub fn Profile() -> impl IntoView {
                 </Suspense>
             </div>
             <div class="profile-icon" on:click=open_dropdown>
-				<Suspense fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }>
+				<Suspense fallback=|| view! { <Icon icon={icondata::CgProfile} width="45" height="45"/> }>
 					<Show 
 						when=move || user.get().map(|user| user.is_some()).unwrap_or(false)
-						fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
+						fallback=|| view! { <Icon icon={icondata::CgProfile} width="45" height="45"/> }
 					>
 						<object class="profile-image" data={user_profile_picture} type="image/webp">
-							<Icon class="profile-image" icon=icondata::CgProfile width="45" height="45"/>
+							<Icon icon={icondata::CgProfile} width="45" height="45" {..} class="profile-image" />
 						</object>
 					</Show>
 				</Suspense>

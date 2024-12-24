@@ -100,7 +100,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 	view! {
 		<Show when=open fallback=move || view! {}>
 			<div class="upload-container" open=open>
-				<div class="close-button" on:click=close_dialog><Icon icon=icondata::IoClose /></div>
+				<div class="close-button" on:click=close_dialog><Icon icon={icondata::IoClose} /></div>
 				<div class="upload-header">
 					<h1>Upload Song</h1>
 				</div>
@@ -169,7 +169,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					fallback=move || view! {}
 				>
 					<div class="error-msg">
-						<Icon icon=icondata::IoAlertCircleSharp />
+						<Icon icon={icondata::IoAlertCircleSharp} />
 						{error_msg.get().as_ref().unwrap()}
 					</div>
 				</Show>

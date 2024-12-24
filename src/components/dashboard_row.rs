@@ -96,10 +96,10 @@ impl IntoView for DashboardRow {
 					<h2>{self.title}</h2>
 					<div class="dashboard-tile-row-scroll-btn">
 						<button on:click=scroll_left tabindex=-1 style=scroll_left_hidden>
-							<Icon class="dashboard-tile-row-scroll" icon=icondata::FiChevronLeft />
+							<Icon icon={icondata::FiChevronLeft} {..} class="dashboard-tile-row-scroll" />
 						</button>
 						<button on:click=scroll_right tabindex=-1 style=scroll_right_hidden>
-							<Icon class="dashboard-tile-row-scroll" icon=icondata::FiChevronRight />
+							<Icon icon={icondata::FiChevronRight} {..} class="dashboard-tile-row-scroll" />
 						</button>
 					</div>
 				</div>
