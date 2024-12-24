@@ -170,7 +170,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 				>
 					<div class="error-msg">
 						<Icon icon={icondata::IoAlertCircleSharp} />
-						{error_msg.get().as_ref().unwrap()}
+						{error_msg.get().unwrap()}
 					</div>
 				</Show>
 			</div>
