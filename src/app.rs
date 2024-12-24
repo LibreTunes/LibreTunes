@@ -4,6 +4,7 @@ use crate::queue::Queue;
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::*;
+use leptos_router::components::*;
 use crate::pages::login::*;
 use crate::pages::signup::*;
 use crate::pages::profile::*;
@@ -33,28 +34,28 @@ pub fn App() -> impl IntoView {
         <CustomTitle />
 
         // content for this welcome page
-        <Router fallback=|| {
-            let mut outside_errors = Errors::default();
-            outside_errors.insert_with_default_key(AppError::NotFound);
-            view! {
-                <ErrorTemplate outside_errors/>
-            }
-            .into_view()
-        }>
+        <Router>
             <main>
-                <Routes>
-                    <Route path="" view=move || view! { <HomePage upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/> }>
-                        <Route path="" view=Dashboard />
-                        <Route path="dashboard" view=Dashboard />
-                        <Route path="search" view=Search />
-                        <Route path="user/:id" view=Profile />
-                        <Route path="user" view=Profile />
-                        <Route path="album/:id" view=AlbumPage />
-                        <Route path="artist/:id" view=ArtistPage />
-                        <Route path="song/:id" view=SongPage />
-                    </Route>
-                    <Route path="/login" view=Login />
-                    <Route path="/signup" view=Signup />
+                <Routes fallback=|| {
+                    let mut outside_errors = Errors::default();
+                    outside_errors.insert_with_default_key(AppError::NotFound);
+                    view! {
+                        <ErrorTemplate outside_errors/>
+                    }
+                    .into_view()
+                }>
+                    <ParentRoute path=path!("") view=move || view! { <HomePage upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/> }>
+                        <Route path=path!("") view=Dashboard />
+                        <Route path=path!("dashboard") view=Dashboard />
+                        <Route path=path!("search") view=Search />
+                        <Route path=path!("user/:id") view=Profile />
+                        <Route path=path!("user") view=Profile />
+                        <Route path=path!("album/:id") view=AlbumPage />
+                        <Route path=path!("artist/:id") view=ArtistPage />
+                        <Route path=path!("song/:id") view=SongPage />
+                    </ParentRoute>
+                    <Route path=path!("/login") view=Login />
+                    <Route path=path!("/signup") view=Signup />
                 </Routes>
             </main>
         </Router>
