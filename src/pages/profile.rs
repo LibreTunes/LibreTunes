@@ -5,7 +5,6 @@ use leptos_icons::*;
 use server_fn::error::NoCustomError;
 
 use crate::components::dashboard_row::DashboardRow;
-use crate::components::dashboard_tile::DashboardTile;
 use crate::components::song_list::*;
 use crate::components::loading::*;
 use crate::components::error::*;
@@ -304,10 +303,12 @@ fn TopArtists(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 					top_artists.get().map(|top_artists| {
 						top_artists.map(|top_artists| {
 							let tiles = top_artists.into_iter().map(|artist| {
-								Box::new(artist) as Box<dyn DashboardTile>
+								artist.into()
 							}).collect::<Vec<_>>();
 
-							DashboardRow::new(format!("Top Artists {}", HISTORY_MESSAGE), tiles)
+							view! {
+								<DashboardRow title=format!("Top Artists {}", HISTORY_MESSAGE) tiles />
+							}
 						})
 					})
 				}

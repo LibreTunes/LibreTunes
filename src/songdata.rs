@@ -67,20 +67,13 @@ impl TryInto<Song> for SongData {
 	}
 }
 
-impl DashboardTile for SongData {
-	fn image_path(&self) -> String {
-		self.image_path.clone()
-	}
-
-	fn title(&self) -> String {
-		self.title.clone()
-	}
-
-	fn link(&self) -> String {
-		format!("/song/{}", self.id)
-	}
-
-	fn description(&self) -> Option<String> {
-		Some(format!("Song • {}", Artist::display_list(&self.artists)))
+impl Into<DashboardTile> for SongData {
+	fn into(self) -> DashboardTile {
+		DashboardTile {
+			image_path: self.image_path.into(),
+			title: self.title.into(),
+			link: format!("/song/{}", self.id).into(),
+			description: Some(format!("Song • {}", Artist::display_list(&self.artists)).into()),
+		}
 	}
 }

@@ -15,20 +15,13 @@ pub struct ArtistData {
 	pub image_path: String,
 }
 
-impl DashboardTile for ArtistData {
-	fn image_path(&self) -> String {
-		self.image_path.clone()
-	}
-
-	fn title(&self) -> String {
-		self.name.clone()
-	}
-
-	fn link(&self) -> String {
-		format!("/artist/{}", self.id)
-	}
-
-	fn description(&self) -> Option<String> {
-		Some("Artist".to_string())
+impl Into<DashboardTile> for ArtistData {
+	fn into(self) -> DashboardTile {
+		DashboardTile {
+			image_path: self.image_path.into(),
+			title: self.name.into(),
+			link: format!("/artist/{}", self.id).into(),
+			description: Some("Artist".into()),
+		}
 	}
 }
