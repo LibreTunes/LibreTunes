@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use leptos::either::*;
 use leptos_router::use_params_map;
 use leptos_icons::*;
 use server_fn::error::NoCustomError;
@@ -20,23 +21,23 @@ pub fn ArtistPage() -> impl IntoView {
             {move || params.with(|params| {
                 match params.get("id").map(|id| id.parse::<i32>()) {
                     Some(Ok(id)) => {
-                        view! { <ArtistIdProfile id /> }.into_view()
+                        Either::Left(view! { <ArtistIdProfile id /> })
                     },
                     Some(Err(e)) => {
-                        view! {
+                        Either::Right(view! {
                             <Error<String>
                                 title="Invalid Artist ID"
                                 error=e.to_string()
                             />
-                        }.into_view()
+                        })
                     },
                     None => {
-                        view! {
+                        Either::Right(view! {
                             <Error<String>
                                 title="No Artist ID"
                                 message="You must specify an artist ID to view their page."
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}
@@ -60,20 +61,20 @@ fn ArtistIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
                 match artist {
                     Ok(Some(artist)) => {
                         show_details.set(true);
-                        view! { <ArtistProfile artist /> }.into_view()
+                        EitherOf3::A(view! { <ArtistProfile artist /> })
                     },
-                    Ok(None) => view! {
+                    Ok(None) => EitherOf3::B(view! {
                         <Error<String>
                             title="Artist Not Found"
                             message=format!("Artist with ID {} not found", id.get())
                         />
-                    }.into_view(),
-                    Err(error) => view! {
+                    }),
+                    Err(error) => EitherOf3::C(view! {
                         <ServerError<NoCustomError>
                             title="Error Getting Artist"
                             error
                         />
-                    }.into_view(),
+                    }),
                 }
             })}
         </Transition>

@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use leptos::prelude::*;
+use leptos::either::*;
 use leptos::logging::*;
 use leptos_icons::*;
 
@@ -127,11 +128,11 @@ pub fn SongImage(image_path: String, song_playing: MaybeSignal<bool>, list_index
 	view! {
 		<img class="song-image" src={image_path}/>
 		{move || if song_playing.get() {
-			view! { <Icon icon={icondata::BsPauseFill} on:click={pause_song}
-					{..} class="song-image-overlay song-playing-overlay" /> }.into_view()
+			Either::Left(view! { <Icon icon={icondata::BsPauseFill} on:click={pause_song}
+					{..} class="song-image-overlay song-playing-overlay" /> })
 		} else {
-			view! { <Icon icon={icondata::BsPlayFill} on:click={play_song}
-				{..} class="song-image-overlay hide-until-hover" /> }.into_view()
+			Either::Right(view! { <Icon icon={icondata::BsPlayFill} on:click={play_song}
+				{..} class="song-image-overlay hide-until-hover" /> })
 		}}
 	}
 }
@@ -147,9 +148,9 @@ pub fn SongArtists(artists: Vec<Artist>) -> impl IntoView {
 		view! {
 			{
 				if let Some(id) = artist.id {
-					view! { <a href={format!("/artist/{}", id)}>{artist.name.clone()}</a> }.into_view()
+					Either::Left(view! { <a href={format!("/artist/{}", id)}>{artist.name.clone()}</a> })
 				} else {
-					view! { <span>{artist.name.clone()}</span> }.into_view()
+					Either::Right(view! { <span>{artist.name.clone()}</span> })
 				}
 			}
 			{if i < num_artists - 2 { ", " } else if i == num_artists - 2 { " & " } else { "" }}
@@ -165,9 +166,9 @@ pub fn SongAlbum(album: Option<Album>) -> impl IntoView {
 			<span>
 				{
 					if let Some(id) = album.id {
-						view! { <a href={format!("/album/{}", id)}>{album.title.clone()}</a> }.into_view()
+						Either::Left(view! { <a href={format!("/album/{}", id)}>{album.title.clone()}</a> })
 					} else {
-						view! { <span>{album.title.clone()}</span> }.into_view()
+						Either::Right(view! { <span>{album.title.clone()}</span> })
 					}
 				}
 			</span>

@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use leptos::either::*;
 use leptos_router::use_params_map;
 use leptos_icons::*;
 use server_fn::error::NoCustomError;
@@ -38,20 +39,20 @@ pub fn Profile() -> impl IntoView {
 				match params.get("id").map(|id| id.parse::<i32>()) {
 					None => {
 						// No id specified, show the current user's profile
-						view! { <OwnProfile /> }.into_view()
+						EitherOf3::A(view! { <OwnProfile /> })
 					},
 					Some(Ok(id)) => {
 						// Id specified, get the user and show their profile
-						view! { <UserIdProfile id /> }.into_view()
+						EitherOf3::B(view! { <UserIdProfile id /> })
 					},
 					Some(Err(e)) => {
 						// Invalid id, return an error
-						view! {
+						EitherOf3::C(view! {
 							<Error<String>
 								title="Invalid User ID"
 								error=e.to_string()
 							/>
-						}.into_view()
+						})
 					}
 				}
 			})}
@@ -70,19 +71,19 @@ fn OwnProfile() -> impl IntoView {
 				match user {
 					Some(user) => {
 						let user_id = user.id.unwrap();
-						view! {
+						Either::Left(view! {
 								<UserProfile user />
 								<TopSongs user_id={user_id} />
 								<RecentSongs user_id={user_id} />
 								<TopArtists user_id={user_id} />
-						}.into_view()
+						})
 					},
-					None => view! {
+					None => Either::Right(view! {
 						<Error<String>
 							title="Not Logged In"
 							message="You must be logged in to view your profile"
 						/>
-					}.into_view(),
+					}),
 				}
 			})}
 		</Transition>
@@ -108,27 +109,27 @@ fn UserIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
 					Ok(Some(user)) => {
 						show_details.set(true);
 
-						view! { <UserProfile user /> }.into_view()
+						EitherOf3::A(view! { <UserProfile user /> })
 					},
 					Ok(None) => {
 						show_details.set(false);
 
-						view! {
+						EitherOf3::B(view! {
 							<Error<String>
 								title="User Not Found"
 								message=format!("User with ID {} not found", id.get())
 							/>
-						}.into_view()
+						})
 					},
 					Err(error) => {
 						show_details.set(false);
 
-						view! {
+						EitherOf3::C(view! {
 							<ServerError<NoCustomError>
 								title="Error Getting User"
 								error
 							/>
-						}.into_view()
+						})
 					}
 				}
 			})}

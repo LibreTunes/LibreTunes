@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use leptos::either::*;
 use leptos_router::use_params_map;
 use leptos_icons::*;
 use server_fn::error::NoCustomError;
@@ -25,23 +26,23 @@ pub fn SongPage() -> impl IntoView {
             {move || params.with(|params| {
                 match params.get("id").map(|id| id.parse::<i32>()) {
                     Some(Ok(id)) => {
-                        view! { <SongDetails id /> }.into_view()
+                        Either::Left(view! { <SongDetails id /> })
                     },
                     Some(Err(e)) => {
-                        view! {
+                        Either::Right(view! {
                             <Error<String>
                                 title="Invalid Song ID"
                                 error=e.to_string()
                             />
-                        }.into_view()
+                        })
                     },
                     None => {
-                        view! {
+                        Either::Right(view! {
                             <Error<String>
                                 title="No Song ID"
                                 message="You must specify a song ID to view its page."
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}
@@ -62,23 +63,23 @@ fn SongDetails(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
             {move || song_info.get().map(|song| {
                 match song {
                     Ok(Some(song)) => {
-                        view! { <SongOverview song /> }.into_view()
+                        EitherOf3::A(view! { <SongOverview song /> })
                     },
                     Ok(None) => {
-                        view! {
+                        EitherOf3::B(view! {
                             <Error<String>
                                 title="Song Not Found"
                                 message=format!("Song with ID {} not found", id.get())
                             />
-                        }.into_view()
+                        })
                     },
                     Err(error) => {
-                        view! {
+                        EitherOf3::C(view! {
                             <ServerError<NoCustomError>
                                 title="Error Fetching Song"
                                 error
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}
@@ -154,17 +155,17 @@ fn SongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
             {move || plays.get().map(|plays| {
                 match plays {
                     Ok(plays) => {
-                        view! {
+                        Either::Left(view! {
                             <p>{format!("Plays: {}", plays)}</p>
-                        }.into_view()
+                        })
                     },
                     Err(error) => {
-                        view! {
+                        Either::Right(view! {
                             <ServerError<NoCustomError>
                                 title="Error fetching song plays"
                                 error
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}
@@ -183,17 +184,17 @@ fn MySongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
             {move || plays.get().map(|plays| {
                 match plays {
                     Ok(plays) => {
-                        view! {
+                        Either::Left(view! {
                             <p>{format!("My Plays: {}", plays)}</p>
-                        }.into_view()
+                        })
                     },
                     Err(error) => {
-                        view! {
+                        Either::Right(view! {
                             <ServerError<NoCustomError>
                                 title="Error fetching my song plays"
                                 error
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}

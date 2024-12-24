@@ -1,5 +1,6 @@
 use leptos::leptos_dom::*;
 use leptos::prelude::*;
+use leptos::either::*;
 use leptos_router::*;
 use crate::components::song_list::*;
 use crate::api::album::*;
@@ -52,12 +53,12 @@ pub fn AlbumPage() -> impl IntoView {
                         albumdata.with( |albumdata| {
                             match albumdata {
                                 Some(Ok(s)) => {
-                                    view! { <AlbumInfo albumdata=(*s).clone() /> }
+                                    EitherOf3::A(view! { <AlbumInfo albumdata=(*s).clone() /> })
                                 },
                                 Some(Err(e)) => {
-                                    view! { <div class="error">{format!("Error loading album : {}",e)}</div> }.into_view()
+                                    EitherOf3::B(view! { <div class="error">{format!("Error loading album : {}",e)}</div> })
                                 },
-                                None => {view! { }.into_view()}
+                                None => {EitherOf3::C(view! { })}
                             }
                         })
                     }}
@@ -71,12 +72,12 @@ pub fn AlbumPage() -> impl IntoView {
                     song_list.with( |song_list| {
                         match song_list {
                             Some(Ok(s)) => {
-                                view! { <SongList songs=(*s).clone()/> }
+                                EitherOf3::A(view! { <SongList songs=(*s).clone()/> })
                             },
                             Some(Err(e)) => {
-                                view! { <div class="error">{format!("Error loading albums: : {}",e)}</div> }.into_view()
+                                EitherOf3::B(view! { <div class="error">{format!("Error loading albums: : {}",e)}</div> })
                             },
-                            None => {view! { }.into_view()}
+                            None => {EitherOf3::C(view! { })}
                         }
                     })
                 }}
