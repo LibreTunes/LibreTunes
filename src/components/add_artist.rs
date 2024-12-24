@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 use leptos::leptos_dom::log;
 use leptos_icons::*;
+use leptos::task::spawn_local;
 use crate::api::artists::add_artist;
 
 #[component]

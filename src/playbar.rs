@@ -9,6 +9,7 @@ use leptos_meta::Title;
 use leptos::prelude::*;
 use leptos_icons::*;
 use leptos_use::{utils::Pausable, use_interval_fn};
+use leptos::task::spawn_local;
 
 /// Width and height of the forward/backward skip buttons
 const SKIP_BTN_SIZE: &str = "3.5em";
