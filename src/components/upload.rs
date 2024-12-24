@@ -106,7 +106,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					<h1>Upload Song</h1>
 				</div>
 				<Form action="/api/upload" method="POST" enctype=String::from("multipart/form-data")
-					class="upload-form" on_response=handle_response.clone()>
+					on_response=handle_response.clone() {..} class="upload-form" >
 					<div class="input-bx">
 						<input type="text" name="title" required class="text-input" required/>
 						<span>Title</span>
