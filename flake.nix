@@ -6,7 +6,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url  = "github:numtide/flake-utils";
     cargo-leptos = {
-      url = "github:leptos-rs/cargo-leptos?ref=v0.2.22";
+      url = "github:leptos-rs/cargo-leptos?ref=v0.2.24";
       flake = false;
     };
   };
@@ -24,7 +24,7 @@
           name = "cargo-leptos";
           buildFeatures = ["no_downloads"];
           src = cargo-leptos; 
-          cargoHash = "sha256-4v6sCTPRxe7bO7uV3HwUC8P1UsG8ydIvZ4rG2kU22zA=";
+          cargoHash = "sha256-kj80+fN1rcJHf7XEG1QvECP3p2Y6Z9+ObW3lfE4AeL0=";
 
           nativeBuildInputs = with pkgs; [
             pkg-config
