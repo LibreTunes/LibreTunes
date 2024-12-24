@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use leptos::leptos_dom::*;
 use leptos::prelude::*;
 use leptos_icons::*;
@@ -84,7 +84,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 		})
 	};
 
-	let handle_response = Rc::new(move |response: &Response| {
+	let handle_response = Arc::new(move |response: &Response| {
 		if response.ok() {
 			set_error_msg.update(|value| *value = None);
 			set_filtered_artists.update(|value| *value = vec![]);
