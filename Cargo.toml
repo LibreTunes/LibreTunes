@@ -38,7 +38,7 @@ multer = { version = "3.1.0", optional = true }
 log = { version = "0.4.21", optional = true }
 flexi_logger = { version = "0.28.0", optional = true, default-features = false }
 web-sys = "0.3.69"
-leptos-use = "0.13.5"
+leptos-use = "0.15.0"
 image-convert = { version = "0.18.0", optional = true, default-features = false }
 chrono = { version = "0.4.38", default-features = false, features = ["serde", "clock"] }
 dotenvy = { version = "0.15.7", optional = true }
