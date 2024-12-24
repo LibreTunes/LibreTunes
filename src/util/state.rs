@@ -14,7 +14,7 @@ pub struct GlobalState {
 	/// A resource that fetches the logged in user
 	/// This will not automatically refetch, so any login/logout related code
 	/// should call `refetch` on this resource
-    pub logged_in_user: Resource<(), Option<User>>,
+    pub logged_in_user: Resource<Option<User>>,
 
     /// The current play status
     pub play_status: RwSignal<PlayStatus>,
@@ -39,7 +39,7 @@ impl GlobalState {
         }
     }
 
-    pub fn logged_in_user() -> Resource<(), Option<User>> {
+    pub fn logged_in_user() -> Resource<Option<User>> {
         expect_context::<Self>().logged_in_user
     }
 
