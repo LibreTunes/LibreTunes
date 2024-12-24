@@ -46,7 +46,6 @@ dotenvy = { version = "0.15.7", optional = true }
 [features]
 hydrate = [
   "leptos/hydrate",
-  "leptos_router/hydrate",
   "console_error_panic_hook",
   "wasm-bindgen",
   "chrono/wasmbind",
