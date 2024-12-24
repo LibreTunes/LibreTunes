@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use leptos::leptos_dom::log;
 use leptos_icons::*;
 use crate::api::artists::add_artist;

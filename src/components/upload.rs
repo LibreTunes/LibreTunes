@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use leptos_router::Form;
 use web_sys::Response;

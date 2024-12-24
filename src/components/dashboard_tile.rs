@@ -1,5 +1,5 @@
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 
 pub trait DashboardTile {
 	fn image_path(&self) -> String;

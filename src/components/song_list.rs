@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use leptos::*;
+use leptos::prelude::*;
 use leptos::logging::*;
 use leptos_icons::*;
 

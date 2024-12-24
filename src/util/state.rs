@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use leptos::logging::*;
 
 use crate::playstatus::PlayStatus;

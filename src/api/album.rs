@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use crate::albumdata::AlbumData;
 use crate::songdata::SongData;
 

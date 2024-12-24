@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use crate::components::upload::*;
 use crate::components::add_artist::*;

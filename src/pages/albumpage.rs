@@ -1,5 +1,5 @@
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_router::*;
 use crate::components::song_list::*;
 use crate::api::album::*;

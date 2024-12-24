@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use leptos::*;
+use leptos::prelude::*;
 use crate::models::HistoryEntry;
 use crate::models::Song;
 

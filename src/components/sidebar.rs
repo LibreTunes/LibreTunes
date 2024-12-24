@@ -1,5 +1,5 @@
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use crate::components::upload_dropdown::*;
 

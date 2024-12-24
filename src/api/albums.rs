@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 
 use cfg_if::cfg_if;
 

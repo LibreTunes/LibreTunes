@@ -1,6 +1,6 @@
 use leptos::html::Ul;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_use::{use_element_size, UseElementSizeReturn, use_scroll, UseScrollReturn};
 use crate::components::dashboard_tile::DashboardTile;
 use leptos_icons::*;

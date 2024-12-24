@@ -6,7 +6,7 @@ use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
 use leptos_meta::Title;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use leptos_use::{utils::Pausable, use_interval_fn};
 

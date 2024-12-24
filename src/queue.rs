@@ -3,7 +3,7 @@ use crate::song::Song;
 use crate::util::state::GlobalState;
 use leptos::ev::MouseEvent;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use leptos::ev::DragEvent;
 

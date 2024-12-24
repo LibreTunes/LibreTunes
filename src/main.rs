@@ -15,7 +15,7 @@ extern crate diesel_migrations;
 #[tokio::main]
 async fn main() {
     use axum::{routing::get, Router, extract::Path, middleware::from_fn};
-    use leptos::*;
+    use leptos::prelude::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use libretunes::app::*;
     use libretunes::util::require_auth::require_auth_middleware;

@@ -2,7 +2,7 @@ use crate::auth::signup;
 use crate::models::User;
 use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use crate::components::loading::Loading;
 
