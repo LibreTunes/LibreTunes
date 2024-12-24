@@ -435,7 +435,7 @@ fn ProgressBar(percentage: MaybeSignal<f64>) -> impl IntoView {
     let bar_width_style = Signal::derive(move || format!("width: {}%;", percentage.get()));
 
     view! {
-        <div class="invisible-media-progress" _ref=progress_bar_ref on:click=progress_jump> // Larger click area
+        <div class="invisible-media-progress" node_ref=progress_bar_ref on:click=progress_jump> // Larger click area
         <div class="media-progress"> // "Unfilled" progress bar
         <div class="media-progress-solid" style=bar_width_style> // "Filled" progress bar
 		</div>
@@ -665,7 +665,7 @@ pub fn PlayBar() -> impl IntoView {
     };
 
     view! {
-        <audio _ref=audio_ref on:play=on_play on:pause=on_pause
+        <audio node_ref=audio_ref on:play=on_play on:pause=on_pause
             on:timeupdate=on_time_update on:ended=on_end type="audio/mpeg" />
         <div class="playbar">
         <ProgressBar percentage=percentage.into() />

@@ -103,7 +103,7 @@ impl IntoView for DashboardRow {
 						</button>
 					</div>
 				</div>
-				<ul _ref={list_ref}>
+				<ul node_ref={list_ref}>
 				{self.tiles.into_iter().map(|tile_info| {
 					view! {
 						<li>
