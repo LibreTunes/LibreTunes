@@ -489,7 +489,7 @@ pub fn PlayBar() -> impl IntoView {
     let status = GlobalState::play_status();
 
     // Listen for key down events -- arrow keys don't seem to trigger key press events
-    let _arrow_key_handle = window_event_listener(ev::keydown, move |e: ev::KeyboardEvent| {
+    let _arrow_key_handle = window_event_listener(leptos::ev::keydown, move |e: leptos::ev::KeyboardEvent| {
         if e.key() == "ArrowRight" {
             e.prevent_default();
             log!("Right arrow key pressed, skipping forward by {} seconds", ARROW_KEY_SKIP_TIME);
@@ -519,7 +519,7 @@ pub fn PlayBar() -> impl IntoView {
     });
 
     // Listen for space bar presses to play/pause
-    let _space_bar_handle = window_event_listener(ev::keypress, move |e: ev::KeyboardEvent| {
+    let _space_bar_handle = window_event_listener(leptos::ev::keypress, move |e: leptos::ev::KeyboardEvent| {
         if e.key() == " " {
             e.prevent_default();
             log!("Space bar pressed, toggling play/pause");
