@@ -53,7 +53,7 @@ pub fn Login() -> impl IntoView {
 
                 // Redirect to the login page
                 log!("Logged in Successfully!");
-                leptos_router::use_navigate()("/", Default::default());
+                leptos_router::hooks::use_navigate()("/", Default::default());
                 log!("Navigated to home page after login");
             } else if let Ok(None) = login_result {
                 log!("Invalid username or password");

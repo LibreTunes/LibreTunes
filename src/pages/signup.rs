@@ -55,7 +55,7 @@ pub fn Signup() -> impl IntoView {
 
                 // Redirect to the login page
                 log!("Signed up successfully!");
-                leptos_router::use_navigate()("/", Default::default());
+                leptos_router::hooks::use_navigate()("/", Default::default());
                 log!("Navigated to home page after signup")
             }
 
