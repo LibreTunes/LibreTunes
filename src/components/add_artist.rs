@@ -50,7 +50,6 @@ pub fn AddArtist(open: RwSignal<bool>) -> impl IntoView {
                             on:input=move |ev: leptos::ev::Event| {
                                 artist_name.set(event_target_value(&ev));
                             }        
-                            required 
                          />
                         <span>Artist Name</span>
                     </div>

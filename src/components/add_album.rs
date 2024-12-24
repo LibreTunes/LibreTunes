@@ -58,7 +58,6 @@ pub fn AddAlbum(open: RwSignal<bool>) -> impl IntoView {
                             on:input=move |ev: leptos::ev::Event| {
                                 album_title.set(event_target_value(&ev));
                             }        
-                            required 
                          />
                         <span>Album Title</span>
                     </div>
