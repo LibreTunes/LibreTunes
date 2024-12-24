@@ -1,7 +1,8 @@
 use leptos::leptos_dom::*;
 use leptos::prelude::*;
 use leptos::either::*;
-use leptos_router::*;
+use leptos_router::params::Params;
+use leptos_router::hooks::use_params;
 use crate::components::song_list::*;
 use crate::api::album::*;
 use crate::components::album_info::*;
