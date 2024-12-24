@@ -2,7 +2,7 @@ use std::rc::Rc;
 use leptos::leptos_dom::*;
 use leptos::prelude::*;
 use leptos_icons::*;
-use leptos_router::Form;
+use leptos_router::components::Form;
 use web_sys::Response;
 use crate::search::search_artists;
 use crate::search::search_albums;
