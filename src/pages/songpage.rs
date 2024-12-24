@@ -51,7 +51,7 @@ pub fn SongPage() -> impl IntoView {
 
 #[component]
 fn SongDetails(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-    let song_info = create_resource(move || id.get(), move |id| {
+    let song_info = Resource::new(move || id.get(), move |id| {
         get_song_by_id(id)
     });
 
@@ -145,7 +145,7 @@ fn SongOverview(song: SongData) -> impl IntoView {
 
 #[component]
 fn SongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-    let plays = create_resource(move || id.get(), move |id| songs::get_song_plays(id));
+    let plays = Resource::new(move || id.get(), move |id| songs::get_song_plays(id));
 
     view! {
         <Transition
@@ -174,7 +174,7 @@ fn SongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
 
 #[component]
 fn MySongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-    let plays = create_resource(move || id.get(), move |id| songs::get_my_song_plays(id));
+    let plays = Resource::new(move || id.get(), move |id| songs::get_my_song_plays(id));
 
     view! {
         <Transition

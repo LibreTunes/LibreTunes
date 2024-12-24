@@ -24,7 +24,7 @@ impl GlobalState {
     pub fn new() -> Self {
         let play_status = create_rw_signal(PlayStatus::default());
 
-        let logged_in_user = create_resource(|| (), |_| async {
+        let logged_in_user = Resource::new(|| (), |_| async {
             get_logged_in_user().await
                 .inspect_err(|e| {
                     error!("Error getting logged in user: {:?}", e);

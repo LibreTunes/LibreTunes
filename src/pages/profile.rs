@@ -92,7 +92,7 @@ fn OwnProfile() -> impl IntoView {
 /// Show a user's profile by ID
 #[component]
 fn UserIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-	let user_info = create_resource(move || id.get(), move |id| {
+	let user_info = Resource::new(move || id.get(), move |id| {
 		get_user_by_id(id)
 	});
 
@@ -177,7 +177,7 @@ fn UserProfile(user: User) -> impl IntoView {
 /// Show a list of top songs for a user
 #[component]
 fn TopSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
-	let top_songs = create_resource(move || user_id.get(), |user_id| async move {
+	let top_songs = Resource::new(move || user_id.get(), |user_id| async move {
 		use chrono::{Local, Duration};
 		let now = Local::now();
 		let start = now - Duration::seconds(HISTORY_SECS);
@@ -227,7 +227,7 @@ fn TopSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 /// Show a list of recently played songs for a user
 #[component]
 fn RecentSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
-	let recent_songs = create_resource(move || user_id.get(), |user_id| async move {
+	let recent_songs = Resource::new(move || user_id.get(), |user_id| async move {
 		let recent_songs = recent_songs(user_id, Some(RECENT_SONGS_COUNT)).await;
 
 		recent_songs.map(|recent_songs| {
@@ -268,7 +268,7 @@ fn RecentSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 /// Show a list of top artists for a user
 #[component]
 fn TopArtists(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
-	let top_artists = create_resource(move || user_id.get(), |user_id| async move {
+	let top_artists = Resource::new(move || user_id.get(), |user_id| async move {
 		use chrono::{Local, Duration};
 
 		let now = Local::now();

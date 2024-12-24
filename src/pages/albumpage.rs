@@ -22,7 +22,7 @@ pub fn AlbumPage() -> impl IntoView {
         })
     };
 
-    let song_list = create_resource(
+    let song_list = Resource::new(
         id,
         |value| async move {
             match value {
@@ -32,7 +32,7 @@ pub fn AlbumPage() -> impl IntoView {
         },
     );
 
-    let albumdata = create_resource(
+    let albumdata = Resource::new(
         id,
         |value| async move {
             match value {
