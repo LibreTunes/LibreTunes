@@ -146,7 +146,6 @@ fn TopSongsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView 
 #[component]
 fn AlbumsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
     use crate::components::dashboard_row::*;
-    use crate::components::dashboard_tile::*;
 
     let albums = create_resource(move || artist_id.get(), |artist_id| async move {
         let albums = albums_by_artist(artist_id, None).await;
@@ -173,9 +172,13 @@ fn AlbumsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
             >
                 {move || albums.get().map(|albums| {
                     albums.map(|albums| {
-                        DashboardRow::new("Albums".to_string(), albums.into_iter().map(|album| {
-                            Box::new(album) as Box<dyn DashboardTile>
-                        }).collect())
+                        let tiles = albums.into_iter().map(|album| {
+                          album.into()
+                        }).collect::<Vec<_>>();
+
+                        view! {
+                            <DashboardRow title="Albums" tiles />
+                        }
                     })
                 })}
             </ErrorBoundary>
