@@ -11,10 +11,10 @@ crate-type = ["cdylib", "rlib"]
 console_error_panic_hook = { version = "0.1", optional = true }
 cfg-if = "1"
 http = { version = "1.0", default-features = false }
-leptos = { version = "0.6", default-features = false, features = ["nightly"] }
-leptos_meta = { version = "0.6", features = ["nightly"] }
-leptos_axum = { version = "0.6", optional = true }
-leptos_router = { version = "0.6", features = ["nightly"] }
+leptos = { version = "0.7.2", default-features = false, features = ["nightly"] }
+leptos_meta = { version = "0.7.2", features = ["nightly"] }
+leptos_axum = { version = "0.7.2", optional = true }
+leptos_router = { version = "0.7.2", features = ["nightly"] }
 wasm-bindgen = { version = "=0.2.96", default-features = false, optional = true }
 leptos_icons = { version = "0.3.0" }
 icondata = { version = "0.3.0" }
