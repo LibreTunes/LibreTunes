@@ -666,7 +666,7 @@ pub fn PlayBar() -> impl IntoView {
 
     view! {
         <audio node_ref=audio_ref on:play=on_play on:pause=on_pause
-            on:timeupdate=on_time_update on:ended=on_end type="audio/mpeg" />
+            on:timeupdate=on_time_update on:ended=on_end />
         <div class="playbar">
         <ProgressBar percentage=percentage.into() />
         <div class="playbar-left-group">
