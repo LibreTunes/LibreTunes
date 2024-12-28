@@ -12,7 +12,7 @@ pub fn DashboardRow(
 	#[prop(into)] title: TextProp,
 	#[prop(default=vec![])] tiles: Vec<DashboardTile>,
 ) -> impl IntoView {
-	let list_ref = create_node_ref::<Ul>();
+	let list_ref = NodeRef::<Ul>::new();
 
 	// Scroll functions attempt to align the left edge of the scroll area with the left edge of a tile
 	// This is done by scrolling to the nearest multiple of the tile width, plus some for padding

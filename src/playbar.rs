@@ -409,7 +409,7 @@ fn LikeDislike() -> impl IntoView {
 #[component]
 fn ProgressBar(percentage: MaybeSignal<f64>) -> impl IntoView {
     // Keep a reference to the progress bar div so we can get its width and calculate the time to skip to
-    let progress_bar_ref = create_node_ref::<Div>();
+    let progress_bar_ref = NodeRef::<Div>::new();
 
     let progress_jump = move |e: MouseEvent| {
         let x_click_pos = e.offset_x() as f64;
@@ -530,7 +530,7 @@ pub fn PlayBar() -> impl IntoView {
     });
 
     // Keep a reference to the audio element so we can set its source and play/pause it
-    let audio_ref = create_node_ref::<Audio>();
+    let audio_ref = NodeRef::<Audio>::new();
     status.update(|status| status.audio_player = Some(audio_ref));
 
     // Create signals for song time and progress
