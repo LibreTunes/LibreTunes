@@ -53,7 +53,7 @@ async fn main() {
     let auth_backend = AuthBackend;
     let auth_layer = AuthManagerLayerBuilder::new(auth_backend, session_layer).build();
 
-    let conf = get_configuration(None).await.unwrap();
+    let conf = get_configuration(None).unwrap();
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
     // Generate the list of routes in your Leptos App
