@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos::HtmlElement;
+use web_sys::HtmlAudioElement;
 use leptos::html::Audio;
 use std::collections::VecDeque;
 
@@ -39,7 +39,7 @@ impl PlayStatus {
 	/// 	let _ = audio.play();
 	/// }
 	/// ```
-	pub fn get_audio(&self) -> Option<HtmlElement<Audio>> {
+	pub fn get_audio(&self) -> Option<HtmlAudioElement> {
         if let Some(audio) = &self.audio_player {
             if let Some(audio) = audio.get() {
                 return Some(audio);
