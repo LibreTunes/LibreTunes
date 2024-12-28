@@ -83,7 +83,7 @@ pub fn DashboardRow(
 	view! {
 		<div class="dashboard-tile-row">
 			<div class="dashboard-tile-row-title-row">
-				<h2>{title}</h2>
+				<h2>{move || title.get()}</h2>
 				<div class="dashboard-tile-row-scroll-btn">
 					<button on:click=scroll_left tabindex=-1 style=scroll_left_hidden>
 						<Icon icon={icondata::FiChevronLeft} {..} class="dashboard-tile-row-scroll" />
@@ -98,11 +98,11 @@ pub fn DashboardRow(
 				view! {
 					<li>
 						<div class="dashboard-tile">
-							<a href={tile.link}>
-								<img src={tile.image_path} alt="dashboard-tile" />
-								<p class="dashboard-tile-title">{tile.title}</p>
+							<a href={move || tile.link.get()}>
+								<img src={move || tile.image_path.get()} alt="dashboard-tile" />
+								<p class="dashboard-tile-title">{move || tile.title.get()}</p>
 								<p class="dashboard-tile-description">
-									{tile.description}
+									{move || tile.description.as_ref().map(|desc| desc.get())}
 								</p>
 							</a>
 						</div>
