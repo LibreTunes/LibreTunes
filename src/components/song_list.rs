@@ -62,6 +62,7 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 
 	view! {
 		<table class="song-list">
+			<tbody>
 			{
 				songs_2.iter().enumerate().map(|(list_index, (song, extra))| {
 					let song_id = song.id;
@@ -79,6 +80,7 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 					}
 				}).collect::<Vec<_>>()
 			}
+			</tbody>
 		</table>
 	}
 }
