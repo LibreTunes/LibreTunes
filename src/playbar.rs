@@ -471,7 +471,7 @@ fn QueueToggle() -> impl IntoView {
 /// Renders the title of the page based on the currently playing song
 #[component]
 pub fn CustomTitle() -> impl IntoView {
-    let title = create_memo(move |_| {
+    let title = Memo::new(move |_| {
         GlobalState::play_status().with(|play_status| {
             play_status.queue.front().map_or("LibreTunes".to_string(), |song_data| {
                     format!("{} - {} | {}",song_data.title.clone(),Artist::display_list(&song_data.artists), "LibreTunes")
@@ -561,7 +561,7 @@ pub fn PlayBar() -> impl IntoView {
         });
     });
 
-    let current_song_id = create_memo(move |_| {
+    let current_song_id = Memo::new(move |_| {
         status.with(|status| {
             status.queue.front().map(|song| song.id)
         })
