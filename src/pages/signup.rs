@@ -9,11 +9,11 @@ use crate::components::loading::Loading;
 
 #[component]
 pub fn Signup() -> impl IntoView {
-    let (username, set_username) = create_signal("".to_string());
-    let (email, set_email) = create_signal("".to_string());
-    let (password, set_password) = create_signal("".to_string());
+    let (username, set_username) = signal("".to_string());
+    let (email, set_email) = signal("".to_string());
+    let (password, set_password) = signal("".to_string());
 
-    let (show_password, set_show_password) = create_signal(false);
+    let (show_password, set_show_password) = signal(false);
 
     let loading = RwSignal::new(false);
     let error_msg = RwSignal::new(None);

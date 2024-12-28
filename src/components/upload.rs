@@ -26,13 +26,13 @@ pub fn UploadBtn(dialog_open: RwSignal<bool>) -> impl IntoView {
 #[component]
 pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 	// Create signals for the artist input and the filtered artists
-	let (artists, set_artists) = create_signal("".to_string());
-	let (filtered_artists, set_filtered_artists)  = create_signal(vec![]);
+	let (artists, set_artists) = signal("".to_string());
+	let (filtered_artists, set_filtered_artists)  = signal(vec![]);
 
-	let (albums, set_albums) = create_signal("".to_string());
-	let (filtered_albums, set_filtered_albums) = create_signal(vec![]);
+	let (albums, set_albums) = signal("".to_string());
+	let (filtered_albums, set_filtered_albums) = signal(vec![]);
 
-	let (error_msg, set_error_msg) = create_signal::<Option<String>>(None);
+	let (error_msg, set_error_msg) = signal::<Option<String>>(None);
 
 	let close_dialog = move |ev: leptos::ev::MouseEvent| {
 		ev.prevent_default();

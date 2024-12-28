@@ -534,9 +534,9 @@ pub fn PlayBar() -> impl IntoView {
     status.update(|status| status.audio_player = Some(audio_ref));
 
     // Create signals for song time and progress
-    let (elapsed_secs, set_elapsed_secs) = create_signal(0);
-    let (total_secs, set_total_secs) = create_signal(0);
-    let (percentage, set_percentage) = create_signal(0.0);
+    let (elapsed_secs, set_elapsed_secs) = signal(0);
+    let (total_secs, set_total_secs) = signal(0);
+    let (percentage, set_percentage) = signal(0.0);
 
     audio_ref.on_load(move |audio| {
         log!("Audio element loaded");

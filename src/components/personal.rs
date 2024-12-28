@@ -16,7 +16,7 @@ pub fn Personal() -> impl IntoView {
 
 #[component]
 pub fn Profile() -> impl IntoView {
-    let (dropdown_open, set_dropdown_open) = create_signal(false);
+    let (dropdown_open, set_dropdown_open) = signal(false);
 	let user = GlobalState::logged_in_user();
     
 	let open_dropdown = move |_| {

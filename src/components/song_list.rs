@@ -33,7 +33,7 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 	let songs_2 = songs.clone();
 
 	// Signal that acts as a callback for a song list item to queue songs after it in the list
-	let (handle_queue_remaining, do_queue_remaining) = create_signal(None);
+	let (handle_queue_remaining, do_queue_remaining) = signal(None);
 	create_effect(move |_| {
 		let clicked_index = handle_queue_remaining.get();
 
