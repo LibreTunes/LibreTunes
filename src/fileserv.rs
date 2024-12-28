@@ -21,7 +21,7 @@ cfg_if! { if #[cfg(feature = "ssr")] {
         if res.status() == StatusCode::OK {
             res.into_response()
         } else {
-            let handler = leptos_axum::render_app_to_stream(options.to_owned(), App);
+            let handler = leptos_axum::render_app_to_stream(App);
             handler(req).await.into_response()
         }
     }
