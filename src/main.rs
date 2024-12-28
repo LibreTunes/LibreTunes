@@ -60,7 +60,10 @@ async fn main() {
     let routes = generate_route_list(App);
 
     let app = Router::new()
-        .leptos_routes(&leptos_options, routes, App)
+        .leptos_routes(&leptos_options, routes, {
+            let leptos_options = leptos_options.clone();
+            move || shell(leptos_options.clone())
+        })
         .route("/assets/audio/:song", get(|Path(song) : Path<String>| get_asset_file(song, AssetType::Audio)))
         .route("/assets/images/:image", get(|Path(image) : Path<String>| get_asset_file(image, AssetType::Image)))
         .route("/assets/*uri", get(|uri| get_static_file(uri, "")))
