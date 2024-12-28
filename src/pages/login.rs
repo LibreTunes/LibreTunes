@@ -49,7 +49,7 @@ pub fn Login() -> impl IntoView {
                 user.refetch();
             } else if let Ok(Some(login_user)) = login_result {
                 // Manually set the user to the new user, avoiding a refetch
-                user.set(Some(login_user));
+                user.set(Some(Some(login_user)));
 
                 // Redirect to the login page
                 log!("Logged in Successfully!");

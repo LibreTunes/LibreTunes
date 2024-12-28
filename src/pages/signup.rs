@@ -51,7 +51,7 @@ pub fn Signup() -> impl IntoView {
             } else {
                 // Manually set the user to the new user, avoiding a refetch
                 new_user.password = None;
-                user.set(Some(new_user));
+                user.set(Some(Some(new_user)));
 
                 // Redirect to the login page
                 log!("Signed up successfully!");
