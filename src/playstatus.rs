@@ -24,6 +24,7 @@ impl PlayStatus {
 	/// 
 	/// Instead of:
 	/// ```
+	/// use leptos::prelude::*;
 	/// let status = libretunes::playstatus::PlayStatus::default();
 	/// if let Some(audio) = status.audio_player {
 	/// 	if let Some(audio) = audio.get() {
