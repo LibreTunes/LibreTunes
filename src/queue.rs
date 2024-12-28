@@ -33,9 +33,9 @@ pub fn Queue() -> impl IntoView {
         e.prevent_default();
     };
 
-	let index_being_dragged = create_rw_signal(-1);
+	let index_being_dragged = RwSignal::new(-1);
 
-	let index_being_hovered = create_rw_signal(-1);
+	let index_being_hovered = RwSignal::new(-1);
 
 	let on_drag_start = move |_e: DragEvent, index: usize| {
 		// set the index of the item being dragged

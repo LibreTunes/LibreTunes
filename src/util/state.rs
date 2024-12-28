@@ -22,7 +22,7 @@ pub struct GlobalState {
 
 impl GlobalState {
     pub fn new() -> Self {
-        let play_status = create_rw_signal(PlayStatus::default());
+        let play_status = RwSignal::new(PlayStatus::default());
 
         let logged_in_user = Resource::new(|| (), |_| async {
             get_logged_in_user().await

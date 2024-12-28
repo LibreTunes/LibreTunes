@@ -17,7 +17,7 @@ pub fn AddArtistBtn(add_artist_open: RwSignal<bool>) -> impl IntoView {
 }
 #[component]
 pub fn AddArtist(open: RwSignal<bool>) -> impl IntoView {
-    let artist_name = create_rw_signal("".to_string());
+    let artist_name = RwSignal::new("".to_string());
 
     let close_dialog = move |ev: leptos::ev::MouseEvent| {
 		ev.prevent_default();

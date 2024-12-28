@@ -8,7 +8,7 @@ pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add
     use leptos_router::hooks::use_location;
     let location = use_location();
 
-    let dropdown_open = create_rw_signal(false);
+    let dropdown_open = RwSignal::new(false);
 
     let on_dashboard = Signal::derive(
         move || location.pathname.get().starts_with("/dashboard") || location.pathname.get() == "/",

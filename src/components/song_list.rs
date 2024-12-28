@@ -66,7 +66,7 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 			{
 				songs_2.iter().enumerate().map(|(list_index, (song, extra))| {
 					let song_id = song.id;
-					let playing = create_rw_signal(false);
+					let playing = RwSignal::new(false);
 
 					create_effect(move |_| {
 						GlobalState::play_status().with(|status| {
@@ -90,8 +90,8 @@ pub fn SongListItem<T>(song: SongData, song_playing: MaybeSignal<bool>, extra: O
 	list_index: usize, do_queue_remaining: WriteSignal<Option<usize>>) -> impl IntoView where
 	T: IntoView + 'static
 {
-	let liked = create_rw_signal(song.like_dislike.map(|(liked, _)| liked).unwrap_or(false));
-	let disliked = create_rw_signal(song.like_dislike.map(|(_, disliked)| disliked).unwrap_or(false));
+	let liked = RwSignal::new(song.like_dislike.map(|(liked, _)| liked).unwrap_or(false));
+	let disliked = RwSignal::new(song.like_dislike.map(|(_, disliked)| disliked).unwrap_or(false));
 	
 	view! {
 		<tr class="song-list-item">

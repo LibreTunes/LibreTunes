@@ -97,7 +97,7 @@ fn UserIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
 	});
 
 	// Show the details if the user is found
-	let show_details = create_rw_signal(false);
+	let show_details = RwSignal::new(false);
 
 	view!{ 
 		<Transition

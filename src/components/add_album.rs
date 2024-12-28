@@ -17,9 +17,9 @@ pub fn AddAlbumBtn(add_album_open: RwSignal<bool>) -> impl IntoView {
 }
 #[component]
 pub fn AddAlbum(open: RwSignal<bool>) -> impl IntoView {
-    let album_title = create_rw_signal("".to_string());
-    let release_date = create_rw_signal("".to_string());
-    let image_path = create_rw_signal("".to_string());
+    let album_title = RwSignal::new("".to_string());
+    let release_date = RwSignal::new("".to_string());
+    let image_path = RwSignal::new("".to_string());
 
     let close_dialog = move |ev: leptos::ev::MouseEvent| {
 		ev.prevent_default();

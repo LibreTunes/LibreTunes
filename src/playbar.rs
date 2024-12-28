@@ -568,7 +568,7 @@ pub fn PlayBar() -> impl IntoView {
     });
 
     // Track the last song that was added to the history to prevent duplicates
-    let last_history_song_id = create_rw_signal(None);
+    let last_history_song_id = RwSignal::new(None);
 
     let Pausable { 
         is_active: hist_timeout_pending,

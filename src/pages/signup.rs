@@ -15,8 +15,8 @@ pub fn Signup() -> impl IntoView {
 
     let (show_password, set_show_password) = create_signal(false);
 
-    let loading = create_rw_signal(false);
-    let error_msg = create_rw_signal(None);
+    let loading = RwSignal::new(false);
+    let error_msg = RwSignal::new(None);
 
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);

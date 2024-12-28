@@ -39,9 +39,9 @@ pub fn App() -> impl IntoView {
 
     provide_context(GlobalState::new());
 
-    let upload_open = create_rw_signal(false);
-    let add_artist_open = create_rw_signal(false);
-    let add_album_open = create_rw_signal(false);
+    let upload_open = RwSignal::new(false);
+    let add_artist_open = RwSignal::new(false);
+    let add_album_open = RwSignal::new(false);
 
     view! {
         // injects a stylesheet into the document <head>

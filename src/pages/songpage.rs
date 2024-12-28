@@ -91,10 +91,10 @@ fn SongDetails(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
 
 #[component]
 fn SongOverview(song: SongData) -> impl IntoView {
-    let liked = create_rw_signal(song.like_dislike.map(|ld| ld.0).unwrap_or(false));
-    let disliked = create_rw_signal(song.like_dislike.map(|ld| ld.1).unwrap_or(false));
+    let liked = RwSignal::new(song.like_dislike.map(|ld| ld.0).unwrap_or(false));
+    let disliked = RwSignal::new(song.like_dislike.map(|ld| ld.1).unwrap_or(false));
 
-    let playing = create_rw_signal(false);
+    let playing = RwSignal::new(false);
     let icon = Signal::derive(move || {
         if playing.get() {
             icondata::BsPauseFill

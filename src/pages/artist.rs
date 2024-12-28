@@ -51,7 +51,7 @@ fn ArtistIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
         get_artist_by_id(id)
     });
 
-    let show_details = create_rw_signal(false);
+    let show_details = RwSignal::new(false);
 
     view! {
         <Transition
