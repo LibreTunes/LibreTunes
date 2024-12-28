@@ -230,7 +230,7 @@ fn PlayControls() -> impl IntoView {
 
 /// The elapsed time and total time of the current song
 #[component]
-fn PlayDuration(elapsed_secs: MaybeSignal<i64>, total_secs: MaybeSignal<i64>) -> impl IntoView {
+fn PlayDuration(elapsed_secs: Signal<i64>, total_secs: Signal<i64>) -> impl IntoView {
     // Create a derived signal that formats the elapsed and total seconds into a string
     let play_duration = Signal::derive(move || {
         let elapsed_mins = (elapsed_secs.get() - elapsed_secs.get() % 60) / 60;
@@ -407,7 +407,7 @@ fn LikeDislike() -> impl IntoView {
 
 /// The play progress bar, and click handler for skipping to a certain time in the song
 #[component]
-fn ProgressBar(percentage: MaybeSignal<f64>) -> impl IntoView {
+fn ProgressBar(percentage: Signal<f64>) -> impl IntoView {
     // Keep a reference to the progress bar div so we can get its width and calculate the time to skip to
     let progress_bar_ref = NodeRef::<Div>::new();
 

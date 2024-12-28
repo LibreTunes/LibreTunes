@@ -85,7 +85,7 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 }
 
 #[component]
-pub fn SongListItem<T>(song: SongData, song_playing: MaybeSignal<bool>, extra: Option<T>,
+pub fn SongListItem<T>(song: SongData, song_playing: Signal<bool>, extra: Option<T>,
 	list_index: usize, do_queue_remaining: WriteSignal<Option<usize>>) -> impl IntoView where
 	T: IntoView + 'static
 {
@@ -115,7 +115,7 @@ pub fn SongListItem<T>(song: SongData, song_playing: MaybeSignal<bool>, extra: O
 /// Display the song's image, with an overlay if the song is playing
 /// When the song list item is hovered, the overlay will show the play button
 #[component]
-pub fn SongImage(image_path: String, song_playing: MaybeSignal<bool>, list_index: usize,
+pub fn SongImage(image_path: String, song_playing: Signal<bool>, list_index: usize,
 	do_queue_remaining: WriteSignal<Option<usize>>) -> impl IntoView
 {
 	let play_song = move |_| {
@@ -183,7 +183,7 @@ pub fn SongAlbum(album: Option<Album>) -> impl IntoView {
 #[component]
 pub fn SongLikeDislike(
 	#[prop(into)]
-	song_id: MaybeSignal<i32>,
+	song_id: Signal<i32>,
 	liked: RwSignal<bool>,
 	disliked: RwSignal<bool>) -> impl IntoView
 {

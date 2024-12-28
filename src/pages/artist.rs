@@ -46,7 +46,7 @@ pub fn ArtistPage() -> impl IntoView {
 }
 
 #[component]
-fn ArtistIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
+fn ArtistIdProfile(#[prop(into)] id: Signal<i32>) -> impl IntoView {
     let artist_info = Resource::new(move || id.get(), move |id| {
         get_artist_by_id(id)
     });
@@ -103,7 +103,7 @@ fn ArtistProfile(artist: Artist) -> impl IntoView {
 }
 
 #[component]
-fn TopSongsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
+fn TopSongsByArtist(#[prop(into)] artist_id: Signal<i32>) -> impl IntoView {
     let top_songs = Resource::new(move || artist_id.get(), |artist_id| async move {
         let top_songs = top_songs_by_artist(artist_id, Some(10)).await;
 
@@ -145,7 +145,7 @@ fn TopSongsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView 
 }
 
 #[component]
-fn AlbumsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
+fn AlbumsByArtist(#[prop(into)] artist_id: Signal<i32>) -> impl IntoView {
     use crate::components::dashboard_row::*;
 
     let albums = Resource::new(move || artist_id.get(), |artist_id| async move {
