@@ -25,11 +25,13 @@ pub fn SongListExtra<T>(songs: Vec<(SongData, T)>) -> impl IntoView where
 	__SongListInner(songs, true)
 }
 
+// TODO these arguments shouldn't need a leading underscore,
+// but for some reason the compiler thinks they are unused
 #[component]
-fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoView where
+fn SongListInner<T>(_songs: Vec<(SongData, T)>, _show_extra: bool) -> impl IntoView where
 	T: Clone + IntoView + 'static
 {
-	let songs = Rc::new(songs);
+	let songs = Rc::new(_songs);
 	let songs_2 = songs.clone();
 
 	// Signal that acts as a callback for a song list item to queue songs after it in the list
@@ -75,7 +77,7 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 
 					view! {
 						<SongListItem song={song.clone()} song_playing=playing.into()
-							extra={if show_extra { Some(extra.clone()) } else { None }} list_index do_queue_remaining/>
+							extra={if _show_extra { Some(extra.clone()) } else { None }} list_index do_queue_remaining/>
 					}
 				}).collect::<Vec<_>>()
 			}
