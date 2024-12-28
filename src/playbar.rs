@@ -210,7 +210,7 @@ fn PlayControls() -> impl IntoView {
     });
 
     view! {
-        <div class="playcontrols" align="center">
+        <div class="playcontrols" >
 
         <button on:click=skip_back on:mousedown=prevent_focus>
         <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipStartFill} {..} class="controlbtn" />
@@ -243,7 +243,7 @@ fn PlayDuration(elapsed_secs: MaybeSignal<i64>, total_secs: MaybeSignal<i64>) ->
     });
 
     view! {
-        <div class="playduration" align="right">
+        <div class="playduration" >
         {play_duration}
         </div>
     }
@@ -281,7 +281,7 @@ fn MediaInfo() -> impl IntoView {
 	});
 
     view! {
-        <img class="media-info-img" align="left" src={image}/>
+        <img class="media-info-img" src={image}/>
         <div class="media-info-text">
             {name}
             <br/>
