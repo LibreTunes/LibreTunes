@@ -93,7 +93,7 @@ pub fn DashboardRow(
 					</button>
 				</div>
 			</div>
-			<ul _ref={list_ref}>
+			<ul node_ref={list_ref}>
 			{tiles.into_iter().map(|tile| {
 				view! {
 					<li>
