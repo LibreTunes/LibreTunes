@@ -204,19 +204,19 @@ pub fn SongLikeDislike(
 		}
 	});
 
-	let like_class = MaybeProp::derive(move || {
+	let like_class = Signal::derive(move || {
 		if liked.get() {
-			Some(TextProp::from("controlbtn"))
+			"controlbtn"
 		} else {
-			Some(TextProp::from("controlbtn hide-until-hover"))
+			"controlbtn hide-until-hover"
 		}
 	});
 
-	let dislike_class = MaybeProp::derive(move || {
+	let dislike_class = Signal::derive(move || {
 		if disliked.get() {
-			Some(TextProp::from("controlbtn hmirror"))
+			"controlbtn hmirror"
 		} else {
-			Some(TextProp::from("controlbtn hmirror hide-until-hover"))
+			"controlbtn hmirror hide-until-hover"
 		}
 	});
 
