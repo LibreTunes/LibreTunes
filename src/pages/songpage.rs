@@ -103,7 +103,7 @@ fn SongOverview(song: SongData) -> impl IntoView {
         }
     });
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         GlobalState::play_status().with(|status| {
             playing.set(status.queue.front().map(|song| song.id) == Some(song.id) && status.playing);
         });

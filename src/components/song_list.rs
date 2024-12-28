@@ -34,7 +34,7 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 
 	// Signal that acts as a callback for a song list item to queue songs after it in the list
 	let (handle_queue_remaining, do_queue_remaining) = signal(None);
-	create_effect(move |_| {
+	Effect::new(move |_| {
 		let clicked_index = handle_queue_remaining.get();
 
 		if let Some(index) = clicked_index {
@@ -67,7 +67,7 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 					let song_id = song.id;
 					let playing = RwSignal::new(false);
 
-					create_effect(move |_| {
+					Effect::new(move |_| {
 						GlobalState::play_status().with(|status| {
 							playing.set(status.queue.front().map(|song| song.id) == Some(song_id) && status.playing);
 						});
