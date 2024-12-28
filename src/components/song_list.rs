@@ -5,7 +5,6 @@ use leptos::either::*;
 use leptos::logging::*;
 use leptos_icons::*;
 use leptos::task::spawn_local;
-use leptos::text_prop::TextProp;
 
 use crate::api::songs::*;
 use crate::songdata::SongData;
