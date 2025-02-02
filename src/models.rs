@@ -691,8 +691,8 @@ pub struct Song {
 	/// The path to the song's image file
 	pub image_path: Option<String>,
 	/// The date the song was added to the database
-	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDate))]
-	pub added_date: Option<NaiveDate>,
+	#[cfg_attr(feature = "ssr", diesel(deserialize_as = NaiveDateTime))]
+	pub added_date: Option<NaiveDateTime>,
 }
 
 impl Song {
