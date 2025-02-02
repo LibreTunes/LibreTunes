@@ -15,7 +15,7 @@ extern crate diesel_migrations;
 #[tokio::main]
 async fn main() {
     use axum::{routing::get, Router, extract::Path, middleware::from_fn};
-    use leptos::*;
+    use leptos::prelude::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use libretunes::app::*;
     use libretunes::util::require_auth::require_auth_middleware;
@@ -53,14 +53,17 @@ async fn main() {
     let auth_backend = AuthBackend;
     let auth_layer = AuthManagerLayerBuilder::new(auth_backend, session_layer).build();
 
-    let conf = get_configuration(None).await.unwrap();
+    let conf = get_configuration(None).unwrap();
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
     // Generate the list of routes in your Leptos App
     let routes = generate_route_list(App);
 
     let app = Router::new()
-        .leptos_routes(&leptos_options, routes, App)
+        .leptos_routes(&leptos_options, routes, {
+            let leptos_options = leptos_options.clone();
+            move || shell(leptos_options.clone())
+        })
         .route("/assets/audio/:song", get(|Path(song) : Path<String>| get_asset_file(song, AssetType::Audio)))
         .route("/assets/images/:image", get(|Path(image) : Path<String>| get_asset_file(image, AssetType::Image)))
         .route("/assets/*uri", get(|uri| get_static_file(uri, "")))

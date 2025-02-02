@@ -1,4 +1,5 @@
-use leptos::*;
+use leptos::prelude::*;
+use leptos::text_prop::TextProp;
 use leptos_icons::*;
 use std::fmt::Display;
 
@@ -14,10 +15,10 @@ pub fn ServerError<E: Display + 'static>(
 	view!{
 		<div class="error-container">
 			<div class="error-header">
-				<Icon icon=icondata::BiErrorSolid />
-				<h1>{title}</h1>
+				<Icon icon={icondata::BiErrorSolid} />
+				<h1>{move || title.get()}</h1>
 			</div>
-			<p>{message}</p>
+			<p>{move || message.get()}</p>
 			<p>{error.map(|error| format!("{}", error))}</p>
 		</div>
 	}
@@ -35,10 +36,10 @@ pub fn Error<E: Display + 'static>(
 	view! {
 		<div class="error-container">
 			<div class="error-header">
-				<Icon icon=icondata::BiErrorSolid />
-				<h1>{title}</h1>
+				<Icon icon={icondata::BiErrorSolid} />
+				<h1>{move || title.get()}</h1>
 			</div>
-			<p>{message}</p>
+			<p>{move || message.get()}</p>
 			<p>{error.map(|error| format!("{}", error))}</p>
 		</div>
 	}

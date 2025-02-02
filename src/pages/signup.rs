@@ -2,20 +2,21 @@ use crate::auth::signup;
 use crate::models::User;
 use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
+use leptos::task::spawn_local;
 use crate::components::loading::Loading;
 
 #[component]
 pub fn Signup() -> impl IntoView {
-    let (username, set_username) = create_signal("".to_string());
-    let (email, set_email) = create_signal("".to_string());
-    let (password, set_password) = create_signal("".to_string());
+    let (username, set_username) = signal("".to_string());
+    let (email, set_email) = signal("".to_string());
+    let (password, set_password) = signal("".to_string());
 
-    let (show_password, set_show_password) = create_signal(false);
+    let (show_password, set_show_password) = signal(false);
 
-    let loading = create_rw_signal(false);
-    let error_msg = create_rw_signal(None);
+    let loading = RwSignal::new(false);
+    let error_msg = RwSignal::new(None);
 
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);
@@ -50,11 +51,11 @@ pub fn Signup() -> impl IntoView {
             } else {
                 // Manually set the user to the new user, avoiding a refetch
                 new_user.password = None;
-                user.set(Some(new_user));
+                user.set(Some(Some(new_user)));
 
                 // Redirect to the login page
                 log!("Signed up successfully!");
-                leptos_router::use_navigate()("/", Default::default());
+                leptos_router::hooks::use_navigate()("/", Default::default());
                 log!("Navigated to home page after signup")
             }
 
@@ -65,7 +66,7 @@ pub fn Signup() -> impl IntoView {
     view! {
         <div class="auth-page-container">
             <div class="signup-container">
-                <a class="return" href="/"><Icon icon=icondata::IoReturnUpBackSharp /></a>
+                <a class="return" href="/"><Icon icon={icondata::IoReturnUpBackSharp} /></a>
                 <div class="header">
                     <h1>LibreTunes</h1>
                 </div>
@@ -102,10 +103,10 @@ pub fn Signup() -> impl IntoView {
                         <i></i>
                         <Show
                             when=move || {show_password() == false}
-                            fallback=move || view!{ <button on:click=toggle_password class="password-visibility"> <Icon icon=icondata::AiEyeInvisibleFilled /></button> /> }
+                            fallback=move || view!{ <button on:click=toggle_password class="password-visibility"> <Icon icon={icondata::AiEyeInvisibleFilled} /></button> /> }
                         >
                             <button on:click=toggle_password class="password-visibility">
-                                <Icon icon=icondata::AiEyeFilled />
+                                <Icon icon={icondata::AiEyeFilled} />
                             </button>
                         </Show>
                     </div>

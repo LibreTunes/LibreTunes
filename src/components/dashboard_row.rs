@@ -1,6 +1,7 @@
 use leptos::html::Ul;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
+use leptos::text_prop::TextProp;
 use leptos_use::{use_element_size, UseElementSizeReturn, use_scroll, UseScrollReturn};
 use crate::components::dashboard_tile::*;
 use leptos_icons::*;
@@ -11,7 +12,7 @@ pub fn DashboardRow(
 	#[prop(into)] title: TextProp,
 	#[prop(default=vec![])] tiles: Vec<DashboardTile>,
 ) -> impl IntoView {
-	let list_ref = create_node_ref::<Ul>();
+	let list_ref = NodeRef::<Ul>::new();
 
 	// Scroll functions attempt to align the left edge of the scroll area with the left edge of a tile
 	// This is done by scrolling to the nearest multiple of the tile width, plus some for padding
@@ -82,26 +83,26 @@ pub fn DashboardRow(
 	view! {
 		<div class="dashboard-tile-row">
 			<div class="dashboard-tile-row-title-row">
-				<h2>{title}</h2>
+				<h2>{move || title.get()}</h2>
 				<div class="dashboard-tile-row-scroll-btn">
 					<button on:click=scroll_left tabindex=-1 style=scroll_left_hidden>
-						<Icon class="dashboard-tile-row-scroll" icon=icondata::FiChevronLeft />
+						<Icon icon={icondata::FiChevronLeft} {..} class="dashboard-tile-row-scroll" />
 					</button>
 					<button on:click=scroll_right tabindex=-1 style=scroll_right_hidden>
-						<Icon class="dashboard-tile-row-scroll" icon=icondata::FiChevronRight />
+						<Icon icon={icondata::FiChevronRight} {..} class="dashboard-tile-row-scroll" />
 					</button>
 				</div>
 			</div>
-			<ul _ref={list_ref}>
+			<ul node_ref={list_ref}>
 			{tiles.into_iter().map(|tile| {
 				view! {
 					<li>
 						<div class="dashboard-tile">
-							<a href={tile.link}>
-								<img src={tile.image_path} alt="dashboard-tile" />
-								<p class="dashboard-tile-title">{tile.title}</p>
+							<a href={move || tile.link.get()}>
+								<img src={move || tile.image_path.get()} alt="dashboard-tile" />
+								<p class="dashboard-tile-title">{move || tile.title.get()}</p>
 								<p class="dashboard-tile-description">
-									{tile.description}
+									{move || tile.description.as_ref().map(|desc| desc.get())}
 								</p>
 							</a>
 						</div>

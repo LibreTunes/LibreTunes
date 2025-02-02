@@ -6,9 +6,10 @@ use leptos::ev::MouseEvent;
 use leptos::html::{Audio, Div};
 use leptos::leptos_dom::*;
 use leptos_meta::Title;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use leptos_use::{utils::Pausable, use_interval_fn};
+use leptos::task::spawn_local;
 
 /// Width and height of the forward/backward skip buttons
 const SKIP_BTN_SIZE: &str = "3.5em";
@@ -209,18 +210,18 @@ fn PlayControls() -> impl IntoView {
     });
 
     view! {
-        <div class="playcontrols" align="center">
+        <div class="playcontrols" >
 
         <button on:click=skip_back on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=icondata::BsSkipStartFill />
+        <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipStartFill} {..} class="controlbtn" />
         </button>
 
         <button on:click=toggle_play on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon={icon} />
+        <Icon width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon={icon} {..} class="controlbtn" />
         </button>
 
         <button on:click=skip_forward on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=icondata::BsSkipEndFill />
+        <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipEndFill} {..} class="controlbtn" />
         </button>
 
         </div>
@@ -229,7 +230,7 @@ fn PlayControls() -> impl IntoView {
 
 /// The elapsed time and total time of the current song
 #[component]
-fn PlayDuration(elapsed_secs: MaybeSignal<i64>, total_secs: MaybeSignal<i64>) -> impl IntoView {
+fn PlayDuration(elapsed_secs: Signal<i64>, total_secs: Signal<i64>) -> impl IntoView {
     // Create a derived signal that formats the elapsed and total seconds into a string
     let play_duration = Signal::derive(move || {
         let elapsed_mins = (elapsed_secs.get() - elapsed_secs.get() % 60) / 60;
@@ -242,7 +243,7 @@ fn PlayDuration(elapsed_secs: MaybeSignal<i64>, total_secs: MaybeSignal<i64>) ->
     });
 
     view! {
-        <div class="playduration" align="right">
+        <div class="playduration" >
         {play_duration}
         </div>
     }
@@ -280,7 +281,7 @@ fn MediaInfo() -> impl IntoView {
 	});
 
     view! {
-        <img class="media-info-img" align="left" src={image}/>
+        <img class="media-info-img" src={image}/>
         <div class="media-info-text">
             {name}
             <br/>
@@ -395,10 +396,10 @@ fn LikeDislike() -> impl IntoView {
     view! {
         <div class="like-dislike">
             <button on:click=toggle_dislike>
-                <Icon class="controlbtn hmirror" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=dislike_icon />
+                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={dislike_icon} {..} class="controlbtn hmirror" />
             </button>
             <button on:click=toggle_like>
-                <Icon class="controlbtn" width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon=like_icon />
+                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={like_icon} {..} class="controlbtn" />
             </button>
         </div>
     }
@@ -406,9 +407,9 @@ fn LikeDislike() -> impl IntoView {
 
 /// The play progress bar, and click handler for skipping to a certain time in the song
 #[component]
-fn ProgressBar(percentage: MaybeSignal<f64>) -> impl IntoView {
+fn ProgressBar(percentage: Signal<f64>) -> impl IntoView {
     // Keep a reference to the progress bar div so we can get its width and calculate the time to skip to
-    let progress_bar_ref = create_node_ref::<Div>();
+    let progress_bar_ref = NodeRef::<Div>::new();
 
     let progress_jump = move |e: MouseEvent| {
         let x_click_pos = e.offset_x() as f64;
@@ -434,7 +435,7 @@ fn ProgressBar(percentage: MaybeSignal<f64>) -> impl IntoView {
     let bar_width_style = Signal::derive(move || format!("width: {}%;", percentage.get()));
 
     view! {
-        <div class="invisible-media-progress" _ref=progress_bar_ref on:click=progress_jump> // Larger click area
+        <div class="invisible-media-progress" node_ref=progress_bar_ref on:click=progress_jump> // Larger click area
         <div class="media-progress"> // "Unfilled" progress bar
         <div class="media-progress-solid" style=bar_width_style> // "Filled" progress bar
 		</div>
@@ -461,7 +462,7 @@ fn QueueToggle() -> impl IntoView {
     view! {
         <div class="queue-toggle">
         <button on:click=update_queue on:mousedown=prevent_focus>
-        <Icon class="controlbtn" width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon=icondata::RiPlayListMediaFill />
+        <Icon width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon={icondata::RiPlayListMediaFill} {..} class="controlbtn" />
         </button>
         </div>
     }
@@ -470,7 +471,7 @@ fn QueueToggle() -> impl IntoView {
 /// Renders the title of the page based on the currently playing song
 #[component]
 pub fn CustomTitle() -> impl IntoView {
-    let title = create_memo(move |_| {
+    let title = Memo::new(move |_| {
         GlobalState::play_status().with(|play_status| {
             play_status.queue.front().map_or("LibreTunes".to_string(), |song_data| {
                     format!("{} - {} | {}",song_data.title.clone(),Artist::display_list(&song_data.artists), "LibreTunes")
@@ -488,7 +489,7 @@ pub fn PlayBar() -> impl IntoView {
     let status = GlobalState::play_status();
 
     // Listen for key down events -- arrow keys don't seem to trigger key press events
-    let _arrow_key_handle = window_event_listener(ev::keydown, move |e: ev::KeyboardEvent| {
+    let _arrow_key_handle = window_event_listener(leptos::ev::keydown, move |e: leptos::ev::KeyboardEvent| {
         if e.key() == "ArrowRight" {
             e.prevent_default();
             log!("Right arrow key pressed, skipping forward by {} seconds", ARROW_KEY_SKIP_TIME);
@@ -518,7 +519,7 @@ pub fn PlayBar() -> impl IntoView {
     });
 
     // Listen for space bar presses to play/pause
-    let _space_bar_handle = window_event_listener(ev::keypress, move |e: ev::KeyboardEvent| {
+    let _space_bar_handle = window_event_listener(leptos::ev::keypress, move |e: leptos::ev::KeyboardEvent| {
         if e.key() == " " {
             e.prevent_default();
             log!("Space bar pressed, toggling play/pause");
@@ -529,13 +530,13 @@ pub fn PlayBar() -> impl IntoView {
     });
 
     // Keep a reference to the audio element so we can set its source and play/pause it
-    let audio_ref = create_node_ref::<Audio>();
+    let audio_ref = NodeRef::<Audio>::new();
     status.update(|status| status.audio_player = Some(audio_ref));
 
     // Create signals for song time and progress
-    let (elapsed_secs, set_elapsed_secs) = create_signal(0);
-    let (total_secs, set_total_secs) = create_signal(0);
-    let (percentage, set_percentage) = create_signal(0.0);
+    let (elapsed_secs, set_elapsed_secs) = signal(0);
+    let (total_secs, set_total_secs) = signal(0);
+    let (percentage, set_percentage) = signal(0.0);
 
     audio_ref.on_load(move |audio| {
         log!("Audio element loaded");
@@ -560,14 +561,14 @@ pub fn PlayBar() -> impl IntoView {
         });
     });
 
-    let current_song_id = create_memo(move |_| {
+    let current_song_id = Memo::new(move |_| {
         status.with(|status| {
             status.queue.front().map(|song| song.id)
         })
     });
 
     // Track the last song that was added to the history to prevent duplicates
-    let last_history_song_id = create_rw_signal(None);
+    let last_history_song_id = RwSignal::new(None);
 
     let Pausable { 
         is_active: hist_timeout_pending,
@@ -664,8 +665,8 @@ pub fn PlayBar() -> impl IntoView {
     };
 
     view! {
-        <audio _ref=audio_ref on:play=on_play on:pause=on_pause
-            on:timeupdate=on_time_update on:ended=on_end type="audio/mpeg" />
+        <audio node_ref=audio_ref on:play=on_play on:pause=on_pause
+            on:timeupdate=on_time_update on:ended=on_end />
         <div class="playbar">
         <ProgressBar percentage=percentage.into() />
         <div class="playbar-left-group">

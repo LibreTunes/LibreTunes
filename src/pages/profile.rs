@@ -1,5 +1,6 @@
-use leptos::*;
-use leptos_router::use_params_map;
+use leptos::prelude::*;
+use leptos::either::*;
+use leptos_router::hooks::use_params_map;
 use leptos_icons::*;
 use server_fn::error::NoCustomError;
 
@@ -37,20 +38,20 @@ pub fn Profile() -> impl IntoView {
 				match params.get("id").map(|id| id.parse::<i32>()) {
 					None => {
 						// No id specified, show the current user's profile
-						view! { <OwnProfile /> }.into_view()
+						EitherOf3::A(view! { <OwnProfile /> })
 					},
 					Some(Ok(id)) => {
 						// Id specified, get the user and show their profile
-						view! { <UserIdProfile id /> }.into_view()
+						EitherOf3::B(view! { <UserIdProfile id /> })
 					},
 					Some(Err(e)) => {
 						// Invalid id, return an error
-						view! {
+						EitherOf3::C(view! {
 							<Error<String>
 								title="Invalid User ID"
 								error=e.to_string()
 							/>
-						}.into_view()
+						})
 					}
 				}
 			})}
@@ -69,19 +70,19 @@ fn OwnProfile() -> impl IntoView {
 				match user {
 					Some(user) => {
 						let user_id = user.id.unwrap();
-						view! {
+						Either::Left(view! {
 								<UserProfile user />
 								<TopSongs user_id={user_id} />
 								<RecentSongs user_id={user_id} />
 								<TopArtists user_id={user_id} />
-						}.into_view()
+						})
 					},
-					None => view! {
+					None => Either::Right(view! {
 						<Error<String>
 							title="Not Logged In"
 							message="You must be logged in to view your profile"
 						/>
-					}.into_view(),
+					}),
 				}
 			})}
 		</Transition>
@@ -90,13 +91,13 @@ fn OwnProfile() -> impl IntoView {
 
 /// Show a user's profile by ID
 #[component]
-fn UserIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-	let user_info = create_resource(move || id.get(), move |id| {
+fn UserIdProfile(#[prop(into)] id: Signal<i32>) -> impl IntoView {
+	let user_info = Resource::new(move || id.get(), move |id| {
 		get_user_by_id(id)
 	});
 
 	// Show the details if the user is found
-	let show_details = create_rw_signal(false);
+	let show_details = RwSignal::new(false);
 
 	view!{ 
 		<Transition
@@ -107,27 +108,27 @@ fn UserIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
 					Ok(Some(user)) => {
 						show_details.set(true);
 
-						view! { <UserProfile user /> }.into_view()
+						EitherOf3::A(view! { <UserProfile user /> })
 					},
 					Ok(None) => {
 						show_details.set(false);
 
-						view! {
+						EitherOf3::B(view! {
 							<Error<String>
 								title="User Not Found"
 								message=format!("User with ID {} not found", id.get())
 							/>
-						}.into_view()
+						})
 					},
 					Err(error) => {
 						show_details.set(false);
 
-						view! {
+						EitherOf3::C(view! {
 							<ServerError<NoCustomError>
 								title="Error Getting User"
 								error
 							/>
-						}.into_view()
+						})
 					}
 				}
 			})}
@@ -149,7 +150,7 @@ fn UserProfile(user: User) -> impl IntoView {
 	view! {
 		<div class="profile-header">
 			<object class="profile-image" data={profile_image_path.clone()} type="image/webp">
-				<Icon class="profile-image" icon=icondata::CgProfile width="75" height="75"/>
+				<Icon icon={icondata::CgProfile} width="75" height="75" {..} class="profile-image" />
 			</object>
 			<h1>{user.username}</h1>
 		</div>
@@ -175,8 +176,8 @@ fn UserProfile(user: User) -> impl IntoView {
 
 /// Show a list of top songs for a user
 #[component]
-fn TopSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
-	let top_songs = create_resource(move || user_id.get(), |user_id| async move {
+fn TopSongs(#[prop(into)] user_id: Signal<i32>) -> impl IntoView {
+	let top_songs = Resource::new(move || user_id.get(), |user_id| async move {
 		use chrono::{Local, Duration};
 		let now = Local::now();
 		let start = now - Duration::seconds(HISTORY_SECS);
@@ -225,8 +226,8 @@ fn TopSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 
 /// Show a list of recently played songs for a user
 #[component]
-fn RecentSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
-	let recent_songs = create_resource(move || user_id.get(), |user_id| async move {
+fn RecentSongs(#[prop(into)] user_id: Signal<i32>) -> impl IntoView {
+	let recent_songs = Resource::new(move || user_id.get(), |user_id| async move {
 		let recent_songs = recent_songs(user_id, Some(RECENT_SONGS_COUNT)).await;
 
 		recent_songs.map(|recent_songs| {
@@ -266,8 +267,8 @@ fn RecentSongs(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
 
 /// Show a list of top artists for a user
 #[component]
-fn TopArtists(#[prop(into)] user_id: MaybeSignal<i32>) -> impl IntoView {
-	let top_artists = create_resource(move || user_id.get(), |user_id| async move {
+fn TopArtists(#[prop(into)] user_id: Signal<i32>) -> impl IntoView {
+	let top_artists = Resource::new(move || user_id.get(), |user_id| async move {
 		use chrono::{Local, Duration};
 
 		let now = Local::now();

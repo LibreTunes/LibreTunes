@@ -1,6 +1,7 @@
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
+use leptos::task::spawn_local;
 use crate::auth::logout;
 use crate::util::state::GlobalState;
 
@@ -15,7 +16,7 @@ pub fn Personal() -> impl IntoView {
 
 #[component]
 pub fn Profile() -> impl IntoView {
-    let (dropdown_open, set_dropdown_open) = create_signal(false);
+    let (dropdown_open, set_dropdown_open) = signal(false);
 	let user = GlobalState::logged_in_user();
     
 	let open_dropdown = move |_| {
@@ -52,13 +53,13 @@ pub fn Profile() -> impl IntoView {
                 </Suspense>
             </div>
             <div class="profile-icon" on:click=open_dropdown>
-				<Suspense fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }>
+				<Suspense fallback=|| view! { <Icon icon={icondata::CgProfile} width="45" height="45"/> }>
 					<Show 
 						when=move || user.get().map(|user| user.is_some()).unwrap_or(false)
-						fallback=|| view! { <Icon icon=icondata::CgProfile width="45" height="45"/> }
+						fallback=|| view! { <Icon icon={icondata::CgProfile} width="45" height="45"/> }
 					>
 						<object class="profile-image" data={user_profile_picture} type="image/webp">
-							<Icon class="profile-image" icon=icondata::CgProfile width="45" height="45"/>
+							<Icon icon={icondata::CgProfile} width="45" height="45" {..} class="profile-image" />
 						</object>
 					</Show>
 				</Suspense>

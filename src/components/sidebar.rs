@@ -1,14 +1,13 @@
-use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use crate::components::upload_dropdown::*;
 
 #[component]
 pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add_album_open: RwSignal<bool>) -> impl IntoView {
-    use leptos_router::use_location;
+    use leptos_router::hooks::use_location;
     let location = use_location();
 
-    let dropdown_open = create_rw_signal(false);
+    let dropdown_open = RwSignal::new(false);
 
     let on_dashboard = Signal::derive(
         move || location.pathname.get().starts_with("/dashboard") || location.pathname.get() == "/",
@@ -42,11 +41,11 @@ pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add
                     </Show>
                 </div>
                 <a class="buttons" href="/dashboard" style={move || if on_dashboard() {"color: #e1e3e1"} else {""}} >
-                    <Icon icon=icondata::OcHomeFillLg />
+                    <Icon icon={icondata::OcHomeFillLg} />
                     <h1>Dashboard</h1>
                 </a>
                 <a class="buttons" href="/search" style={move || if on_search() {"color: #e1e3e1"} else {""}}>
-                    <Icon icon=icondata::BiSearchRegular />
+                    <Icon icon={icondata::BiSearchRegular} />
                     <h1>Search</h1>
                 </a>
             </div>
@@ -64,7 +63,7 @@ pub fn Bottom() -> impl IntoView {
                 <h1 class="header">Playlists</h1>
                 <button class="add-playlist">
                     <div class="add-sign">
-                        <Icon icon=icondata::IoAddSharp />
+                        <Icon icon={icondata::IoAddSharp} />
                     </div>
                     New Playlist
                 </button>

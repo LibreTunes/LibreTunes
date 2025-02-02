@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use crate::components::upload::*;
 use crate::components::add_artist::*;
@@ -12,7 +12,7 @@ pub fn UploadDropdownBtn(dropdown_open: RwSignal<bool>) -> impl IntoView {
     view! {
         <button class={move || if dropdown_open() {"upload-dropdown-btn upload-dropdown-btn-active"} else {"upload-dropdown-btn"}} on:click=open_dropdown>
 			<div class="add-sign">
-				<Icon icon=icondata::IoAddSharp />
+				<Icon icon={icondata::IoAddSharp} />
 			</div>
 		</button>
     }

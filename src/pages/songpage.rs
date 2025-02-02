@@ -1,5 +1,6 @@
-use leptos::*;
-use leptos_router::use_params_map;
+use leptos::prelude::*;
+use leptos::either::*;
+use leptos_router::hooks::use_params_map;
 use leptos_icons::*;
 use server_fn::error::NoCustomError;
 
@@ -25,23 +26,23 @@ pub fn SongPage() -> impl IntoView {
             {move || params.with(|params| {
                 match params.get("id").map(|id| id.parse::<i32>()) {
                     Some(Ok(id)) => {
-                        view! { <SongDetails id /> }.into_view()
+                        Either::Left(view! { <SongDetails id /> })
                     },
                     Some(Err(e)) => {
-                        view! {
+                        Either::Right(view! {
                             <Error<String>
                                 title="Invalid Song ID"
                                 error=e.to_string()
                             />
-                        }.into_view()
+                        })
                     },
                     None => {
-                        view! {
+                        Either::Right(view! {
                             <Error<String>
                                 title="No Song ID"
                                 message="You must specify a song ID to view its page."
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}
@@ -50,8 +51,8 @@ pub fn SongPage() -> impl IntoView {
 }
 
 #[component]
-fn SongDetails(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-    let song_info = create_resource(move || id.get(), move |id| {
+fn SongDetails(#[prop(into)] id: Signal<i32>) -> impl IntoView {
+    let song_info = Resource::new(move || id.get(), move |id| {
         get_song_by_id(id)
     });
 
@@ -62,23 +63,23 @@ fn SongDetails(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
             {move || song_info.get().map(|song| {
                 match song {
                     Ok(Some(song)) => {
-                        view! { <SongOverview song /> }.into_view()
+                        EitherOf3::A(view! { <SongOverview song /> })
                     },
                     Ok(None) => {
-                        view! {
+                        EitherOf3::B(view! {
                             <Error<String>
                                 title="Song Not Found"
                                 message=format!("Song with ID {} not found", id.get())
                             />
-                        }.into_view()
+                        })
                     },
                     Err(error) => {
-                        view! {
+                        EitherOf3::C(view! {
                             <ServerError<NoCustomError>
                                 title="Error Fetching Song"
                                 error
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}
@@ -90,10 +91,10 @@ fn SongDetails(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
 
 #[component]
 fn SongOverview(song: SongData) -> impl IntoView {
-    let liked = create_rw_signal(song.like_dislike.map(|ld| ld.0).unwrap_or(false));
-    let disliked = create_rw_signal(song.like_dislike.map(|ld| ld.1).unwrap_or(false));
+    let liked = RwSignal::new(song.like_dislike.map(|ld| ld.0).unwrap_or(false));
+    let disliked = RwSignal::new(song.like_dislike.map(|ld| ld.1).unwrap_or(false));
 
-    let playing = create_rw_signal(false);
+    let playing = RwSignal::new(false);
     let icon = Signal::derive(move || {
         if playing.get() {
             icondata::BsPauseFill
@@ -102,7 +103,7 @@ fn SongOverview(song: SongData) -> impl IntoView {
         }
     });
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         GlobalState::play_status().with(|status| {
             playing.set(status.queue.front().map(|song| song.id) == Some(song.id) && status.playing);
         });
@@ -133,7 +134,7 @@ fn SongOverview(song: SongData) -> impl IntoView {
         </div>
         <div class="song-actions">
             <button on:click=toggle_play_song>
-                <Icon class="controlbtn" width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon />
+                <Icon width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon {..} class="controlbtn" />
             </button>
             <SongLikeDislike song_id=song.id liked disliked /><br/>
         </div>
@@ -144,8 +145,8 @@ fn SongOverview(song: SongData) -> impl IntoView {
 }
 
 #[component]
-fn SongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-    let plays = create_resource(move || id.get(), move |id| songs::get_song_plays(id));
+fn SongPlays(#[prop(into)] id: Signal<i32>) -> impl IntoView {
+    let plays = Resource::new(move || id.get(), move |id| songs::get_song_plays(id));
 
     view! {
         <Transition
@@ -154,17 +155,17 @@ fn SongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
             {move || plays.get().map(|plays| {
                 match plays {
                     Ok(plays) => {
-                        view! {
+                        Either::Left(view! {
                             <p>{format!("Plays: {}", plays)}</p>
-                        }.into_view()
+                        })
                     },
                     Err(error) => {
-                        view! {
+                        Either::Right(view! {
                             <ServerError<NoCustomError>
                                 title="Error fetching song plays"
                                 error
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}
@@ -173,8 +174,8 @@ fn SongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
 }
 
 #[component]
-fn MySongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-    let plays = create_resource(move || id.get(), move |id| songs::get_my_song_plays(id));
+fn MySongPlays(#[prop(into)] id: Signal<i32>) -> impl IntoView {
+    let plays = Resource::new(move || id.get(), move |id| songs::get_my_song_plays(id));
 
     view! {
         <Transition
@@ -183,17 +184,17 @@ fn MySongPlays(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
             {move || plays.get().map(|plays| {
                 match plays {
                     Ok(plays) => {
-                        view! {
+                        Either::Left(view! {
                             <p>{format!("My Plays: {}", plays)}</p>
-                        }.into_view()
+                        })
                     },
                     Err(error) => {
-                        view! {
+                        Either::Right(view! {
                             <ServerError<NoCustomError>
                                 title="Error fetching my song plays"
                                 error
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}

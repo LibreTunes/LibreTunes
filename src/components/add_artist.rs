@@ -1,6 +1,7 @@
-use leptos::*;
+use leptos::prelude::*;
 use leptos::leptos_dom::log;
 use leptos_icons::*;
+use leptos::task::spawn_local;
 use crate::api::artists::add_artist;
 
 #[component]
@@ -16,7 +17,7 @@ pub fn AddArtistBtn(add_artist_open: RwSignal<bool>) -> impl IntoView {
 }
 #[component]
 pub fn AddArtist(open: RwSignal<bool>) -> impl IntoView {
-    let artist_name = create_rw_signal("".to_string());
+    let artist_name = RwSignal::new("".to_string());
 
     let close_dialog = move |ev: leptos::ev::MouseEvent| {
 		ev.prevent_default();
@@ -42,7 +43,7 @@ pub fn AddArtist(open: RwSignal<bool>) -> impl IntoView {
                 <div class="upload-header">
                     <h1>Add Artist</h1>
                 </div>
-                <div class="close-button" on:click=close_dialog><Icon icon=icondata::IoClose /></div>
+                <div class="close-button" on:click=close_dialog><Icon icon={icondata::IoClose} /></div>
                 <form class="create-artist-form" action="POST" on:submit=on_add_artist>
                     <div class="input-bx">
                         <input type="text" name="title" required class="text-input" 
@@ -50,7 +51,6 @@ pub fn AddArtist(open: RwSignal<bool>) -> impl IntoView {
                             on:input=move |ev: leptos::ev::Event| {
                                 artist_name.set(event_target_value(&ev));
                             }        
-                            required 
                          />
                         <span>Artist Name</span>
                     </div>

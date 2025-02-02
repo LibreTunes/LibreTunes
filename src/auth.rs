@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 
 use cfg_if::cfg_if;
 
@@ -110,7 +110,7 @@ pub async fn check_auth() -> Result<bool, ServerFnError> {
 /// Returns a Result with the error message if the user is not logged in
 /// Intended to be used at the start of a protected route, to ensure the user is logged in:
 /// ```rust
-/// use leptos::*;
+/// use leptos::prelude::*;
 /// use libretunes::auth::require_auth;
 /// #[server(endpoint = "protected_route")]
 /// pub async fn protected_route() -> Result<(), ServerFnError> {
@@ -135,7 +135,7 @@ pub async fn require_auth() -> Result<(), ServerFnError> {
 /// Returns an error if the user is not logged in, or if there is an error getting the user
 /// Intended to be used in a route to get the current user:
 /// ```rust
-/// use leptos::*;
+/// use leptos::prelude::*;
 /// use libretunes::auth::get_user;
 /// #[server(endpoint = "user_route")]
 /// pub async fn user_route() -> Result<(), ServerFnError> {
@@ -180,7 +180,7 @@ pub async fn check_admin() -> Result<bool, ServerFnError> {
 /// Returns a Result with the error message if the user is not logged in or is not an admin
 /// Intended to be used at the start of a protected route, to ensure the user is logged in and an admin:
 /// ```rust
-/// use leptos::*;
+/// use leptos::prelude::*;
 /// use libretunes::auth::require_admin;
 /// #[server(endpoint = "protected_admin_route")]
 /// pub async fn protected_admin_route() -> Result<(), ServerFnError> {

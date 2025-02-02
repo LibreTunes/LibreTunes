@@ -1,9 +1,10 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
-use leptos_router::Form;
+use leptos_router::components::Form;
 use web_sys::Response;
+use leptos::task::spawn_local;
 use crate::search::search_artists;
 use crate::search::search_albums;
 use crate::models::Artist;
@@ -25,13 +26,13 @@ pub fn UploadBtn(dialog_open: RwSignal<bool>) -> impl IntoView {
 #[component]
 pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 	// Create signals for the artist input and the filtered artists
-	let (artists, set_artists) = create_signal("".to_string());
-	let (filtered_artists, set_filtered_artists)  = create_signal(vec![]);
+	let (artists, set_artists) = signal("".to_string());
+	let (filtered_artists, set_filtered_artists)  = signal(vec![]);
 
-	let (albums, set_albums) = create_signal("".to_string());
-	let (filtered_albums, set_filtered_albums) = create_signal(vec![]);
+	let (albums, set_albums) = signal("".to_string());
+	let (filtered_albums, set_filtered_albums) = signal(vec![]);
 
-	let (error_msg, set_error_msg) = create_signal::<Option<String>>(None);
+	let (error_msg, set_error_msg) = signal::<Option<String>>(None);
 
 	let close_dialog = move |ev: leptos::ev::MouseEvent| {
 		ev.prevent_default();
@@ -83,7 +84,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 		})
 	};
 
-	let handle_response = Rc::new(move |response: &Response| {
+	let handle_response = Arc::new(move |response: &Response| {
 		if response.ok() {
 			set_error_msg.update(|value| *value = None);
 			set_filtered_artists.update(|value| *value = vec![]);
@@ -99,13 +100,13 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 
 	view! {
 		<Show when=open fallback=move || view! {}>
-			<div class="upload-container" open=open>
-				<div class="close-button" on:click=close_dialog><Icon icon=icondata::IoClose /></div>
+			<dialog class="upload-container" open=open>
+				<div class="close-button" on:click=close_dialog><Icon icon={icondata::IoClose} /></div>
 				<div class="upload-header">
 					<h1>Upload Song</h1>
 				</div>
 				<Form action="/api/upload" method="POST" enctype=String::from("multipart/form-data")
-					class="upload-form" on_response=handle_response.clone()>
+					on_response=handle_response.clone() {..} class="upload-form" >
 					<div class="input-bx">
 						<input type="text" name="title" required class="text-input" required/>
 						<span>Title</span>
@@ -169,11 +170,11 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 					fallback=move || view! {}
 				>
 					<div class="error-msg">
-						<Icon icon=icondata::IoAlertCircleSharp />
-						{error_msg.get().as_ref().unwrap()}
+						<Icon icon={icondata::IoAlertCircleSharp} />
+						{error_msg.get().unwrap()}
 					</div>
 				</Show>
-			</div>
+			</dialog>
 		</Show>
 	}
 }

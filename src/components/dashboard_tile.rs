@@ -1,4 +1,5 @@
-use leptos::*;
+use leptos::prelude::*;
+use leptos::text_prop::TextProp;
 
 #[slot]
 pub struct DashboardTile {
