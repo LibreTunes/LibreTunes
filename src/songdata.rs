@@ -2,7 +2,7 @@ use crate::models::{Album, Artist, Song};
 use crate::components::dashboard_tile::DashboardTile;
 
 use serde::{Serialize, Deserialize};
-use chrono::NaiveDate;
+use chrono::{NaiveDate, NaiveDateTime};
 
 /// Holds information about a song
 /// 
@@ -32,7 +32,7 @@ pub struct SongData {
 	/// Whether the song is liked by the user
 	pub like_dislike: Option<(bool, bool)>,
 	/// The date the song was added to the database
-	pub added_date: NaiveDate,
+	pub added_date: NaiveDateTime,
 }
 
 
