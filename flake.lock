@@ -3,16 +3,16 @@
     "cargo-leptos": {
       "flake": false,
       "locked": {
-        "lastModified": 1733606386,
-        "narHash": "sha256-KNasxy/hEU04H/xAV3y92OtxBmYgA0RZjCQnC/XvBoo=",
+        "lastModified": 1736814985,
+        "narHash": "sha256-v1gNH3pq5db/swsk79nEzgtR4jy3f/xHs4QaLnVcVYU=",
         "owner": "leptos-rs",
         "repo": "cargo-leptos",
-        "rev": "0d36a3ee1414a54b993e80c21131667bc92b7f74",
+        "rev": "87b156f4f0bc0374e7b5557d15bf79f1a12d7569",
         "type": "github"
       },
       "original": {
         "owner": "leptos-rs",
-        "ref": "v0.2.24",
+        "ref": "v0.2.26",
         "repo": "cargo-leptos",
         "type": "github"
       }
