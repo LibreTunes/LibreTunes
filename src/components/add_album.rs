@@ -1,6 +1,7 @@
-use leptos::*;
+use leptos::prelude::*;
 use leptos::leptos_dom::log;
 use leptos_icons::*;
+use leptos::task::spawn_local;
 use crate::api::albums::add_album;
 
 #[component]
@@ -16,9 +17,9 @@ pub fn AddAlbumBtn(add_album_open: RwSignal<bool>) -> impl IntoView {
 }
 #[component]
 pub fn AddAlbum(open: RwSignal<bool>) -> impl IntoView {
-    let album_title = create_rw_signal("".to_string());
-    let release_date = create_rw_signal("".to_string());
-    let image_path = create_rw_signal("".to_string());
+    let album_title = RwSignal::new("".to_string());
+    let release_date = RwSignal::new("".to_string());
+    let image_path = RwSignal::new("".to_string());
 
     let close_dialog = move |ev: leptos::ev::MouseEvent| {
 		ev.prevent_default();
@@ -50,7 +51,7 @@ pub fn AddAlbum(open: RwSignal<bool>) -> impl IntoView {
                 <div class="upload-header">
                     <h1>Add Album</h1>
                 </div>
-                <div class="close-button" on:click=close_dialog><Icon icon=icondata::IoClose /></div>
+                <div class="close-button" on:click=close_dialog><Icon icon={icondata::IoClose} /></div>
                 <form class="create-album-form" action="POST" on:submit=on_add_album>
                     <div class="input-bx">
                         <input type="text" required class="text-input" 
@@ -58,7 +59,6 @@ pub fn AddAlbum(open: RwSignal<bool>) -> impl IntoView {
                             on:input=move |ev: leptos::ev::Event| {
                                 album_title.set(event_target_value(&ev));
                             }        
-                            required 
                          />
                         <span>Album Title</span>
                     </div>

@@ -13,7 +13,7 @@ cfg_if::cfg_if! {
 	}
 }
 
-use leptos::*;
+use leptos::prelude::*;
 use serde::{Serialize, Deserialize};
 use crate::models::User;
 

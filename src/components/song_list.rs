@@ -1,8 +1,10 @@
 use std::rc::Rc;
 
-use leptos::*;
+use leptos::prelude::*;
+use leptos::either::*;
 use leptos::logging::*;
 use leptos_icons::*;
+use leptos::task::spawn_local;
 
 use crate::api::songs::*;
 use crate::songdata::SongData;
@@ -23,16 +25,18 @@ pub fn SongListExtra<T>(songs: Vec<(SongData, T)>) -> impl IntoView where
 	__SongListInner(songs, true)
 }
 
+// TODO these arguments shouldn't need a leading underscore,
+// but for some reason the compiler thinks they are unused
 #[component]
-fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoView where
+fn SongListInner<T>(_songs: Vec<(SongData, T)>, _show_extra: bool) -> impl IntoView where
 	T: Clone + IntoView + 'static
 {
-	let songs = Rc::new(songs);
+	let songs = Rc::new(_songs);
 	let songs_2 = songs.clone();
 
 	// Signal that acts as a callback for a song list item to queue songs after it in the list
-	let (handle_queue_remaining, do_queue_remaining) = create_signal(None);
-	create_effect(move |_| {
+	let (handle_queue_remaining, do_queue_remaining) = signal(None);
+	Effect::new(move |_| {
 		let clicked_index = handle_queue_remaining.get();
 
 		if let Some(index) = clicked_index {
@@ -59,12 +63,13 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 
 	view! {
 		<table class="song-list">
+			<tbody>
 			{
 				songs_2.iter().enumerate().map(|(list_index, (song, extra))| {
 					let song_id = song.id;
-					let playing = create_rw_signal(false);
+					let playing = RwSignal::new(false);
 
-					create_effect(move |_| {
+					Effect::new(move |_| {
 						GlobalState::play_status().with(|status| {
 							playing.set(status.queue.front().map(|song| song.id) == Some(song_id) && status.playing);
 						});
@@ -72,21 +77,22 @@ fn SongListInner<T>(songs: Vec<(SongData, T)>, show_extra: bool) -> impl IntoVie
 
 					view! {
 						<SongListItem song={song.clone()} song_playing=playing.into()
-							extra={if show_extra { Some(extra.clone()) } else { None }} list_index do_queue_remaining/>
+							extra={if _show_extra { Some(extra.clone()) } else { None }} list_index do_queue_remaining/>
 					}
 				}).collect::<Vec<_>>()
 			}
+			</tbody>
 		</table>
 	}
 }
 
 #[component]
-pub fn SongListItem<T>(song: SongData, song_playing: MaybeSignal<bool>, extra: Option<T>,
+pub fn SongListItem<T>(song: SongData, song_playing: Signal<bool>, extra: Option<T>,
 	list_index: usize, do_queue_remaining: WriteSignal<Option<usize>>) -> impl IntoView where
 	T: IntoView + 'static
 {
-	let liked = create_rw_signal(song.like_dislike.map(|(liked, _)| liked).unwrap_or(false));
-	let disliked = create_rw_signal(song.like_dislike.map(|(_, disliked)| disliked).unwrap_or(false));
+	let liked = RwSignal::new(song.like_dislike.map(|(liked, _)| liked).unwrap_or(false));
+	let disliked = RwSignal::new(song.like_dislike.map(|(_, disliked)| disliked).unwrap_or(false));
 	
 	view! {
 		<tr class="song-list-item">
@@ -111,7 +117,7 @@ pub fn SongListItem<T>(song: SongData, song_playing: MaybeSignal<bool>, extra: O
 /// Display the song's image, with an overlay if the song is playing
 /// When the song list item is hovered, the overlay will show the play button
 #[component]
-pub fn SongImage(image_path: String, song_playing: MaybeSignal<bool>, list_index: usize,
+pub fn SongImage(image_path: String, song_playing: Signal<bool>, list_index: usize,
 	do_queue_remaining: WriteSignal<Option<usize>>) -> impl IntoView
 {
 	let play_song = move |_| {
@@ -127,11 +133,11 @@ pub fn SongImage(image_path: String, song_playing: MaybeSignal<bool>, list_index
 	view! {
 		<img class="song-image" src={image_path}/>
 		{move || if song_playing.get() {
-			view! { <Icon class="song-image-overlay song-playing-overlay"
-				icon=icondata::BsPauseFill on:click=pause_song /> }.into_view()
+			Either::Left(view! { <Icon icon={icondata::BsPauseFill} on:click={pause_song}
+					{..} class="song-image-overlay song-playing-overlay" /> })
 		} else {
-			view! { <Icon class="song-image-overlay hide-until-hover"
-				icon=icondata::BsPlayFill on:click=play_song /> }.into_view()
+			Either::Right(view! { <Icon icon={icondata::BsPlayFill} on:click={play_song}
+				{..} class="song-image-overlay hide-until-hover" /> })
 		}}
 	}
 }
@@ -147,9 +153,9 @@ pub fn SongArtists(artists: Vec<Artist>) -> impl IntoView {
 		view! {
 			{
 				if let Some(id) = artist.id {
-					view! { <a href={format!("/artist/{}", id)}>{artist.name.clone()}</a> }.into_view()
+					Either::Left(view! { <a href={format!("/artist/{}", id)}>{artist.name.clone()}</a> })
 				} else {
-					view! { <span>{artist.name.clone()}</span> }.into_view()
+					Either::Right(view! { <span>{artist.name.clone()}</span> })
 				}
 			}
 			{if i < num_artists - 2 { ", " } else if i == num_artists - 2 { " & " } else { "" }}
@@ -165,9 +171,9 @@ pub fn SongAlbum(album: Option<Album>) -> impl IntoView {
 			<span>
 				{
 					if let Some(id) = album.id {
-						view! { <a href={format!("/album/{}", id)}>{album.title.clone()}</a> }.into_view()
+						Either::Left(view! { <a href={format!("/album/{}", id)}>{album.title.clone()}</a> })
 					} else {
-						view! { <span>{album.title.clone()}</span> }.into_view()
+						Either::Right(view! { <span>{album.title.clone()}</span> })
 					}
 				}
 			</span>
@@ -179,7 +185,7 @@ pub fn SongAlbum(album: Option<Album>) -> impl IntoView {
 #[component]
 pub fn SongLikeDislike(
 	#[prop(into)]
-	song_id: MaybeSignal<i32>,
+	song_id: Signal<i32>,
 	liked: RwSignal<bool>,
 	disliked: RwSignal<bool>) -> impl IntoView
 {
@@ -199,19 +205,19 @@ pub fn SongLikeDislike(
 		}
 	});
 
-	let like_class = MaybeProp::derive(move || {
+	let like_class = Signal::derive(move || {
 		if liked.get() {
-			Some(TextProp::from("controlbtn"))
+			"controlbtn"
 		} else {
-			Some(TextProp::from("controlbtn hide-until-hover"))
+			"controlbtn hide-until-hover"
 		}
 	});
 
-	let dislike_class = MaybeProp::derive(move || {
+	let dislike_class = Signal::derive(move || {
 		if disliked.get() {
-			Some(TextProp::from("controlbtn hmirror"))
+			"controlbtn hmirror"
 		} else {
-			Some(TextProp::from("controlbtn hmirror hide-until-hover"))
+			"controlbtn hmirror hide-until-hover"
 		}
 	});
 
@@ -261,10 +267,10 @@ pub fn SongLikeDislike(
 
 	view! {
 		<button on:click=toggle_dislike>
-			<Icon class=dislike_class width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon=dislike_icon />
+			<Icon width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon={dislike_icon} {..} class=dislike_class />
 		</button>
 		<button on:click=toggle_like>
-			<Icon class=like_class width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon=like_icon />
+			<Icon width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon={like_icon} {..} class=like_class />
 		</button>
 	}
 }

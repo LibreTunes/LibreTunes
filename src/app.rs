@@ -1,9 +1,10 @@
 use crate::playbar::PlayBar;
 use crate::playbar::CustomTitle;
 use crate::queue::Queue;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::*;
+use leptos_router::components::*;
 use crate::pages::login::*;
 use crate::pages::signup::*;
 use crate::pages::profile::*;
@@ -13,6 +14,24 @@ use crate::pages::songpage::*;
 use crate::error_template::{AppError, ErrorTemplate};
 use crate::util::state::GlobalState;
 
+pub fn shell(options: LeptosOptions) -> impl IntoView {
+    view! {
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <AutoReload options=options.clone() />
+                <HydrationScripts options/>
+                <MetaTags/>
+            </head>
+            <body>
+                <App/>
+            </body>
+        </html>
+    }
+}
+
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
@@ -20,9 +39,9 @@ pub fn App() -> impl IntoView {
 
     provide_context(GlobalState::new());
 
-    let upload_open = create_rw_signal(false);
-    let add_artist_open = create_rw_signal(false);
-    let add_album_open = create_rw_signal(false);
+    let upload_open = RwSignal::new(false);
+    let add_artist_open = RwSignal::new(false);
+    let add_album_open = RwSignal::new(false);
 
     view! {
         // injects a stylesheet into the document <head>
@@ -33,28 +52,28 @@ pub fn App() -> impl IntoView {
         <CustomTitle />
 
         // content for this welcome page
-        <Router fallback=|| {
-            let mut outside_errors = Errors::default();
-            outside_errors.insert_with_default_key(AppError::NotFound);
-            view! {
-                <ErrorTemplate outside_errors/>
-            }
-            .into_view()
-        }>
+        <Router>
             <main>
-                <Routes>
-                    <Route path="" view=move || view! { <HomePage upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/> }>
-                        <Route path="" view=Dashboard />
-                        <Route path="dashboard" view=Dashboard />
-                        <Route path="search" view=Search />
-                        <Route path="user/:id" view=Profile />
-                        <Route path="user" view=Profile />
-                        <Route path="album/:id" view=AlbumPage />
-                        <Route path="artist/:id" view=ArtistPage />
-                        <Route path="song/:id" view=SongPage />
-                    </Route>
-                    <Route path="/login" view=Login />
-                    <Route path="/signup" view=Signup />
+                <Routes fallback=|| {
+                    let mut outside_errors = Errors::default();
+                    outside_errors.insert_with_default_key(AppError::NotFound);
+                    view! {
+                        <ErrorTemplate outside_errors/>
+                    }
+                    .into_view()
+                }>
+                    <ParentRoute path=path!("") view=move || view! { <HomePage upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/> }>
+                        <Route path=path!("") view=Dashboard />
+                        <Route path=path!("dashboard") view=Dashboard />
+                        <Route path=path!("search") view=Search />
+                        <Route path=path!("user/:id") view=Profile />
+                        <Route path=path!("user") view=Profile />
+                        <Route path=path!("album/:id") view=AlbumPage />
+                        <Route path=path!("artist/:id") view=ArtistPage />
+                        <Route path=path!("song/:id") view=SongPage />
+                    </ParentRoute>
+                    <Route path=path!("/login") view=Login />
+                    <Route path=path!("/signup") view=Signup />
                 </Routes>
             </main>
         </Router>

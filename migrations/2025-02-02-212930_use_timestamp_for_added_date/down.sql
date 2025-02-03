@@ -1,0 +1,4 @@
+ALTER TABLE songs
+    ALTER COLUMN added_date TYPE DATE USING added_date::DATE,
+    ALTER COLUMN added_date SET DEFAULT CURRENT_DATE,
+    ALTER COLUMN added_date SET NOT NULL;

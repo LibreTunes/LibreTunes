@@ -1,20 +1,21 @@
 use crate::auth::login;
 use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
+use leptos::task::spawn_local;
 use crate::users::UserCredentials;
 use crate::components::loading::Loading;
 
 #[component]
 pub fn Login() -> impl IntoView {
-    let (username_or_email, set_username_or_email) = create_signal("".to_string());
-    let (password, set_password) = create_signal("".to_string());
+    let (username_or_email, set_username_or_email) = signal("".to_string());
+    let (password, set_password) = signal("".to_string());
 
-    let (show_password, set_show_password) = create_signal(false);
+    let (show_password, set_show_password) = signal(false);
 
-    let loading = create_rw_signal(false);
-    let error_msg = create_rw_signal(None);
+    let loading = RwSignal::new(false);
+    let error_msg = RwSignal::new(None);
 
     let toggle_password = move |_| {
         set_show_password.update(|show_password| *show_password = !*show_password);
@@ -48,11 +49,11 @@ pub fn Login() -> impl IntoView {
                 user.refetch();
             } else if let Ok(Some(login_user)) = login_result {
                 // Manually set the user to the new user, avoiding a refetch
-                user.set(Some(login_user));
+                user.set(Some(Some(login_user)));
 
                 // Redirect to the login page
                 log!("Logged in Successfully!");
-                leptos_router::use_navigate()("/", Default::default());
+                leptos_router::hooks::use_navigate()("/", Default::default());
                 log!("Navigated to home page after login");
             } else if let Ok(None) = login_result {
                 log!("Invalid username or password");
@@ -69,7 +70,7 @@ pub fn Login() -> impl IntoView {
     view! {
         <div class="auth-page-container">
             <div class="login-container">
-                <a class="return" href="/"><Icon icon=icondata::IoReturnUpBackSharp /></a>
+                <a class="return" href="/"><Icon icon={icondata::IoReturnUpBackSharp} /></a>
                 <div class="header">
                     <h1>LibreTunes</h1>
                 </div>
@@ -97,11 +98,11 @@ pub fn Login() -> impl IntoView {
                         <Show
                             when=move || {show_password() == false}
                             fallback=move || view!{ <button on:click=toggle_password class="login-password-visibility">
-                                                  <Icon icon=icondata::AiEyeInvisibleFilled />
+                                                  <Icon icon={icondata::AiEyeInvisibleFilled} />
                                                </button> /> }
                         >
                             <button on:click=toggle_password class="login-password-visibility">
-                                <Icon icon=icondata::AiEyeFilled />
+                                <Icon icon={icondata::AiEyeFilled} />
                             </button>
 
                         </Show>

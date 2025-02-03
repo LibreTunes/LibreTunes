@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 
 #[component]
 pub fn Song(song_image_path: String, song_title: String, song_artist: String) -> impl IntoView {

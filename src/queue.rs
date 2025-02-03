@@ -3,7 +3,7 @@ use crate::song::Song;
 use crate::util::state::GlobalState;
 use leptos::ev::MouseEvent;
 use leptos::leptos_dom::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 use leptos::ev::DragEvent;
 
@@ -33,9 +33,9 @@ pub fn Queue() -> impl IntoView {
         e.prevent_default();
     };
 
-	let index_being_dragged = create_rw_signal(-1);
+	let index_being_dragged = RwSignal::new(-1);
 
-	let index_being_hovered = create_rw_signal(-1);
+	let index_being_hovered = RwSignal::new(-1);
 
 	let on_drag_start = move |_e: DragEvent, index: usize| {
 		// set the index of the item being dragged
@@ -107,7 +107,7 @@ pub fn Queue() -> impl IntoView {
 											<p>Playing</p>
 										}>
 										<button on:click=move |_| remove_song(index) on:mousedown=prevent_focus>
-											<Icon class="remove-song" width=RM_BTN_SIZE height=RM_BTN_SIZE icon=icondata::CgTrash />
+											<Icon width=RM_BTN_SIZE height=RM_BTN_SIZE icon={icondata::CgTrash} {..} class="remove-song" />
 										</button>
 									</Show>
 								</div>

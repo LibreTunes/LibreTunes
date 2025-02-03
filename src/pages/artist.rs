@@ -1,5 +1,6 @@
-use leptos::*;
-use leptos_router::use_params_map;
+use leptos::prelude::*;
+use leptos::either::*;
+use leptos_router::hooks::use_params_map;
 use leptos_icons::*;
 use server_fn::error::NoCustomError;
 
@@ -20,23 +21,23 @@ pub fn ArtistPage() -> impl IntoView {
             {move || params.with(|params| {
                 match params.get("id").map(|id| id.parse::<i32>()) {
                     Some(Ok(id)) => {
-                        view! { <ArtistIdProfile id /> }.into_view()
+                        Either::Left(view! { <ArtistIdProfile id /> })
                     },
                     Some(Err(e)) => {
-                        view! {
+                        Either::Right(view! {
                             <Error<String>
                                 title="Invalid Artist ID"
                                 error=e.to_string()
                             />
-                        }.into_view()
+                        })
                     },
                     None => {
-                        view! {
+                        Either::Right(view! {
                             <Error<String>
                                 title="No Artist ID"
                                 message="You must specify an artist ID to view their page."
                             />
-                        }.into_view()
+                        })
                     }
                 }
             })}
@@ -45,12 +46,12 @@ pub fn ArtistPage() -> impl IntoView {
 }
 
 #[component]
-fn ArtistIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
-    let artist_info = create_resource(move || id.get(), move |id| {
+fn ArtistIdProfile(#[prop(into)] id: Signal<i32>) -> impl IntoView {
+    let artist_info = Resource::new(move || id.get(), move |id| {
         get_artist_by_id(id)
     });
 
-    let show_details = create_rw_signal(false);
+    let show_details = RwSignal::new(false);
 
     view! {
         <Transition
@@ -60,20 +61,20 @@ fn ArtistIdProfile(#[prop(into)] id: MaybeSignal<i32>) -> impl IntoView {
                 match artist {
                     Ok(Some(artist)) => {
                         show_details.set(true);
-                        view! { <ArtistProfile artist /> }.into_view()
+                        EitherOf3::A(view! { <ArtistProfile artist /> })
                     },
-                    Ok(None) => view! {
+                    Ok(None) => EitherOf3::B(view! {
                         <Error<String>
                             title="Artist Not Found"
                             message=format!("Artist with ID {} not found", id.get())
                         />
-                    }.into_view(),
-                    Err(error) => view! {
+                    }),
+                    Err(error) => EitherOf3::C(view! {
                         <ServerError<NoCustomError>
                             title="Error Getting Artist"
                             error
                         />
-                    }.into_view(),
+                    }),
                 }
             })}
         </Transition>
@@ -94,7 +95,7 @@ fn ArtistProfile(artist: Artist) -> impl IntoView {
     view! {
         <div class="artist-header">
             <object class="artist-image" data={profile_image_path.clone()} type="image/webp">
-                <Icon class="artist-image" icon=icondata::CgProfile width="100" height="100"/>
+                <Icon icon={icondata::CgProfile} width="100" height="100" {..} class="artist-image" />
             </object>
             <h1>{artist.name}</h1>
         </div>
@@ -102,8 +103,8 @@ fn ArtistProfile(artist: Artist) -> impl IntoView {
 }
 
 #[component]
-fn TopSongsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
-    let top_songs = create_resource(move || artist_id.get(), |artist_id| async move {
+fn TopSongsByArtist(#[prop(into)] artist_id: Signal<i32>) -> impl IntoView {
+    let top_songs = Resource::new(move || artist_id.get(), |artist_id| async move {
         let top_songs = top_songs_by_artist(artist_id, Some(10)).await;
 
         top_songs.map(|top_songs| {
@@ -144,10 +145,10 @@ fn TopSongsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView 
 }
 
 #[component]
-fn AlbumsByArtist(#[prop(into)] artist_id: MaybeSignal<i32>) -> impl IntoView {
+fn AlbumsByArtist(#[prop(into)] artist_id: Signal<i32>) -> impl IntoView {
     use crate::components::dashboard_row::*;
 
-    let albums = create_resource(move || artist_id.get(), |artist_id| async move {
+    let albums = Resource::new(move || artist_id.get(), |artist_id| async move {
         let albums = albums_by_artist(artist_id, None).await;
 
         albums.map(|albums| {
