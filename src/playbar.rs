@@ -118,26 +118,6 @@ fn toggle_queue() {
 	
 }
 
-/// Set the source of the audio player
-/// 
-/// Logs an error if the audio element is not available
-/// 
-/// 
-/// # Arguments
-/// * `status` - The `PlayStatus` to get the audio element from, as a signal
-/// * `src` - The source to set the audio player to
-/// 
-fn set_play_src(src: String) {
-    GlobalState::play_status().update(|status| {
-        if let Some(audio) = status.get_audio() {
-            audio.set_src(&src);
-            log!("Player set src to: {}", src);
-        } else {
-            error!("Unable to set src: Audio element not available");
-        }
-    });
-}
-
 /// The play, pause, and skip buttons
 #[component]
 fn PlayControls() -> impl IntoView {
@@ -161,10 +141,7 @@ fn PlayControls() -> impl IntoView {
 
                 if let Some(last_played_song) = last_played_song {
                     // Push the popped song to the front of the queue, and play it
-                    let next_src = last_played_song.song_path.clone();
                     status.update(|status| status.queue.push_front(last_played_song));
-                    set_play_src(next_src);
-                    set_playing(true);
                 } else {
                     warn!("Unable to skip back: No previous song");
                 }
@@ -538,32 +515,29 @@ pub fn PlayBar() -> impl IntoView {
     let (total_secs, set_total_secs) = signal(0);
     let (percentage, set_percentage) = signal(0.0);
 
-    audio_ref.on_load(move |audio| {
-        log!("Audio element loaded");
-
-        status.with_untracked(|status| {
-            // Start playing the first song in the queue, if available
-            if let Some(song) = status.queue.front() {
-                log!("Starting playing with song: {}", song.title);
-
-                // Don't use the set_play_src / set_playing helper function
-                // here because we already have access to the audio element
-                audio.set_src(&song.song_path);
-
-                if let Err(e) = audio.play() {
-                    error!("Error playing audio on load: {:?}", e);
-                } else {
-                    log!("Audio playing on load");
-                }
-            } else {
-                log!("Queue is empty, no first song to play");
-            }
-        });
-    });
-
     let current_song_id = Memo::new(move |_| {
         status.with(|status| {
             status.queue.front().map(|song| song.id)
+        })
+    });
+
+    let current_song_src = Memo::new(move |_| {
+        status.with(|status| {
+            status.queue.front().map(|song| song.song_path.clone())
+        })
+    });
+
+    Effect::new(move |_| {
+        current_song_src.with(|src| {
+            if let Some(src) = src {
+                GlobalState::play_status().with_untracked(|status| {
+                    if let Some(audio) = status.get_audio() {
+                        audio.set_src(&src);
+                    } else {
+                        error!("Unable to set audio source: Audio element not available");
+                    }
+                });
+            }
         })
     });
 
@@ -642,26 +616,6 @@ pub fn PlayBar() -> impl IntoView {
                 log!("Queue empty, no previous song to add to history");
             }
         });
-
-        // Get the next song to play, if available
-        let next_src = status.with_untracked(|status| {
-            status.queue.front().map(|song| song.song_path.clone())
-        });
-
-        if let Some(audio) = audio_ref.get() {
-            if let Some(next_src) = next_src {
-                log!("Playing next song: {}", next_src);
-                audio.set_src(&next_src);
-
-                if let Err(e) = audio.play() {
-                    error!("Error playing audio after song change: {:?}", e);
-                } else {
-                    log!("Audio playing after song change");
-                }
-            }
-        } else {
-            error!("Unable to play next song: Audio element not available");
-        }
     };
 
     view! {
