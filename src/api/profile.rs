@@ -13,7 +13,7 @@ cfg_if! {
 		use crate::auth::get_user;
 		use server_fn::error::NoCustomError;
 
-		use crate::database::get_db_conn;
+		use crate::util::database::get_db_conn;
 		use diesel::prelude::*;
 		use diesel::dsl::count;
 		use crate::models::*;

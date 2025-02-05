@@ -1,7 +1,7 @@
 cfg_if::cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use diesel::prelude::*;
-		use crate::database::get_db_conn;
+		use crate::util::database::get_db_conn;
 
 		use pbkdf2::{
 			password_hash::{

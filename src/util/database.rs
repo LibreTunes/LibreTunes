@@ -1,7 +1,3 @@
-use cfg_if::cfg_if;
-
-cfg_if! {
-if #[cfg(feature = "ssr")] {
 use leptos::logging::log;
 
 use lazy_static::lazy_static;
@@ -109,7 +105,4 @@ const DB_MIGRATIONS: EmbeddedMigrations =  embed_migrations!();
 pub fn migrate() {
     let db_con = &mut get_db_conn();
     db_con.run_pending_migrations(DB_MIGRATIONS).expect("Could not run database migrations");
-}
-
-}
 }

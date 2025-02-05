@@ -5,6 +5,7 @@ cfg_if! {
 		pub mod audio;
 		pub mod require_auth;
 		pub mod fileserv;
+		pub mod database;
 	}
 }
 

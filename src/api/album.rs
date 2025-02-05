@@ -7,7 +7,7 @@ use cfg_if::cfg_if;
 cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use leptos::server_fn::error::NoCustomError;
-		use crate::database::get_db_conn;
+		use crate::util::database::get_db_conn;
 	}
 }
 

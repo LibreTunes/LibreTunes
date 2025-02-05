@@ -37,7 +37,7 @@ async fn main() {
     debug!("Running database migrations...");
 
     // Bring the database up to date
-    libretunes::database::migrate();
+    libretunes::util::database::migrate();
 
     debug!("Connecting to Redis...");
 

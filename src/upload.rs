@@ -6,7 +6,7 @@ use cfg_if::cfg_if;
 cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use multer::Field;
-		use crate::database::get_db_conn;
+		use crate::util::database::get_db_conn;
 		use diesel::prelude::*;
 		use log::*;
 		use server_fn::error::NoCustomError;

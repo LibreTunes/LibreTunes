@@ -6,7 +6,7 @@ use cfg_if::cfg_if;
 cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use diesel::prelude::*;
-		use crate::database::*;
+		use crate::util::database::*;
 		use std::error::Error;
 		use crate::songdata::SongData;
 		use crate::albumdata::AlbumData;

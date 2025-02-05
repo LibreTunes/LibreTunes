@@ -8,7 +8,7 @@ use crate::songdata::SongData;
 
 cfg_if! {
     if #[cfg(feature = "ssr")] {
-        use crate::database::get_db_conn;
+        use crate::util::database::get_db_conn;
         use diesel::prelude::*;
         use std::collections::HashMap;
         use server_fn::error::NoCustomError;

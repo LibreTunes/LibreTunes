@@ -10,7 +10,7 @@ if #[cfg(feature = "ssr")] {
 	use diesel::pg::Pg;
 	use diesel::expression::AsExpression;
 
-	use crate::database::get_db_conn;
+	use crate::util::database::get_db_conn;
 
 	// Define pg_trgm operators
 	// Functions do not use indices for queries, so we need to use operators

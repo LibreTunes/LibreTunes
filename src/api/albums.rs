@@ -4,7 +4,7 @@ use cfg_if::cfg_if;
 
 cfg_if! {
     if #[cfg(feature = "ssr")] {
-        use crate::database::get_db_conn;
+        use crate::util::database::get_db_conn;
         use diesel::prelude::*;
         use chrono::NaiveDate;
     }
