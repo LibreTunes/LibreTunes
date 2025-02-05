@@ -1,9 +1,5 @@
 pub mod app;
 pub mod auth;
-pub mod songdata;
-pub mod albumdata;
-pub mod artistdata;
-pub mod playstatus;
 pub mod playbar;
 pub mod queue;
 pub mod song;

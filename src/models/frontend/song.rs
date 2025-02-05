@@ -1,4 +1,4 @@
-use crate::models::{Album, Artist, Song};
+use crate::models::backend::{self, Album, Artist};
 use crate::components::dashboard_tile::DashboardTile;
 
 use serde::{Serialize, Deserialize};
@@ -8,7 +8,7 @@ use chrono::{NaiveDate, NaiveDateTime};
 /// 
 /// Intended to be used in the front-end, as it includes artist and album objects, rather than just their ids.
 #[derive(Serialize, Deserialize, Clone)]
-pub struct SongData {
+pub struct Song {
 	/// Song id
 	pub id: i32,
 	/// Song name
@@ -36,15 +36,15 @@ pub struct SongData {
 }
 
 
-impl TryInto<Song> for SongData {
+impl TryInto<backend::Song> for Song {
 	type Error = Box<dyn std::error::Error>;
 
 	/// Convert a SongData object into a Song object
 	/// 
 	/// The SongData/Song conversions are also not truly reversible,
 	/// due to the way the image_path data is handled.
-	fn try_into(self) -> Result<Song, Self::Error> {
-		Ok(Song {
+	fn try_into(self) -> Result<backend::Song, Self::Error> {
+		Ok(backend::Song {
 			id: Some(self.id),
 			title: self.title,
 			album_id: self.album.map(|album|
@@ -67,7 +67,7 @@ impl TryInto<Song> for SongData {
 	}
 }
 
-impl Into<DashboardTile> for SongData {
+impl Into<DashboardTile> for Song {
 	fn into(self) -> DashboardTile {
 		DashboardTile {
 			image_path: self.image_path.into(),

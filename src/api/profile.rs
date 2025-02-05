@@ -3,9 +3,7 @@ use server_fn::codec::{MultipartData, MultipartFormData};
 
 use cfg_if::cfg_if;
 
-use crate::songdata::SongData;
-use crate::artistdata::ArtistData;
-
+use crate::models::frontend;
 use chrono::NaiveDateTime;
 
 cfg_if! {
@@ -16,7 +14,7 @@ cfg_if! {
 		use crate::util::database::get_db_conn;
 		use diesel::prelude::*;
 		use diesel::dsl::count;
-		use crate::models::*;
+		use crate::models::backend::{Album, Artist, Song, HistoryEntry};
 		use crate::schema::*;
 
 		use std::collections::HashMap;
@@ -67,7 +65,7 @@ pub async fn upload_picture(data: MultipartData) -> Result<(), ServerFnError> {
 /// Returns a list of tuples with the date the song was listened to
 /// and the song data, sorted by date (most recent first).
 #[server(endpoint = "/profile/recent_songs")]
-pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(NaiveDateTime, SongData)>, ServerFnError> {
+pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(NaiveDateTime, frontend::Song)>, ServerFnError> {
 	let viewing_user_id = get_user().await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting user: {}", e)))?.id.unwrap();
 
@@ -111,7 +109,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 		.load(&mut db_con)?;
 
 	// Process the history data into a map of song ids to song data
-	let mut history_songs: HashMap<i32, (NaiveDateTime, SongData)> = HashMap::with_capacity(history.len());
+	let mut history_songs: HashMap<i32, (NaiveDateTime, frontend::Song)> = HashMap::with_capacity(history.len());
 
 	for (history, song, album, artist, like, dislike) in history {
 		let song_id = history.song_id;
@@ -133,7 +131,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 				album.as_ref().map(|album| album.image_path.clone()).flatten()
 					.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
 
-			let songdata = SongData {
+			let songdata = frontend::Song {
 				id: song_id,
 				title: song.title,
 				artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
@@ -152,7 +150,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 	}
 
 	// Sort the songs by date
-	let mut history_songs: Vec<(NaiveDateTime, SongData)> = history_songs.into_values().collect();
+	let mut history_songs: Vec<(NaiveDateTime, frontend::Song)> = history_songs.into_values().collect();
 	history_songs.sort_by(|a, b| b.0.cmp(&a.0));
 	Ok(history_songs)
 }
@@ -163,7 +161,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 /// Returns a list of tuples with the play count and the song data, sorted by play count (most played first).
 #[server(endpoint = "/profile/top_songs")]
 pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: NaiveDateTime, limit: Option<i64>)
-	-> Result<Vec<(i64, SongData)>, ServerFnError>
+	-> Result<Vec<(i64, frontend::Song)>, ServerFnError>
 {	let viewing_user_id = get_user().await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting user: {}", e)))?.id.unwrap();
 
@@ -211,7 +209,7 @@ pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: Na
 		.load(&mut db_con)?;
 
 	// Process the history data into a map of song ids to song data
-	let mut history_songs_map: HashMap<i32, (i64, SongData)> = HashMap::with_capacity(history_counts.len());
+	let mut history_songs_map: HashMap<i32, (i64, frontend::Song)> = HashMap::with_capacity(history_counts.len());
 
 	for (song, album, artist, like, dislike) in history_songs {
 		let song_id = song.id
@@ -234,7 +232,7 @@ pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: Na
 				album.as_ref().map(|album| album.image_path.clone()).flatten()
 					.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
 
-			let songdata = SongData {
+			let songdata = frontend::Song {
 				id: song_id,
 				title: song.title,
 				artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
@@ -256,7 +254,7 @@ pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: Na
 	}
 
 	// Sort the songs by play count
-	let mut history_songs: Vec<(i64, SongData)> = history_songs_map.into_values().collect();
+	let mut history_songs: Vec<(i64, frontend::Song)> = history_songs_map.into_values().collect();
 	history_songs.sort_by(|a, b| b.0.cmp(&a.0));
 	Ok(history_songs)
 }
@@ -267,7 +265,7 @@ pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: Na
 /// Returns a list of tuples with the play count and the artist data, sorted by play count (most played first).
 #[server(endpoint = "/profile/top_artists")]
 pub async fn top_artists(for_user_id: i32, start_date: NaiveDateTime, end_date: NaiveDateTime, limit: Option<i64>)
-	-> Result<Vec<(i64, ArtistData)>, ServerFnError>
+	-> Result<Vec<(i64, frontend::Artist)>, ServerFnError>
 {
 	let mut db_con = get_db_conn();
 
@@ -295,8 +293,8 @@ pub async fn top_artists(for_user_id: i32, start_date: NaiveDateTime, end_date: 
 				.load(&mut db_con)?
 		};
 
-	let artist_data: Vec<(i64, ArtistData)> = artist_counts.into_iter().map(|(plays, artist)| {
-		(plays, ArtistData {
+	let artist_data: Vec<(i64, frontend::Artist)> = artist_counts.into_iter().map(|(plays, artist)| {
+		(plays, frontend::Artist {
 			id: artist.id.unwrap(),
 			name: artist.name,
 			image_path: format!("/assets/images/artists/{}.webp", artist.id.unwrap()),

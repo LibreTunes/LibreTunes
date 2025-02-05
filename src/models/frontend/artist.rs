@@ -5,7 +5,7 @@ use serde::{Serialize, Deserialize};
 /// 
 /// Intended to be used in the front-end
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ArtistData {
+pub struct Artist {
 	/// Artist id
 	pub id: i32,
 	/// Artist name
@@ -15,7 +15,7 @@ pub struct ArtistData {
 	pub image_path: String,
 }
 
-impl Into<DashboardTile> for ArtistData {
+impl Into<DashboardTile> for Artist {
 	fn into(self) -> DashboardTile {
 		DashboardTile {
 			image_path: self.image_path.into(),

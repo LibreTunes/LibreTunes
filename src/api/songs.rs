@@ -2,15 +2,14 @@ use leptos::prelude::*;
 
 use cfg_if::cfg_if;
 
-use crate::songdata::SongData;
-
+use crate::models::frontend;
 
 cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use leptos::server_fn::error::NoCustomError;
 		use crate::util::database::get_db_conn;
 		use crate::auth::get_user;
-		use crate::models::{Song, Album, Artist};
+		use crate::models::backend::{Song, Album, Artist};
 		use diesel::prelude::*;
 	}
 }
@@ -59,7 +58,7 @@ pub async fn get_like_dislike_song(song_id: i32) -> Result<(bool, bool), ServerF
 }
 
 #[server(endpoint = "songs/get")]
-pub async fn get_song_by_id(song_id: i32) -> Result<Option<SongData>, ServerFnError> {
+pub async fn get_song_by_id(song_id: i32) -> Result<Option<frontend::Song>, ServerFnError> {
 	use crate::schema::*;
 
 	let user_id: i32 = get_user().await.map_err(|e| ServerFnError::<NoCustomError>::
@@ -97,7 +96,7 @@ pub async fn get_song_by_id(song_id: i32) -> Result<Option<SongData>, ServerFnEr
 				)
 			});
 
-			Ok(Some(SongData {
+			Ok(Some(frontend::Song {
 				id: song.id.unwrap(),
 				title: song.title.clone(),
 				artists: artists,

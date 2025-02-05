@@ -15,7 +15,7 @@ cfg_if::cfg_if! {
 
 use leptos::prelude::*;
 use serde::{Serialize, Deserialize};
-use crate::models::User;
+use crate::models::backend::User;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserCredentials {

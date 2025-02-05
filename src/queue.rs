@@ -1,4 +1,4 @@
-use crate::models::Artist;
+use crate::models::backend::Artist;
 use crate::song::Song;
 use crate::util::state::GlobalState;
 use leptos::ev::MouseEvent;

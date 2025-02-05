@@ -2,9 +2,8 @@ use leptos::prelude::*;
 
 use cfg_if::cfg_if;
 
-use crate::albumdata::AlbumData;
-use crate::models::Artist;
-use crate::songdata::SongData;
+use crate::models::frontend;
+use crate::models::backend::Artist;
 
 cfg_if! {
     if #[cfg(feature = "ssr")] {
@@ -12,7 +11,7 @@ cfg_if! {
         use diesel::prelude::*;
         use std::collections::HashMap;
         use server_fn::error::NoCustomError;
-        use crate::models::Album;
+        use crate::models::backend::Album;
     }
 }
 
@@ -28,7 +27,6 @@ cfg_if! {
 #[server(endpoint = "artists/add-artist")]
 pub async fn add_artist(artist_name: String) -> Result<(), ServerFnError> {
     use crate::schema::artists::dsl::*;
-    use crate::models::Artist;
     use leptos::server_fn::error::NoCustomError;
 
     let new_artist = Artist {
@@ -48,7 +46,6 @@ pub async fn add_artist(artist_name: String) -> Result<(), ServerFnError> {
 #[server(endpoint = "artists/get")]
 pub async fn get_artist_by_id(artist_id: i32) -> Result<Option<Artist>, ServerFnError> {
     use crate::schema::artists::dsl::*;
-    use crate::models::Artist;
     use leptos::server_fn::error::NoCustomError;
 
     let db = &mut get_db_conn();
@@ -62,8 +59,8 @@ pub async fn get_artist_by_id(artist_id: i32) -> Result<Option<Artist>, ServerFn
 }
 
 #[server(endpoint = "artists/top_songs")]
-pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<(SongData, i64)>, ServerFnError> {
-    use crate::models::Song;
+pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<(frontend::Song, i64)>, ServerFnError> {
+    use crate::models::backend::Song;
     use crate::auth::get_user;
     use crate::schema::*;
     use leptos::server_fn::error::NoCustomError;
@@ -114,7 +111,7 @@ pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<V
 		))
 		.load(db)?;
 
-    let mut top_songs_map: HashMap<i32, (SongData, i64)> = HashMap::with_capacity(top_songs.len());
+    let mut top_songs_map: HashMap<i32, (frontend::Song, i64)> = HashMap::with_capacity(top_songs.len());
 
 	for (song, album, artist, like, dislike) in top_songs {
 		let song_id = song.id
@@ -137,7 +134,7 @@ pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<V
 				album.as_ref().map(|album| album.image_path.clone()).flatten()
 					.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
 
-			let songdata = SongData {
+			let songdata = frontend::Song {
 				id: song_id,
 				title: song.title,
 				artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
@@ -158,13 +155,13 @@ pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<V
 		}
 	}
 
-    let mut top_songs: Vec<(SongData, i64)> = top_songs_map.into_iter().map(|(_, v)| v).collect();
+    let mut top_songs: Vec<(frontend::Song, i64)> = top_songs_map.into_iter().map(|(_, v)| v).collect();
     top_songs.sort_by(|(_, plays1), (_, plays2)| plays2.cmp(plays1));
     Ok(top_songs)
 }
 
 #[server(endpoint = "artists/albums")]
-pub async fn albums_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<AlbumData>, ServerFnError> {
+pub async fn albums_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<frontend::Album>, ServerFnError> {
     use crate::schema::*;
 
     let db = &mut get_db_conn();
@@ -186,7 +183,7 @@ pub async fn albums_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<
                 .load(db)?
         };
 
-    let mut albums_map: HashMap<i32, AlbumData> = HashMap::with_capacity(album_ids.len());
+    let mut albums_map: HashMap<i32, frontend::Album> = HashMap::with_capacity(album_ids.len());
 
     let album_artists: Vec<(Album, Artist)> = albums::table
         .filter(albums::id.eq_any(album_ids))
@@ -201,7 +198,7 @@ pub async fn albums_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<
         if let Some(stored_album) = albums_map.get_mut(&album_id) {
             stored_album.artists.push(artist);
         } else {
-            let albumdata = AlbumData {
+            let albumdata = frontend::Album {
                 id: album_id,
                 title: album.title,
                 artists: vec![artist],
@@ -213,7 +210,7 @@ pub async fn albums_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<
         }
     }
 
-    let mut albums: Vec<AlbumData> = albums_map.into_iter().map(|(_, v)| v).collect();
+    let mut albums: Vec<frontend::Album> = albums_map.into_iter().map(|(_, v)| v).collect();
     albums.sort_by(|a1, a2| a2.release_date.cmp(&a1.release_date));
     Ok(albums)
 }

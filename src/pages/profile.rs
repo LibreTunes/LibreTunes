@@ -11,7 +11,7 @@ use crate::components::error::*;
 
 use crate::api::profile::*;
 
-use crate::models::User;
+use crate::models::backend::User;
 use crate::users::get_user_by_id;
 use crate::util::state::GlobalState;
 

@@ -29,7 +29,7 @@ async fn extract_field(field: Field<'static>) -> Result<String, ServerFnError> {
 /// Expects a field with a comma-separated list of artist ids, and ensures each is a valid artist id in the database
 #[cfg(feature = "ssr")]
 async fn validate_artist_ids(artist_ids: Field<'static>) -> Result<Vec<i32>, ServerFnError> {
-    use crate::models::Artist;
+    use crate::models::backend::Artist;
 	use diesel::result::Error::NotFound;
 
 	// Extract the artist id from the field
@@ -65,7 +65,7 @@ async fn validate_artist_ids(artist_ids: Field<'static>) -> Result<Vec<i32>, Ser
 /// Expects a field with an album id, and ensures it is a valid album id in the database
 #[cfg(feature = "ssr")]
 async fn validate_album_id(album_id: Field<'static>) -> Result<Option<i32>, ServerFnError> {
-	use crate::models::Album;
+	use crate::models::backend::Album;
 	use diesel::result::Error::NotFound;
 
 	// Extract the album id from the field
@@ -243,7 +243,7 @@ pub async fn upload(data: MultipartData) -> Result<(), ServerFnError> {
 	}
 
 	// Create the song
-	use crate::models::Song;
+	use crate::models::backend::Song;
 	let song = Song {
 		id: None,
 		title,

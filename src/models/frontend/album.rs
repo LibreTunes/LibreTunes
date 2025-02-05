@@ -1,4 +1,4 @@
-use crate::models::Artist;
+use crate::models::backend::Artist;
 use crate::components::dashboard_tile::DashboardTile;
 use serde::{Serialize, Deserialize};
 
@@ -9,7 +9,7 @@ use chrono::NaiveDate;
 /// Intended to be used in the front-end
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct AlbumData {
+pub struct Album {
 	/// Album id
 	pub id: i32,
 	/// Album title
@@ -23,7 +23,7 @@ pub struct AlbumData {
 	pub image_path: String,
 }
 
-impl Into<DashboardTile> for AlbumData {
+impl Into<DashboardTile> for Album {
 	fn into(self) -> DashboardTile {
 		DashboardTile {
 			image_path: self.image_path.into(),

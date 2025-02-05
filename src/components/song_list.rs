@@ -7,19 +7,19 @@ use leptos_icons::*;
 use leptos::task::spawn_local;
 
 use crate::api::songs::*;
-use crate::songdata::SongData;
-use crate::models::{Album, Artist};
+use crate::models::frontend;
+use crate::models::backend::{Album, Artist};
 use crate::util::state::GlobalState;
 
 const LIKE_DISLIKE_BTN_SIZE: &str = "2em";
 
 #[component]
-pub fn SongList(songs: Vec<SongData>) -> impl IntoView {
+pub fn SongList(songs: Vec<frontend::Song>) -> impl IntoView {
 	__SongListInner(songs.into_iter().map(|song| (song, ())).collect::<Vec<_>>(), false)
 }
 
 #[component]
-pub fn SongListExtra<T>(songs: Vec<(SongData, T)>) -> impl IntoView where 
+pub fn SongListExtra<T>(songs: Vec<(frontend::Song, T)>) -> impl IntoView where 
 	T: Clone + IntoView + 'static
 {
 	__SongListInner(songs, true)
@@ -28,7 +28,7 @@ pub fn SongListExtra<T>(songs: Vec<(SongData, T)>) -> impl IntoView where
 // TODO these arguments shouldn't need a leading underscore,
 // but for some reason the compiler thinks they are unused
 #[component]
-fn SongListInner<T>(_songs: Vec<(SongData, T)>, _show_extra: bool) -> impl IntoView where
+fn SongListInner<T>(_songs: Vec<(frontend::Song, T)>, _show_extra: bool) -> impl IntoView where
 	T: Clone + IntoView + 'static
 {
 	let songs = Rc::new(_songs);
@@ -41,7 +41,7 @@ fn SongListInner<T>(_songs: Vec<(SongData, T)>, _show_extra: bool) -> impl IntoV
 
 		if let Some(index) = clicked_index {
 			GlobalState::play_status().update(|status| {
-				let song: &(SongData, T) = songs.get(index).expect("Invalid song list item index");
+				let song: &(frontend::Song, T) = songs.get(index).expect("Invalid song list item index");
 
 				if status.queue.front().map(|song| song.id) == Some(song.0.id) {
 					// If the clicked song is already at the front of the queue, just play it
@@ -87,7 +87,7 @@ fn SongListInner<T>(_songs: Vec<(SongData, T)>, _show_extra: bool) -> impl IntoV
 }
 
 #[component]
-pub fn SongListItem<T>(song: SongData, song_playing: Signal<bool>, extra: Option<T>,
+pub fn SongListItem<T>(song: frontend::Song, song_playing: Signal<bool>, extra: Option<T>,
 	list_index: usize, do_queue_remaining: WriteSignal<Option<usize>>) -> impl IntoView where
 	T: IntoView + 'static
 {

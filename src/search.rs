@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use crate::models::{Artist, Album, Song};
+use crate::models::backend::{Artist, Album, Song};
 
 use cfg_if::cfg_if;
 

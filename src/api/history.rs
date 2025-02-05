@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use leptos::prelude::*;
-use crate::models::HistoryEntry;
-use crate::models::Song;
+use crate::models::backend::HistoryEntry;
+use crate::models::backend::Song;
 
 use cfg_if::cfg_if;
 

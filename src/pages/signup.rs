@@ -1,5 +1,5 @@
 use crate::auth::signup;
-use crate::models::User;
+use crate::models::backend::User;
 use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
 use leptos::prelude::*;

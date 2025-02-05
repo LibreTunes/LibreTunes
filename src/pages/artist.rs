@@ -4,7 +4,7 @@ use leptos_router::hooks::use_params_map;
 use leptos_icons::*;
 use server_fn::error::NoCustomError;
 
-use crate::models::Artist;
+use crate::models::backend::Artist;
 
 use crate::components::loading::*;
 use crate::components::error::*;

@@ -7,8 +7,7 @@ use web_sys::Response;
 use leptos::task::spawn_local;
 use crate::search::search_artists;
 use crate::search::search_albums;
-use crate::models::Artist;
-use crate::models::Album;
+use crate::models::backend::{Artist, Album};
 
 #[component]
 pub fn UploadBtn(dialog_open: RwSignal<bool>) -> impl IntoView {

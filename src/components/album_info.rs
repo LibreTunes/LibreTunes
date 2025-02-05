@@ -1,8 +1,8 @@
 use leptos::prelude::*;
-use crate::albumdata::AlbumData;
+use crate::models::frontend;
 
 #[component]
-pub fn AlbumInfo(albumdata: AlbumData) -> impl IntoView {
+pub fn AlbumInfo(albumdata: frontend::Album) -> impl IntoView {
 	view! {
 		<div class="album-info">
 			<img class="album-image" src={albumdata.image_path} alt="dashboard-tile" />

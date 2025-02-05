@@ -1,8 +1,8 @@
 use leptos::prelude::*;
 use leptos::logging::*;
 
-use crate::playstatus::PlayStatus;
-use crate::models::User;
+use crate::models::frontend::PlayStatus;
+use crate::models::backend::User;
 use crate::auth::get_logged_in_user;
 
 /// Global front-end state

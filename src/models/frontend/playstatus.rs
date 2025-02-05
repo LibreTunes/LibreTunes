@@ -3,7 +3,7 @@ use web_sys::HtmlAudioElement;
 use leptos::html::Audio;
 use std::collections::VecDeque;
 
-use crate::songdata::SongData;
+use crate::models::frontend;
 
 /// Represents the global state of the audio player feature of LibreTunes
 pub struct PlayStatus {
@@ -14,9 +14,9 @@ pub struct PlayStatus {
 	/// A reference to the HTML audio element
     pub audio_player: Option<NodeRef<Audio>>,
 	/// A queue of songs that have been played, ordered from oldest to newest
-    pub history: VecDeque<SongData>,
+    pub history: VecDeque<frontend::Song>,
 	/// A queue of songs that have yet to be played, ordered from next up to last
-    pub queue: VecDeque<SongData>,
+    pub queue: VecDeque<frontend::Song>,
 }
 
 impl PlayStatus {

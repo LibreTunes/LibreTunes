@@ -11,7 +11,7 @@ cfg_if! {
 	}
 }
 
-use crate::models::User;
+use crate::models::backend::User;
 use crate::users::UserCredentials;
 
 /// Create a new user and log them in

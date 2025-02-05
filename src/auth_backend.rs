@@ -2,7 +2,7 @@ use axum_login::{AuthnBackend, AuthUser, UserId};
 use crate::users::UserCredentials;
 use leptos::server_fn::error::ServerFnErrorErr;
 
-use crate::models::User;
+use crate::models::backend::User;
 
 use cfg_if::cfg_if;
 

@@ -9,7 +9,7 @@ use crate::components::loading::*;
 use crate::components::error::*;
 use crate::components::song_list::*;
 use crate::api::songs::*;
-use crate::songdata::SongData;
+use crate::models::frontend;
 use crate::util::state::GlobalState;
 
 use std::rc::Rc;
@@ -90,7 +90,7 @@ fn SongDetails(#[prop(into)] id: Signal<i32>) -> impl IntoView {
 }
 
 #[component]
-fn SongOverview(song: SongData) -> impl IntoView {
+fn SongOverview(song: frontend::Song) -> impl IntoView {
     let liked = RwSignal::new(song.like_dislike.map(|ld| ld.0).unwrap_or(false));
     let disliked = RwSignal::new(song.like_dislike.map(|ld| ld.1).unwrap_or(false));
 
@@ -121,7 +121,7 @@ fn SongOverview(song: SongData) -> impl IntoView {
                 }
 
                 status.queue.clear();
-                status.queue.push_front(<Rc<SongData> as Borrow<SongData>>::borrow(&song_rc).clone());
+                status.queue.push_front(<Rc<frontend::Song> as Borrow<frontend::Song>>::borrow(&song_rc).clone());
                 status.playing = true;
             }
         });

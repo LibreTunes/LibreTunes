@@ -24,7 +24,7 @@ cfg_if! {
 #[server(endpoint = "albums/add-album")]
 pub async fn add_album(album_title: String, release_date: Option<String>, image_path: Option<String>) -> Result<(), ServerFnError> {
     use crate::schema::albums::{self};
-    use crate::models::Album;
+    use crate::models::backend::Album;
     use leptos::server_fn::error::NoCustomError;
     
     let parsed_release_date = match release_date {

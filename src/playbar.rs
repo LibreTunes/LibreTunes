@@ -1,5 +1,5 @@
-use crate::models::Artist;
-use crate::songdata::SongData;
+use crate::models::backend::Artist;
+use crate::models::frontend;
 use crate::api::songs;
 use crate::util::state::GlobalState;
 use leptos::ev::MouseEvent;
@@ -275,7 +275,7 @@ fn LikeDislike() -> impl IntoView {
     let like_icon = Signal::derive(move || {
         status.with(|status| {
             match status.queue.front() {
-                Some(SongData { like_dislike: Some((true, _)), .. }) => icondata::TbThumbUpFilled,
+                Some(frontend::Song { like_dislike: Some((true, _)), .. }) => icondata::TbThumbUpFilled,
                 _ => icondata::TbThumbUp,
             }
         })
@@ -284,7 +284,7 @@ fn LikeDislike() -> impl IntoView {
     let dislike_icon = Signal::derive(move || {
         status.with(|status| {
             match status.queue.front() {
-                Some(SongData { like_dislike: Some((_, true)), .. }) => icondata::TbThumbDownFilled,
+                Some(frontend::Song { like_dislike: Some((_, true)), .. }) => icondata::TbThumbDownFilled,
                 _ => icondata::TbThumbDown,
             }
         })
@@ -293,7 +293,7 @@ fn LikeDislike() -> impl IntoView {
     let toggle_like = move |_| {
         status.update(|status| {
             match status.queue.front_mut() {
-                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                Some(frontend::Song { id, like_dislike: Some((liked, disliked)), .. }) => {
                     *liked = !*liked;
 
                     if *liked {
@@ -308,7 +308,7 @@ fn LikeDislike() -> impl IntoView {
                         }
                     });
                 },
-                Some(SongData { id, like_dislike, .. }) => {
+                Some(frontend::Song { id, like_dislike, .. }) => {
                     // This arm should only be reached if like_dislike is None
                     // In this case, the buttons will show up not filled, indicating that the song is not
                     // liked or disliked. Therefore, clicking the like button should like the song.
@@ -333,7 +333,7 @@ fn LikeDislike() -> impl IntoView {
     let toggle_dislike = move |_| {
         status.update(|status| {
             match status.queue.front_mut() {
-                Some(SongData { id, like_dislike: Some((liked, disliked)), .. }) => {
+                Some(frontend::Song { id, like_dislike: Some((liked, disliked)), .. }) => {
                     *disliked = !*disliked;
 
                     if *disliked {
@@ -348,7 +348,7 @@ fn LikeDislike() -> impl IntoView {
                         }
                     });
                 },
-                Some(SongData { id, like_dislike, .. }) => {
+                Some(frontend::Song { id, like_dislike, .. }) => {
                     // This arm should only be reached if like_dislike is None
                     // In this case, the buttons will show up not filled, indicating that the song is not
                     // liked or disliked. Therefore, clicking the dislike button should dislike the song.
