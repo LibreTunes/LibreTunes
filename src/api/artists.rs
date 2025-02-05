@@ -165,25 +165,20 @@ pub async fn albums_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<
     use crate::schema::*;
 
     let db = &mut get_db_conn();
-    let album_ids: Vec<i32> = 
-        if let Some(limit) = limit {
-            albums::table
-                .left_join(album_artists::table)
-                .filter(album_artists::artist_id.eq(artist_id))
-                .order_by(albums::release_date.desc())
-                .limit(limit)
-                .select(albums::id)
-                .load(db)?
-        } else {
-            albums::table
-                .left_join(album_artists::table)
-                .filter(album_artists::artist_id.eq(artist_id))
-                .order_by(albums::release_date.desc())
-                .select(albums::id)
-                .load(db)?
-        };
 
-    let mut albums_map: HashMap<i32, frontend::Album> = HashMap::with_capacity(album_ids.len());
+    let album_ids = albums::table
+        .left_join(album_artists::table)
+        .filter(album_artists::artist_id.eq(artist_id))
+        .order_by(albums::release_date.desc())
+        .select(albums::id);
+
+    let album_ids = if let Some(limit) = limit {
+        album_ids.limit(limit).into_boxed()
+    } else {
+        album_ids.into_boxed()
+    };
+    
+    let mut albums_map: HashMap<i32, frontend::Album> = HashMap::new();
 
     let album_artists: Vec<(Album, Artist)> = albums::table
         .filter(albums::id.eq_any(album_ids))
