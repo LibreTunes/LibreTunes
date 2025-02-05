@@ -71,27 +71,25 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 
 	let mut db_con = get_db_conn();
 
+	// Create an alias for the table so it can be referenced twice in the query
+	let history2 = diesel::alias!(song_history as history2);
+
 	// Get the ids of the most recent songs listened to
-	let history_items: Vec<i32> = 
-		if let Some(limit) = limit {
-			song_history::table
-				.filter(song_history::user_id.eq(for_user_id))
-				.order(song_history::date.desc())
-				.limit(limit)
-				.select(song_history::id)
-				.load(&mut db_con)?
-		} else {
-			song_history::table
-				.filter(song_history::user_id.eq(for_user_id))
-				.order(song_history::date.desc())
-				.select(song_history::id)
-				.load(&mut db_con)?
-		};
+	let history_ids = history2
+		.filter(history2.fields(song_history::user_id).eq(for_user_id))
+		.order(history2.fields(song_history::date).desc())
+		.select(history2.fields(song_history::id));
+
+	let history_ids = if let Some(limit) = limit {
+		history_ids.limit(limit).into_boxed()
+	} else {
+		history_ids.into_boxed()
+	};
 
 	// Take the history ids and get the song data for them
 	let history: Vec<(HistoryEntry, Song, Option<Album>, Option<Artist>, Option<(i32, i32)>, Option<(i32, i32)>)>
 	= song_history::table
-		.filter(song_history::id.eq_any(history_items))
+		.filter(song_history::id.eq_any(history_ids))
 		.inner_join(songs::table)
 		.left_join(albums::table.on(songs::album_id.eq(albums::id.nullable())))
 		.left_join(song_artists::table.inner_join(artists::table).on(songs::id.eq(song_artists::song_id)))
@@ -109,7 +107,7 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 		.load(&mut db_con)?;
 
 	// Process the history data into a map of song ids to song data
-	let mut history_songs: HashMap<i32, (NaiveDateTime, frontend::Song)> = HashMap::with_capacity(history.len());
+	let mut history_songs: HashMap<i32, (NaiveDateTime, frontend::Song)> = HashMap::new();
 
 	for (history, song, album, artist, like, dislike) in history {
 		let song_id = history.song_id;
