@@ -4,6 +4,7 @@ cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		pub mod audio;
 		pub mod require_auth;
+		pub mod fileserv;
 	}
 }
 

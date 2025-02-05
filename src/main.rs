@@ -19,7 +19,7 @@ async fn main() {
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use libretunes::app::*;
     use libretunes::util::require_auth::require_auth_middleware;
-    use libretunes::fileserv::{file_and_error_handler, get_asset_file, get_static_file, AssetType};
+    use libretunes::util::fileserv::{file_and_error_handler, get_asset_file, get_static_file, AssetType};
     use axum_login::tower_sessions::SessionManagerLayer;
     use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
     use axum_login::AuthManagerLayerBuilder;
