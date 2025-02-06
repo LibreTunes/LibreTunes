@@ -3,7 +3,7 @@ use leptos::logging::*;
 
 use crate::models::frontend::PlayStatus;
 use crate::models::backend::User;
-use crate::auth::get_logged_in_user;
+use crate::api::auth::get_logged_in_user;
 
 /// Global front-end state
 /// Contains anything frequently needed across multiple components

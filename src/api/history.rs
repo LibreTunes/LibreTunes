@@ -9,7 +9,7 @@ cfg_if! {
 	if #[cfg(feature = "ssr")] {
 		use leptos::server_fn::error::NoCustomError;
 		use crate::util::database::get_db_conn;
-		use crate::auth::get_user;
+		use crate::api::auth::get_user;
 	}
 }
 

@@ -1,4 +1,4 @@
-use crate::auth::login;
+use crate::api::auth::login;
 use crate::util::state::GlobalState;
 use leptos::leptos_dom::*;
 use leptos::prelude::*;

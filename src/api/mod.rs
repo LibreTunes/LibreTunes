@@ -6,3 +6,4 @@ pub mod songs;
 pub mod album;
 pub mod search;
 pub mod upload;
+pub mod auth;

@@ -61,7 +61,7 @@ pub async fn get_artist_by_id(artist_id: i32) -> Result<Option<Artist>, ServerFn
 #[server(endpoint = "artists/top_songs")]
 pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<(frontend::Song, i64)>, ServerFnError> {
     use crate::models::backend::Song;
-    use crate::auth::get_user;
+    use crate::api::auth::get_user;
     use crate::schema::*;
     use leptos::server_fn::error::NoCustomError;
 

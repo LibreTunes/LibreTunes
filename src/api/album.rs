@@ -22,7 +22,7 @@ pub async fn get_album(id: i32) -> Result<frontend::Album, ServerFnError> {
 #[server(endpoint = "album/get_songs")]
 pub async fn get_songs(id: i32) -> Result<Vec<frontend::Song>, ServerFnError> {
 	use crate::models::backend::Album;
-	use crate::auth::get_logged_in_user;
+	use crate::api::auth::get_logged_in_user;
 	let user = get_logged_in_user().await?;
 	let db_con = &mut get_db_conn();
 	// TODO: NEEDS SONG DATA QUERIES
