@@ -55,7 +55,7 @@ impl User {
 	/// # Returns
 	/// 
 	/// * `Result<Vec<HistoryEntry>, Box<dyn Error>>` -
-	///     A result indicating success with a vector of history entries, or an error
+	///   A result indicating success with a vector of history entries, or an error
 	/// 
 	#[cfg(feature = "ssr")]
 	pub fn get_history(&self, limit: Option<i64>, conn: &mut PgPooledConn) ->
@@ -94,7 +94,7 @@ impl User {
 	/// # Returns
 	/// 
 	/// * `Result<Vec<(SystemTime, Song)>, Box<dyn Error>>` -
-	///     A result indicating success with a vector of listen dates and songs, or an error
+	///   A result indicating success with a vector of listen dates and songs, or an error
 	/// 
 	#[cfg(feature = "ssr")]
 	pub fn get_history_songs(&self, limit: Option<i64>, conn: &mut PgPooledConn) ->
