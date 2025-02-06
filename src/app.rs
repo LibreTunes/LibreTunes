@@ -11,7 +11,7 @@ use crate::pages::profile::*;
 use crate::pages::albumpage::*;
 use crate::pages::artist::*;
 use crate::pages::songpage::*;
-use crate::error_template::{AppError, ErrorTemplate};
+use crate::components::error_template::{AppError, ErrorTemplate};
 use crate::util::state::GlobalState;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {

@@ -35,7 +35,6 @@ pub mod app;
 pub mod models;
 pub mod pages;
 pub mod components;
-pub mod error_template;
 pub mod api;
 pub mod util;
 

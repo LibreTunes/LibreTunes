@@ -15,3 +15,4 @@ pub mod album_info;
 pub mod queue;
 pub mod playbar;
 pub mod song;
+pub mod error_template;
