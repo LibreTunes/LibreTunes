@@ -5,3 +5,4 @@ pub mod albumpage;
 pub mod artist;
 pub mod songpage;
 pub mod search;
+pub mod dashboard;
