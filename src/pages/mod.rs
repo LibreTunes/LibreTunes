@@ -4,3 +4,4 @@ pub mod profile;
 pub mod albumpage;
 pub mod artist;
 pub mod songpage;
+pub mod search;

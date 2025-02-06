@@ -11,6 +11,7 @@ use crate::pages::profile::*;
 use crate::pages::albumpage::*;
 use crate::pages::artist::*;
 use crate::pages::songpage::*;
+use crate::pages::search::*;
 use crate::components::error_template::{AppError, ErrorTemplate};
 use crate::util::state::GlobalState;
 
@@ -82,7 +83,6 @@ pub fn App() -> impl IntoView {
 
 use crate::components::sidebar::*;
 use crate::components::dashboard::*;
-use crate::components::search::*;
 use crate::components::personal::Personal;
 use crate::components::upload::*;
 use crate::components::add_artist::AddArtist;
