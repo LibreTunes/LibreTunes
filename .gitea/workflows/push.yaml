@@ -91,3 +91,15 @@ jobs:
         run: apt install -y nix-bin
       - name: Build project with Nix
         run: nix build --experimental-features 'nix-command flakes' git+$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git?ref=$GITHUB_REF_NAME#default
+
+  clippy:
+    runs-on: libretunes-cicd
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Use Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Run clippy
+        env:
+          RUSTFLAGS: "-D warnings"
+        run: cargo clippy --all-targets --all-features
