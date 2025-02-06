@@ -1,5 +1,5 @@
-use crate::playbar::PlayBar;
-use crate::playbar::CustomTitle;
+use crate::components::playbar::PlayBar;
+use crate::components::playbar::CustomTitle;
 use crate::components::queue::Queue;
 use leptos::prelude::*;
 use leptos_meta::*;
