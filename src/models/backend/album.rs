@@ -31,60 +31,6 @@ pub struct Album {
 }
 
 impl Album {
-	/// Add an artist to this album in the database
-	/// 
-	/// The `id` field of this album must be present (Some) to add an artist
-	/// 
-	/// # Arguments
-	/// 
-	/// * `new_artist_id` - The id of the artist to add to this album
-	/// * `conn` - A mutable reference to a database connection
-	/// 
-	/// # Returns
-	/// 
-	/// * `Result<(), Box<dyn Error>>` - A result indicating success with an empty value, or an error
-	/// 
-	#[cfg(feature = "ssr")]
-	pub fn add_artist(self: &Self, new_artist_id: i32, conn: &mut PgPooledConn) -> Result<(), Box<dyn Error>> {
-		use crate::schema::album_artists::dsl::*;
-
-		let my_id = self.id.ok_or("Album id must be present (Some) to add an artist")?;
-
-		diesel::insert_into(album_artists)
-			.values((album_id.eq(my_id), artist_id.eq(new_artist_id)))
-			.execute(conn)?;
-
-		Ok(())
-	}
-
-	/// Get songs by this album from the database
-	/// 
-	/// The `id` field of this album must be present (Some) to get songs
-	/// 
-	/// # Arguments
-	/// 
-	/// * `conn` - A mutable reference to a database connection
-	/// 
-	/// # Returns
-	/// 
-	/// * `Result<Vec<Song>, Box<dyn Error>>` - A result indicating success with a vector of songs, or an error
-	/// 
-	#[cfg(feature = "ssr")]
-	pub fn get_songs(self: &Self, conn: &mut PgPooledConn) -> Result<Vec<Song>, Box<dyn Error>> {
-		use crate::schema::songs::dsl::*;
-		use crate::schema::song_artists::dsl::*;
-
-		let my_id = self.id.ok_or("Album id must be present (Some) to get songs")?;
-
-		let my_songs = songs
-			.inner_join(song_artists)
-			.filter(album_id.eq(my_id))
-			.select(songs::all_columns())
-			.load(conn)?;
-
-		Ok(my_songs)
-	}
-
 	/// Obtain an album from its albumid
 	/// # Arguments
 	/// 

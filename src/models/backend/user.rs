@@ -152,35 +152,6 @@ impl User {
 		Ok(())
 	}
 
-	/// Check if this user has listened to a song
-	/// 
-	/// The `id` field of this user must be present (Some) to check history
-	/// 
-	/// # Arguments
-	/// 
-	/// * `song_id` - The id of the song to check if this user has listened to
-	/// * `conn` - A mutable reference to a database connection
-	/// 
-	/// # Returns
-	/// 
-	/// * `Result<bool, Box<dyn Error>>` - A result indicating success with a boolean value, or an error
-	/// 
-	#[cfg(feature = "ssr")]
-	pub fn has_listened_to(self: &Self, song_id: i32, conn: &mut PgPooledConn) -> Result<bool, Box<dyn Error>> {
-		use crate::schema::song_history::{self, user_id};
-
-		let my_id = self.id.ok_or("Artist id must be present (Some) to check history")?;
-
-		let has_listened = song_history::table
-			.filter(user_id.eq(my_id))
-			.filter(song_history::song_id.eq(song_id))
-			.first::<HistoryEntry>(conn)
-			.optional()?
-			.is_some();
-
-		Ok(has_listened)
-	}
-
 	/// Like or unlike a song for this user
 	/// If likeing a song, remove dislike if it exists
 	#[cfg(feature = "ssr")]
@@ -225,23 +196,6 @@ impl User {
 			.is_some();
 
 		Ok(like)
-	}
-
-	/// Get songs liked by this user
-	#[cfg(feature = "ssr")]
-	pub async fn get_liked_songs(self: &Self, conn: &mut PgPooledConn) -> Result<Vec<Song>, Box<dyn Error>> {
-		use crate::schema::songs::dsl::*;
-		use crate::schema::song_likes::dsl::*;
-
-		let my_id = self.id.ok_or("User id must be present (Some) to get liked songs")?;
-
-		let my_songs = songs
-			.inner_join(song_likes)
-			.filter(user_id.eq(my_id))
-			.select(songs::all_columns())
-			.load(conn)?;
-
-		Ok(my_songs)
 	}
 
 	/// Dislike or remove dislike from a song for this user
@@ -289,22 +243,5 @@ impl User {
 			.is_some();
 
 		Ok(dislike)
-	}
-
-	/// Get songs disliked by this user
-	#[cfg(feature = "ssr")]
-	pub async fn get_disliked_songs(self: &Self, conn: &mut PgPooledConn) -> Result<Vec<Song>, Box<dyn Error>> {
-		use crate::schema::songs::dsl::*;
-		use crate::schema::song_likes::dsl::*;
-
-		let my_id = self.id.ok_or("User id must be present (Some) to get disliked songs")?;
-
-		let my_songs = songs
-			.inner_join(song_likes)
-			.filter(user_id.eq(my_id))
-			.select(songs::all_columns())
-			.load(conn)?;
-
-		Ok(my_songs)
 	}
 }
