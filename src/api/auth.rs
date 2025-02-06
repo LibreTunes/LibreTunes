@@ -111,7 +111,7 @@ pub async fn check_auth() -> Result<bool, ServerFnError> {
 /// Intended to be used at the start of a protected route, to ensure the user is logged in:
 /// ```rust
 /// use leptos::prelude::*;
-/// use libretunes::auth::require_auth;
+/// use libretunes::api::auth::require_auth;
 /// #[server(endpoint = "protected_route")]
 /// pub async fn protected_route() -> Result<(), ServerFnError> {
 /// 	require_auth().await?;
@@ -136,7 +136,7 @@ pub async fn require_auth() -> Result<(), ServerFnError> {
 /// Intended to be used in a route to get the current user:
 /// ```rust
 /// use leptos::prelude::*;
-/// use libretunes::auth::get_user;
+/// use libretunes::api::auth::get_user;
 /// #[server(endpoint = "user_route")]
 /// pub async fn user_route() -> Result<(), ServerFnError> {
 /// 	let user = get_user().await?;
@@ -181,7 +181,7 @@ pub async fn check_admin() -> Result<bool, ServerFnError> {
 /// Intended to be used at the start of a protected route, to ensure the user is logged in and an admin:
 /// ```rust
 /// use leptos::prelude::*;
-/// use libretunes::auth::require_admin;
+/// use libretunes::api::auth::require_admin;
 /// #[server(endpoint = "protected_admin_route")]
 /// pub async fn protected_admin_route() -> Result<(), ServerFnError> {
 /// 	require_admin().await?;

@@ -25,7 +25,7 @@ impl PlayStatus {
 	/// Instead of:
 	/// ```
 	/// use leptos::prelude::*;
-	/// let status = libretunes::playstatus::PlayStatus::default();
+	/// let status = libretunes::models::frontend::PlayStatus::default();
 	/// if let Some(audio) = status.audio_player {
 	/// 	if let Some(audio) = audio.get() {
 	/// 		let _ = audio.play();
@@ -35,7 +35,7 @@ impl PlayStatus {
 	/// 
 	/// You can do:
 	/// ```
-	/// let status = libretunes::playstatus::PlayStatus::default();
+	/// let status = libretunes::models::frontend::PlayStatus::default();
 	/// if let Some(audio) = status.get_audio() {
 	/// 	let _ = audio.play();
 	/// }
