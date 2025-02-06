@@ -12,7 +12,7 @@ use crate::components::error::*;
 use crate::api::profile::*;
 
 use crate::models::backend::User;
-use crate::users::get_user_by_id;
+use crate::api::users::get_user_by_id;
 use crate::util::state::GlobalState;
 
 /// Duration in seconds backwards from now to aggregate history data for

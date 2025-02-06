@@ -1,5 +1,5 @@
 use axum_login::{AuthnBackend, AuthUser, UserId};
-use crate::users::UserCredentials;
+use crate::api::users::UserCredentials;
 use leptos::server_fn::error::ServerFnErrorErr;
 
 use crate::models::backend::User;
@@ -37,12 +37,12 @@ impl AuthnBackend for AuthBackend {
 	type Error = ServerFnErrorErr;
 
 	async fn authenticate(&self, creds: Self::Credentials) -> Result<Option<Self::User>, Self::Error> {
-		crate::users::validate_user(creds).await
+		crate::api::users::validate_user(creds).await
 			.map_err(|e| ServerFnErrorErr::ServerError(format!("Error validating user: {}", e)))
 	}
 
 	async fn get_user(&self, user_id: &UserId<Self>) ->  Result<Option<Self::User>, Self::Error> {
-		crate::users::find_user_by_id(*user_id).await
+		crate::api::users::find_user_by_id(*user_id).await
 			.map_err(|e| ServerFnErrorErr::ServerError(format!("Error getting user: {}", e)))
 	}
 }

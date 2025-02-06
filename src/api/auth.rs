@@ -12,7 +12,7 @@ cfg_if! {
 }
 
 use crate::models::backend::User;
-use crate::users::UserCredentials;
+use crate::api::users::UserCredentials;
 
 /// Create a new user and log them in
 /// Takes in a NewUser struct, with the password in plaintext
@@ -24,7 +24,7 @@ pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 		return Err(ServerFnError::<NoCustomError>::ServerError("Signup is disabled".to_string()));
 	}
 
-	use crate::users::create_user;
+	use crate::api::users::create_user;
 
 	// Ensure the user has no id, and is not a self-proclaimed admin
 	let new_user = User {
@@ -63,7 +63,7 @@ pub async fn signup(new_user: User) -> Result<(), ServerFnError> {
 /// Returns a Result with a boolean indicating if the login was successful
 #[server(endpoint = "login")]
 pub async fn login(credentials: UserCredentials) -> Result<Option<User>, ServerFnError> {
-	use crate::users::validate_user;
+	use crate::api::users::validate_user;
 
 	let mut auth_session = extract::<AuthSession<AuthBackend>>().await
 		.map_err(|e| ServerFnError::<NoCustomError>::ServerError(format!("Error getting auth session: {}", e)))?;
