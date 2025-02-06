@@ -6,6 +6,7 @@ cfg_if! {
 		pub mod require_auth;
 		pub mod fileserv;
 		pub mod database;
+		pub mod auth_backend;
 	}
 }
 

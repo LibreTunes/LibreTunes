@@ -23,7 +23,7 @@ async fn main() {
     use axum_login::tower_sessions::SessionManagerLayer;
     use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
     use axum_login::AuthManagerLayerBuilder;
-    use libretunes::auth_backend::AuthBackend;
+    use libretunes::util::auth_backend::AuthBackend;
     use log::*;
 
     flexi_logger::Logger::try_with_env_or_str("debug").unwrap().format(flexi_logger::opt_format).start().unwrap();

@@ -7,7 +7,7 @@ cfg_if! {
 		use leptos::server_fn::error::NoCustomError;
 		use leptos_axum::extract;
 		use axum_login::AuthSession;
-		use crate::auth_backend::AuthBackend;
+		use crate::util::auth_backend::AuthBackend;
 	}
 }
 

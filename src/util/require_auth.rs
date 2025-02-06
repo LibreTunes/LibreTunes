@@ -5,7 +5,7 @@ use axum::middleware::Next;
 use axum_login::AuthSession;
 use http::StatusCode;
 
-use crate::auth_backend::AuthBackend;
+use crate::util::auth_backend::AuthBackend;
 
 use axum::extract::FromRequestParts;
 

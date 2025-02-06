@@ -43,7 +43,6 @@ use cfg_if::cfg_if;
 
 cfg_if! {
   if #[cfg(feature = "ssr")] {
-    pub mod auth_backend;
     pub mod schema;
   }
 }

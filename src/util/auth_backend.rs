@@ -4,13 +4,8 @@ use leptos::server_fn::error::ServerFnErrorErr;
 
 use crate::models::backend::User;
 
-use cfg_if::cfg_if;
+use async_trait::async_trait;
 
-cfg_if! {
-	if #[cfg(feature = "ssr")] {
-		use async_trait::async_trait;
-	}
-}
 
 impl AuthUser for User {
 	type Id = i32;
@@ -29,7 +24,6 @@ impl AuthUser for User {
 #[derive(Clone)]
 pub struct AuthBackend;
 
-#[cfg(feature = "ssr")]
 #[async_trait]
 impl AuthnBackend for AuthBackend {
 	type User = User;
