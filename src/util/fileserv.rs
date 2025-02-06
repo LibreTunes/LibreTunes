@@ -32,7 +32,7 @@ pub async fn get_static_file(uri: Uri, root: &str) -> Result<Response<Body>, (St
         Some(res) => Ok(res.into_response()),
         None => Err((
             StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Something went wrong"),
+            "Something went wrong".to_string(),
         )),
     }
 }
@@ -59,7 +59,7 @@ pub async fn get_asset_file(filename: String, asset_type: AssetType) -> Result<R
         Ok(uri) => get_static_file(uri, root.as_str()).await,
         Err(_) => Err((
             StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Attempted to serve an invalid file"),
+            "Attempted to serve an invalid file".to_string(),
         )),
     }
 }

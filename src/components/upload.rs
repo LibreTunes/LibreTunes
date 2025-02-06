@@ -60,7 +60,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 
 				set_filtered_artists.update(|value| *value = artists);
 			}
-		})
+		});
 	};
 	// Create a filter function to handle filtering albums
 	// Allow users to search for albums by title, converts the album title to album id to be handed off to backend
@@ -80,7 +80,7 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 				log!("Filtered albums: {:?}", albums);
 				set_filtered_albums.update(|value| *value = albums);
 			}
-		})
+		});
 	};
 
 	let handle_response = Arc::new(move |response: &Response| {
@@ -116,12 +116,12 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 							<span>Artists</span>
 						</div>
 						<Show
-							when=move || {filtered_artists.get().len() > 0}
+							when=move || {!filtered_artists.get().is_empty()}
 							fallback=move || view! {}						
 						>
 							<ul class="artist_results search-results">
 								{
-									move || filtered_artists.get().iter().enumerate().map(|(_index,filtered_artist)| view! {
+									move || filtered_artists.get().iter().map(|filtered_artist| view! {
 										<Artist artist=filtered_artist.clone() artists=artists set_artists=set_artists set_filtered=set_filtered_artists/>
 									}).collect::<Vec<_>>()
 								}
@@ -134,12 +134,12 @@ pub fn Upload(open: RwSignal<bool>) -> impl IntoView {
 							<span>Album ID</span>
 						</div>
 						<Show
-							when=move || {filtered_albums.get().len() > 0}
+							when=move || {!filtered_albums.get().is_empty()}
 							fallback=move || view! {}						
 						>
 							<ul class="album_results search-results">
 								{
-									move || filtered_albums.get().iter().enumerate().map(|(_index,filtered_album)| view! {
+									move || filtered_albums.get().iter().map(|filtered_album| view! {
 										<Album album=filtered_album.clone() _albums=albums set_albums=set_albums set_filtered=set_filtered_albums/>
 									}).collect::<Vec<_>>()
 								}
@@ -190,12 +190,12 @@ pub fn Artist(artist: Artist, artists: ReadSignal<String>, set_artists: WriteSig
 		let mut ids: Vec<&str> = all_artirts.split(",").collect();
 		//If there is only one artist in the input, get their id equivalent and add it to the string
 		if ids.len() == 1 {
-			let value_str = match artist.id.clone() {
+			let value_str = match artist.id {
 				Some(v) => v.to_string(),
 				None => String::from("None"),
 			};
 			s.push_str(&value_str);
-			s.push_str(",");
+			s.push(',');
 			set_artists.update(|value| *value = s);
 		//If there are multiple artists in the input, pop the last artist by string off the vector, 
 		//get their id equivalent, and add it to the string
@@ -203,14 +203,14 @@ pub fn Artist(artist: Artist, artists: ReadSignal<String>, set_artists: WriteSig
 			ids.pop();
 			for id in ids {
 				s.push_str(id);
-				s.push_str(",");
+				s.push(',');
 			}
-			let value_str = match artist.id.clone() {
+			let value_str = match artist.id {
 				Some(v) => v.to_string(),
 				None => String::from("None"),
 			};
 			s.push_str(&value_str);
-			s.push_str(",");
+			s.push(',');
 			set_artists.update(|value| *value = s);
 		}
 		//Clear the search results
@@ -227,7 +227,7 @@ pub fn Artist(artist: Artist, artists: ReadSignal<String>, set_artists: WriteSig
 pub fn Album(album: Album, _albums: ReadSignal<String>, set_albums: WriteSignal<String>, set_filtered: WriteSignal<Vec<Album>>) -> impl IntoView {
 	//Converts album title to album id to upload a song
 	let add_album = move |_| {
-		let value_str = match album.id.clone() {
+		let value_str = match album.id {
 			Some(v) => v.to_string(),
 			None => String::from("None"),
 		};

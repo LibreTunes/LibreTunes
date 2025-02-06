@@ -153,8 +153,8 @@ impl Album {
 						duration: song.duration,
 						release_date: song.release_date,
 						song_path: song.storage_path,
-						image_path: image_path,
-						like_dislike: like_dislike,
+						image_path,
+						like_dislike,
 						added_date: song.added_date.unwrap(),
 					};
 		

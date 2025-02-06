@@ -14,8 +14,8 @@ cfg_if! {
 
 // Model for a "User", used for querying the database
 /// Various fields are wrapped in Options, because they are not always wanted for inserts/retrieval
-/// Using deserialize_as makes Diesel use the specified type when deserializing from the database,
-/// and then call .into() to convert it into the Option
+/// Using `deserialize_as` makes Diesel use the specified type when deserializing from the database,
+/// and then call `.into()` to convert it into the Option
 #[cfg_attr(feature = "ssr", derive(Queryable, Selectable, Insertable))]
 #[cfg_attr(feature = "ssr", diesel(table_name = crate::schema::users))]
 #[cfg_attr(feature = "ssr", diesel(check_for_backend(diesel::pg::Pg)))]
@@ -55,10 +55,10 @@ impl User {
 	/// # Returns
 	/// 
 	/// * `Result<Vec<HistoryEntry>, Box<dyn Error>>` -
-	/// 	A result indicating success with a vector of history entries, or an error
+	///     A result indicating success with a vector of history entries, or an error
 	/// 
 	#[cfg(feature = "ssr")]
-	pub fn get_history(self: &Self, limit: Option<i64>, conn: &mut PgPooledConn) ->
+	pub fn get_history(&self, limit: Option<i64>, conn: &mut PgPooledConn) ->
 		Result<Vec<HistoryEntry>, Box<dyn Error>> {
 		use crate::schema::song_history::dsl::*;
 
@@ -94,10 +94,10 @@ impl User {
 	/// # Returns
 	/// 
 	/// * `Result<Vec<(SystemTime, Song)>, Box<dyn Error>>` -
-	/// 	A result indicating success with a vector of listen dates and songs, or an error
+	///     A result indicating success with a vector of listen dates and songs, or an error
 	/// 
 	#[cfg(feature = "ssr")]
-	pub fn get_history_songs(self: &Self, limit: Option<i64>, conn: &mut PgPooledConn) ->
+	pub fn get_history_songs(&self, limit: Option<i64>, conn: &mut PgPooledConn) ->
 		Result<Vec<(NaiveDateTime, Song)>, Box<dyn Error>> {
 		use crate::schema::songs::dsl::*;
 		use crate::schema::song_history::dsl::*;
@@ -140,7 +140,7 @@ impl User {
 	/// * `Result<(), Box<dyn Error>>` - A result indicating success with an empty value, or an error
 	/// 
 	#[cfg(feature = "ssr")]
-	pub fn add_history(self: &Self, song_id: i32, conn: &mut PgPooledConn) -> Result<(), Box<dyn Error>> {
+	pub fn add_history(&self, song_id: i32, conn: &mut PgPooledConn) -> Result<(), Box<dyn Error>> {
 		use crate::schema::song_history;
 
 		let my_id = self.id.ok_or("Artist id must be present (Some) to add history")?;
@@ -155,7 +155,7 @@ impl User {
 	/// Like or unlike a song for this user
 	/// If likeing a song, remove dislike if it exists
 	#[cfg(feature = "ssr")]
-	pub async fn set_like_song(self: &Self, song_id: i32, like: bool, conn: &mut PgPooledConn) -> 
+	pub async fn set_like_song(&self, song_id: i32, like: bool, conn: &mut PgPooledConn) -> 
 		Result<(), Box<dyn Error>> {
 		use log::*;
 		debug!("Setting like for song {} to {}", song_id, like);
@@ -184,7 +184,7 @@ impl User {
 
 	/// Get the like status of a song for this user
 	#[cfg(feature = "ssr")]
-	pub async fn get_like_song(self: &Self, song_id: i32, conn: &mut PgPooledConn) -> Result<bool, Box<dyn Error>> {
+	pub async fn get_like_song(&self, song_id: i32, conn: &mut PgPooledConn) -> Result<bool, Box<dyn Error>> {
 		use crate::schema::song_likes;
 
 		let my_id = self.id.ok_or("User id must be present (Some) to get like status of a song")?;
@@ -201,7 +201,7 @@ impl User {
 	/// Dislike or remove dislike from a song for this user
 	/// If disliking a song, remove like if it exists
 	#[cfg(feature = "ssr")]
-	pub async fn set_dislike_song(self: &Self, song_id: i32, dislike: bool, conn: &mut PgPooledConn) -> 
+	pub async fn set_dislike_song(&self, song_id: i32, dislike: bool, conn: &mut PgPooledConn) -> 
 		Result<(), Box<dyn Error>> {
 		use log::*;
 		debug!("Setting dislike for song {} to {}", song_id, dislike);
@@ -231,7 +231,7 @@ impl User {
 
 	/// Get the dislike status of a song for this user
 	#[cfg(feature = "ssr")]
-	pub async fn get_dislike_song(self: &Self, song_id: i32, conn: &mut PgPooledConn) -> Result<bool, Box<dyn Error>> {
+	pub async fn get_dislike_song(&self, song_id: i32, conn: &mut PgPooledConn) -> Result<bool, Box<dyn Error>> {
 		use crate::schema::song_dislikes;
 
 		let my_id = self.id.ok_or("User id must be present (Some) to get dislike status of a song")?;

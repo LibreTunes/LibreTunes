@@ -26,9 +26,7 @@ pub fn Profile() -> impl IntoView {
     let user_profile_picture = move || {
         user.get().and_then(|user| {
             if let Some(user) = user {
-				if user.id.is_none() {
-					return None;
-				}
+				user.id?;
 				Some(format!("/assets/images/profile/{}.webp", user.id.unwrap()))
 			} else {
 				None

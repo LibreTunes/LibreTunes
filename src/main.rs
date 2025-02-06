@@ -42,7 +42,7 @@ async fn main() {
     debug!("Connecting to Redis...");
 
     let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
-    let redis_config = RedisConfig::from_url(&redis_url).expect(&format!("Unable to parse Redis URL: {}", redis_url));
+    let redis_config = RedisConfig::from_url(&redis_url).unwrap_or_else(|_| panic!("Unable to parse Redis URL: {}", redis_url));
     let redis_pool = RedisPool::new(redis_config, None, None, None, 1).expect("Unable to create Redis pool");
     redis_pool.connect();
     redis_pool.wait_for_connect().await.expect("Unable to connect to Redis");
@@ -72,7 +72,7 @@ async fn main() {
         .fallback(file_and_error_handler)
         .with_state(leptos_options);
 
-    let listener = tokio::net::TcpListener::bind(&addr).await.expect(&format!("Could not bind to {}", &addr));
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap_or_else(|_| panic!("Could not bind to {}", &addr));
 
     info!("Listening on http://{}", &addr);
 

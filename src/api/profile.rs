@@ -126,20 +126,20 @@ pub async fn recent_songs(for_user_id: i32, limit: Option<i64>) -> Result<Vec<(N
 			};
 
 			let image_path = song.image_path.unwrap_or(
-				album.as_ref().map(|album| album.image_path.clone()).flatten()
+				album.as_ref().and_then(|album| album.image_path.clone())
 					.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
 
 			let songdata = frontend::Song {
 				id: song_id,
 				title: song.title,
 				artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
-				album: album,
+				album,
 				track: song.track,
 				duration: song.duration,
 				release_date: song.release_date,
 				song_path: song.storage_path,
-				image_path: image_path,
-				like_dislike: like_dislike,
+				image_path,
+				like_dislike,
 				added_date: song.added_date.unwrap(),
 			};
 
@@ -186,7 +186,7 @@ pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: Na
 		};
 
 	let history_counts: HashMap<i32, i64> = history_counts.into_iter().collect();
-	let history_song_ids = history_counts.iter().map(|(song_id, _)| *song_id).collect::<Vec<i32>>();
+	let history_song_ids = history_counts.keys().copied().collect::<Vec<i32>>();
 
 	// Get the song data for the songs listened to in the date range
 	let history_songs: Vec<(Song, Option<Album>, Option<Artist>, Option<(i32, i32)>, Option<(i32, i32)>)>
@@ -227,20 +227,20 @@ pub async fn top_songs(for_user_id: i32, start_date: NaiveDateTime, end_date: Na
 			};
 
 			let image_path = song.image_path.unwrap_or(
-				album.as_ref().map(|album| album.image_path.clone()).flatten()
+				album.as_ref().and_then(|album| album.image_path.clone())
 					.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
 
 			let songdata = frontend::Song {
 				id: song_id,
 				title: song.title,
 				artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
-				album: album,
+				album,
 				track: song.track,
 				duration: song.duration,
 				release_date: song.release_date,
 				song_path: song.storage_path,
-				image_path: image_path,
-				like_dislike: like_dislike,
+				image_path,
+				like_dislike,
 				added_date: song.added_date.unwrap(),
 			};
 

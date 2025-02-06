@@ -84,8 +84,7 @@ pub async fn get_song_by_id(song_id: i32) -> Result<Option<frontend::Song>, Serv
 	.load(db_con)?;
 
 	let song = song_parts.first().cloned();
-	let artists = song_parts.into_iter().map(|(_, _, artist, _, _)| artist)
-		.filter_map(|artist| artist).collect::<Vec<_>>();
+	let artists = song_parts.into_iter().filter_map(|(_, _, artist, _, _)| artist).collect::<Vec<_>>();
 
 	match song {
 		Some((song, album, _artist, like, dislike)) => {
@@ -99,13 +98,13 @@ pub async fn get_song_by_id(song_id: i32) -> Result<Option<frontend::Song>, Serv
 			Ok(Some(frontend::Song {
 				id: song.id.unwrap(),
 				title: song.title.clone(),
-				artists: artists,
-				album: album.clone().map(|album| album.into()),
+				artists,
+				album: album.clone(),
 				track: song.track,
 				duration: song.duration,
 				release_date: song.release_date,
 				song_path: song.storage_path.clone(),
-				image_path: image_path,
+				image_path,
 				like_dislike: Some((like.is_some(), dislike.is_some())),
 				added_date: song.added_date.unwrap(),
 			}))

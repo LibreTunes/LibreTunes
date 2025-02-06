@@ -28,7 +28,7 @@ pub fn AlbumPage() -> impl IntoView {
         |value| async move {
             match value {
                 Ok(v) => {get_songs(v).await},
-                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e).into()))},
+                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e)))},
             }
         },
     );
@@ -38,7 +38,7 @@ pub fn AlbumPage() -> impl IntoView {
         |value| async move {
             match value {
                 Ok(v) => {get_album(v).await},
-                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e).into()))},
+                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e)))},
             }
         },
     );

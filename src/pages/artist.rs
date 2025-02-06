@@ -152,9 +152,7 @@ fn AlbumsByArtist(#[prop(into)] artist_id: Signal<i32>) -> impl IntoView {
         let albums = albums_by_artist(artist_id, None).await;
 
         albums.map(|albums| {
-            albums.into_iter().map(|album| {
-                album
-            }).collect::<Vec<_>>()
+            albums.into_iter().collect::<Vec<_>>()
         })
     });
 

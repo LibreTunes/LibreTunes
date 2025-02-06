@@ -158,7 +158,15 @@ pub fn SongArtists(artists: Vec<Artist>) -> impl IntoView {
 					Either::Right(view! { <span>{artist.name.clone()}</span> })
 				}
 			}
-			{if i < num_artists - 2 { ", " } else if i == num_artists - 2 { " & " } else { "" }}
+			{
+				use std::cmp::Ordering;
+
+				match i.cmp(&(num_artists - 2)) {
+					Ordering::Less => ", ",
+					Ordering::Equal => " & ",
+					Ordering::Greater => "",
+				}
+			}
 		}
 	}).collect::<Vec<_>>()
 }
@@ -224,13 +232,10 @@ pub fn SongLikeDislike(
 	// If an error occurs, check the like/dislike status again to ensure consistency
 	let check_like_dislike = move || {
 		spawn_local(async move {
-			match get_like_dislike_song(song_id.get_untracked()).await {
-				Ok((like, dislike)) => {
-					liked.set(like);
-					disliked.set(dislike);
-				},
-				Err(_) => {}
-			}
+			if let Ok((like, dislike)) = get_like_dislike_song(song_id.get_untracked()).await {
+   					liked.set(like);
+   					disliked.set(dislike);
+   				}
 		});
 	};
 

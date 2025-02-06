@@ -108,13 +108,13 @@ async fn validate_track_number(track_number: Field<'static>) -> Result<Option<i3
 
 			if let Ok(track_number) = track_number.parse::<i32>() {
 				if track_number < 0 {
-					return Err(ServerFnError::<NoCustomError>::
-						ServerError("Track number must be positive or 0".to_string()));
+					Err(ServerFnError::<NoCustomError>::
+						ServerError("Track number must be positive or 0".to_string()))
 				} else {
 					Ok(Some(track_number))
 				}
 			} else {
-				return Err(ServerFnError::<NoCustomError>::ServerError("Error parsing track number".to_string()));
+				Err(ServerFnError::<NoCustomError>::ServerError("Error parsing track number".to_string()))
 			}
 		},
 		Err(e) => Err(ServerFnError::<NoCustomError>::ServerError(format!("Error reading track number: {}", e)))?,
@@ -131,7 +131,7 @@ async fn validate_release_date(release_date: Field<'static>) -> Result<Option<Na
 				return Ok(None);
 			}
 
-			let release_date = NaiveDate::parse_from_str(&release_date.trim(), "%Y-%m-%d");
+			let release_date = NaiveDate::parse_from_str(release_date.trim(), "%Y-%m-%d");
 
 			match release_date {
 				Ok(release_date) => Ok(Some(release_date)),
@@ -192,10 +192,11 @@ pub async fn upload(data: MultipartData) -> Result<(), ServerFnError> {
 					.read(true)
 					.write(true)
 					.create(true)
+					.truncate(true)
 					.open(upload_path.clone())?;
 
 				while let Some(chunk) = field.chunk().await? {
-					file.write(&chunk)?;
+					file.write_all(&chunk)?;
 				}
 
 				file.flush()?;

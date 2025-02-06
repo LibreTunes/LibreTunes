@@ -23,13 +23,13 @@ pub struct Album {
 	pub image_path: String,
 }
 
-impl Into<DashboardTile> for Album {
-	fn into(self) -> DashboardTile {
+impl From<Album> for DashboardTile {
+	fn from(val: Album) -> Self {
 		DashboardTile {
-			image_path: self.image_path.into(),
-			title: self.title.into(),
-			link: format!("/album/{}", self.id).into(),
-			description: Some(format!("Album • {}", Artist::display_list(&self.artists)).into()),
+			image_path: val.image_path.into(),
+			title: val.title.into(),
+			link: format!("/album/{}", val.id).into(),
+			description: Some(format!("Album • {}", Artist::display_list(&val.artists)).into()),
 		}
 	}
 }

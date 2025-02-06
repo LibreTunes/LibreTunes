@@ -42,7 +42,7 @@ pub fn AddAlbum(open: RwSignal<bool>) -> impl IntoView {
                 release_date.set("".to_string());
                 image_path.set("".to_string());
             }
-        })
+        });
     };
 
     view! {

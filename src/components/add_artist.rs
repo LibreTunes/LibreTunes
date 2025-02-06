@@ -34,7 +34,7 @@ pub fn AddArtist(open: RwSignal<bool>) -> impl IntoView {
                 log!("Added artist: {:?}", artist);
                 artist_name.set("".to_string());
             }
-        })
+        });
     };
 
     view! {

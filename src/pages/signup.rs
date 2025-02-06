@@ -56,7 +56,7 @@ pub fn Signup() -> impl IntoView {
                 // Redirect to the login page
                 log!("Signed up successfully!");
                 leptos_router::hooks::use_navigate()("/", Default::default());
-                log!("Navigated to home page after signup")
+                log!("Navigated to home page after signup");
             }
 
             loading.set(false);
@@ -102,7 +102,7 @@ pub fn Signup() -> impl IntoView {
                         <span>Password</span>
                         <i></i>
                         <Show
-                            when=move || {show_password() == false}
+                            when=move || {!show_password()}
                             fallback=move || view!{ <button on:click=toggle_password class="password-visibility"> <Icon icon={icondata::AiEyeInvisibleFilled} /></button> /> }
                         >
                             <button on:click=toggle_password class="password-visibility">

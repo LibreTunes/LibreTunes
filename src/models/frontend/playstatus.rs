@@ -5,7 +5,7 @@ use std::collections::VecDeque;
 
 use crate::models::frontend;
 
-/// Represents the global state of the audio player feature of LibreTunes
+/// Represents the global state of the audio player feature of `LibreTunes`
 pub struct PlayStatus {
 	/// Whether or not the audio player is currently playing
     pub playing: bool,
@@ -27,9 +27,9 @@ impl PlayStatus {
 	/// use leptos::prelude::*;
 	/// let status = libretunes::models::frontend::PlayStatus::default();
 	/// if let Some(audio) = status.audio_player {
-	/// 	if let Some(audio) = audio.get() {
-	/// 		let _ = audio.play();
-	/// 	}
+	///     if let Some(audio) = audio.get() {
+	///         let _ = audio.play();
+	///     }
 	/// }
 	/// ```
 	/// 
@@ -37,7 +37,7 @@ impl PlayStatus {
 	/// ```
 	/// let status = libretunes::models::frontend::PlayStatus::default();
 	/// if let Some(audio) = status.get_audio() {
-	/// 	let _ = audio.play();
+	///     let _ = audio.play();
 	/// }
 	/// ```
 	pub fn get_audio(&self) -> Option<HtmlAudioElement> {
@@ -52,7 +52,7 @@ impl PlayStatus {
 }
 
 impl Default for PlayStatus {
-	/// Creates a paused PlayStatus with no audio player, no progress update handle, and empty queue/history
+	/// Creates a paused `PlayStatus` with no audio player, no progress update handle, and empty queue/history
     fn default() -> Self {
         Self {
             playing: false,

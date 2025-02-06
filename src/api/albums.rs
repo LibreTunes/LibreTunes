@@ -29,7 +29,7 @@ pub async fn add_album(album_title: String, release_date: Option<String>, image_
     
     let parsed_release_date = match release_date {
         Some(date) => {
-            match NaiveDate::parse_from_str(&date.trim(), "%Y-%m-%d") {
+            match NaiveDate::parse_from_str(date.trim(), "%Y-%m-%d") {
                 Ok(parsed_date) => Some(parsed_date),
                 Err(_e) => return Err(ServerFnError::<NoCustomError>::ServerError("Invalid release date".to_string()))
             }
@@ -37,16 +37,7 @@ pub async fn add_album(album_title: String, release_date: Option<String>, image_
         None => None
     };
 
-    let image_path_arg = match image_path {
-        Some(image_path) => {
-            if image_path.is_empty() {
-                None
-            } else {
-                Some(image_path)
-            }
-        },
-        None => None
-    };
+    let image_path_arg = image_path.filter(|image_path| !image_path.is_empty());
     
     let new_album = Album {
         id: None,

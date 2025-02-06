@@ -15,12 +15,12 @@ pub struct Artist {
 	pub image_path: String,
 }
 
-impl Into<DashboardTile> for Artist {
-	fn into(self) -> DashboardTile {
+impl From<Artist> for DashboardTile {
+	fn from(val: Artist) -> Self {
 		DashboardTile {
-			image_path: self.image_path.into(),
-			title: self.name.into(),
-			link: format!("/artist/{}", self.id).into(),
+			image_path: val.image_path.into(),
+			title: val.name.into(),
+			link: format!("/artist/{}", val.id).into(),
 			description: Some("Artist".into()),
 		}
 	}

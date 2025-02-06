@@ -13,7 +13,7 @@ use axum::extract::FromRequestParts;
 const ALLOWED_PATHS: [&str; 5] = ["/login", "/signup", "/api/login", "/api/signup", "/favicon.ico"];
 
 /**
- * Middleware to require authentication for all paths except those in ALLOWED_PATHS
+ * Middleware to require authentication for all paths except those in `ALLOWED_PATHS`
  * 
  * If a user is not authenticated, they will be redirected to the login page
  */

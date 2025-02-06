@@ -39,10 +39,10 @@ pub struct Song {
 impl TryInto<backend::Song> for Song {
 	type Error = Box<dyn std::error::Error>;
 
-	/// Convert a SongData object into a Song object
+	/// Convert a `SongData` object into a Song object
 	/// 
 	/// The SongData/Song conversions are also not truly reversible,
-	/// due to the way the image_path data is handled.
+	/// due to the way the `image_path` data is handled.
 	fn try_into(self) -> Result<backend::Song, Self::Error> {
 		Ok(backend::Song {
 			id: Some(self.id),
@@ -67,13 +67,13 @@ impl TryInto<backend::Song> for Song {
 	}
 }
 
-impl Into<DashboardTile> for Song {
-	fn into(self) -> DashboardTile {
+impl From<Song> for DashboardTile {
+	fn from(val: Song) -> Self {
 		DashboardTile {
-			image_path: self.image_path.into(),
-			title: self.title.into(),
-			link: format!("/song/{}", self.id).into(),
-			description: Some(format!("Song • {}", Artist::display_list(&self.artists)).into()),
+			image_path: val.image_path.into(),
+			title: val.title.into(),
+			link: format!("/song/{}", val.id).into(),
+			description: Some(format!("Song • {}", Artist::display_list(&val.artists)).into()),
 		}
 	}
 }

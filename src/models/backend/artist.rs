@@ -26,7 +26,7 @@ impl Artist {
 	/// 
 	/// For one artist, displays [artist1]. For two artists, displays [artist1] & [artist2].
 	/// For three or more artists, displays [artist1], [artist2], & [artist3].
-	pub fn display_list(artists: &Vec<Artist>) -> String {
+	pub fn display_list(artists: &[Artist]) -> String {
 		let mut artist_list = String::new();
 
 		for (i, artist) in artists.iter().enumerate() {

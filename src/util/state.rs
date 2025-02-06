@@ -7,7 +7,7 @@ use crate::api::auth::get_logged_in_user;
 
 /// Global front-end state
 /// Contains anything frequently needed across multiple components
-/// Behaves like a singleton, in that provide/expect_context will
+/// Behaves like a singleton, in that `provide_context`/`expect_context` will
 /// always return the same instance
 #[derive(Clone)]
 pub struct GlobalState {
@@ -47,3 +47,10 @@ impl GlobalState {
         expect_context::<Self>().play_status
     }
 }
+
+impl Default for GlobalState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+

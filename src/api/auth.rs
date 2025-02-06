@@ -114,9 +114,9 @@ pub async fn check_auth() -> Result<bool, ServerFnError> {
 /// use libretunes::api::auth::require_auth;
 /// #[server(endpoint = "protected_route")]
 /// pub async fn protected_route() -> Result<(), ServerFnError> {
-/// 	require_auth().await?;
-/// 	// Continue with protected route
-/// 	Ok(())
+///     require_auth().await?;
+///     // Continue with protected route
+///     Ok(())
 /// }
 /// ```
 #[cfg(feature = "ssr")]
@@ -125,7 +125,7 @@ pub async fn require_auth() -> Result<(), ServerFnError> {
 		if logged_in {
 			Ok(())
 		} else {
-			Err(ServerFnError::<NoCustomError>::ServerError(format!("Unauthorized")))
+			Err(ServerFnError::<NoCustomError>::ServerError("Unauthorized".to_string()))
 		}
 	})
 }
@@ -139,10 +139,10 @@ pub async fn require_auth() -> Result<(), ServerFnError> {
 /// use libretunes::api::auth::get_user;
 /// #[server(endpoint = "user_route")]
 /// pub async fn user_route() -> Result<(), ServerFnError> {
-/// 	let user = get_user().await?;
-/// 	println!("Logged in as: {}", user.username);
-/// 	// Do something with the user
-/// 	Ok(())
+///     let user = get_user().await?;
+///     println!("Logged in as: {}", user.username);
+///     // Do something with the user
+///     Ok(())
 /// }
 /// ```
 #[cfg(feature = "ssr")]
@@ -184,9 +184,9 @@ pub async fn check_admin() -> Result<bool, ServerFnError> {
 /// use libretunes::api::auth::require_admin;
 /// #[server(endpoint = "protected_admin_route")]
 /// pub async fn protected_admin_route() -> Result<(), ServerFnError> {
-/// 	require_admin().await?;
-/// 	// Continue with protected route
-/// 	Ok(())
+///     require_admin().await?;
+///     // Continue with protected route
+///     Ok(())
 /// }
 /// ```
 #[cfg(feature = "ssr")]
@@ -195,7 +195,7 @@ pub async fn require_admin() -> Result<(), ServerFnError> {
 		if is_admin {
 			Ok(())
 		} else {
-			Err(ServerFnError::<NoCustomError>::ServerError(format!("Unauthorized")))
+			Err(ServerFnError::<NoCustomError>::ServerError("Unauthorized".to_string()))
 		}
 	})
 }

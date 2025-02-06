@@ -92,7 +92,7 @@ pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<V
         };
 
     let song_play_counts: HashMap<i32, i64> = song_play_counts.into_iter().collect();
-    let top_song_ids: Vec<i32> = song_play_counts.iter().map(|(song_id, _)| *song_id).collect();
+    let top_song_ids: Vec<i32> = song_play_counts.keys().copied().collect();
 
     let top_songs: Vec<(Song, Option<Album>, Option<Artist>, Option<(i32, i32)>, Option<(i32, i32)>)>
     = songs::table
@@ -131,20 +131,20 @@ pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<V
 			};
 
 			let image_path = song.image_path.unwrap_or(
-				album.as_ref().map(|album| album.image_path.clone()).flatten()
+				album.as_ref().and_then(|album| album.image_path.clone())
 					.unwrap_or("/assets/images/placeholders/MusicPlaceholder.svg".to_string()));
 
 			let songdata = frontend::Song {
 				id: song_id,
 				title: song.title,
 				artists: artist.map(|artist| vec![artist]).unwrap_or_default(),
-				album: album,
+				album,
 				track: song.track,
 				duration: song.duration,
 				release_date: song.release_date,
 				song_path: song.storage_path,
-				image_path: image_path,
-				like_dislike: like_dislike,
+				image_path,
+				like_dislike,
 				added_date: song.added_date.unwrap(),
 			};
 
@@ -155,7 +155,7 @@ pub async fn top_songs_by_artist(artist_id: i32, limit: Option<i64>) -> Result<V
 		}
 	}
 
-    let mut top_songs: Vec<(frontend::Song, i64)> = top_songs_map.into_iter().map(|(_, v)| v).collect();
+    let mut top_songs: Vec<(frontend::Song, i64)> = top_songs_map.into_values().collect();
     top_songs.sort_by(|(_, plays1), (_, plays2)| plays2.cmp(plays1));
     Ok(top_songs)
 }
@@ -205,7 +205,7 @@ pub async fn albums_by_artist(artist_id: i32, limit: Option<i64>) -> Result<Vec<
         }
     }
 
-    let mut albums: Vec<frontend::Album> = albums_map.into_iter().map(|(_, v)| v).collect();
+    let mut albums: Vec<frontend::Album> = albums_map.into_values().collect();
     albums.sort_by(|a1, a2| a2.release_date.cmp(&a1.release_date));
     Ok(albums)
 }

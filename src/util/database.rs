@@ -28,10 +28,10 @@ lazy_static! {
 
 /// Initialize the database pool
 ///
-/// Uses DATABASE_URL environment variable to connect to the database if set,
+/// Uses `DATABASE_URL` environment variable to connect to the database if set,
 /// otherwise builds a connection string from other environment variables.
 /// 
-/// Will panic if either the DATABASE_URL or POSTGRES_HOST environment variables
+/// Will panic if either the `DATABASE_URL` or `POSTGRES_HOST` environment variables
 /// are not set, or if there is an error creating the pool.
 ///
 /// # Returns
@@ -48,14 +48,14 @@ fn init_db_pool() -> PgPool {
             log_url.push_str(&user);
 
             if let Ok(password) = env::var("POSTGRES_PASSWORD") {
-                url.push_str(":");
-                log_url.push_str(":");
+                url.push(':');
+                log_url.push(':');
                 url.push_str(&password);
                 log_url.push_str("********");
             }
 
-            url.push_str("@");
-            log_url.push_str("@");
+            url.push('@');
+            log_url.push('@');
         }
 
         let host = env::var("POSTGRES_HOST").expect("DATABASE_URL or POSTGRES_HOST must be set");
@@ -64,16 +64,16 @@ fn init_db_pool() -> PgPool {
         log_url.push_str(&host);
 
         if let Ok(port) = env::var("POSTGRES_PORT") {
-            url.push_str(":");
+            url.push(':');
             url.push_str(&port);
-            log_url.push_str(":");
+            log_url.push(':');
             log_url.push_str(&port);
         }
 
         if let Ok(dbname) = env::var("POSTGRES_DB") {
-            url.push_str("/");
+            url.push('/');
             url.push_str(&dbname);
-            log_url.push_str("/");
+            log_url.push('/');
             log_url.push_str(&dbname);
         }
 

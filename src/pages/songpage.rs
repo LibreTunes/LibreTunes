@@ -146,7 +146,7 @@ fn SongOverview(song: frontend::Song) -> impl IntoView {
 
 #[component]
 fn SongPlays(#[prop(into)] id: Signal<i32>) -> impl IntoView {
-    let plays = Resource::new(move || id.get(), move |id| songs::get_song_plays(id));
+    let plays = Resource::new(move || id.get(), songs::get_song_plays);
 
     view! {
         <Transition
@@ -175,7 +175,7 @@ fn SongPlays(#[prop(into)] id: Signal<i32>) -> impl IntoView {
 
 #[component]
 fn MySongPlays(#[prop(into)] id: Signal<i32>) -> impl IntoView {
-    let plays = Resource::new(move || id.get(), move |id| songs::get_my_song_plays(id));
+    let plays = Resource::new(move || id.get(), songs::get_my_song_plays);
 
     view! {
         <Transition

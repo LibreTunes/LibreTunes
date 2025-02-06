@@ -96,13 +96,11 @@ pub fn set_playing(play: bool) {
                     status.playing = true;
                     log!("Successfully played audio");
                 }
+            } else if let Err(e) = audio.pause() {
+                error!("Unable to pause audio: {:?}", e);
             } else {
-                if let Err(e) = audio.pause() {
-                    error!("Unable to pause audio: {:?}", e);
-                } else {
-                    status.playing = false;
-                    log!("Successfully paused audio");
-                }
+                status.playing = false;
+                log!("Successfully paused audio");
             }
         } else {
             error!("Unable to play/pause audio: Audio element not available");
@@ -239,7 +237,7 @@ fn MediaInfo() -> impl IntoView {
 
 	let artist = Signal::derive(move || {
 		status.with(|status| {
-			status.queue.front().map_or("".into(), |song| format!("{}", Artist::display_list(&song.artists)))
+			status.queue.front().map_or("".into(), |song| Artist::display_list(&song.artists).to_string())
 		})
 	});
 
@@ -324,7 +322,6 @@ fn LikeDislike() -> impl IntoView {
                 },
                 _ => {
                     log!("Unable to like song: No song in queue");
-                    return;
                 }
             }
         });
@@ -364,7 +361,6 @@ fn LikeDislike() -> impl IntoView {
                 },
                 _ => {
                     log!("Unable to dislike song: No song in queue");
-                    return;
                 }
             }
         });
@@ -532,13 +528,13 @@ pub fn PlayBar() -> impl IntoView {
             if let Some(src) = src {
                 GlobalState::play_status().with_untracked(|status| {
                     if let Some(audio) = status.get_audio() {
-                        audio.set_src(&src);
+                        audio.set_src(src);
                     } else {
                         error!("Unable to set audio source: Audio element not available");
                     }
                 });
             }
-        })
+        });
     });
 
     // Track the last song that was added to the history to prevent duplicates
