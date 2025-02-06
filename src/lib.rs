@@ -5,7 +5,6 @@ pub mod models;
 pub mod pages;
 pub mod components;
 pub mod users;
-pub mod search;
 pub mod error_template;
 pub mod api;
 pub mod upload;

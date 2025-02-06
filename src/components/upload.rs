@@ -5,8 +5,8 @@ use leptos_icons::*;
 use leptos_router::components::Form;
 use web_sys::Response;
 use leptos::task::spawn_local;
-use crate::search::search_artists;
-use crate::search::search_albums;
+use crate::api::search::search_artists;
+use crate::api::search::search_albums;
 use crate::models::backend::{Artist, Album};
 
 #[component]
