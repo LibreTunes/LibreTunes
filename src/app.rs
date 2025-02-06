@@ -1,6 +1,6 @@
 use crate::playbar::PlayBar;
 use crate::playbar::CustomTitle;
-use crate::queue::Queue;
+use crate::components::queue::Queue;
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::*;
