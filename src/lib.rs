@@ -1,6 +1,5 @@
 pub mod app;
 pub mod auth;
-pub mod song;
 pub mod models;
 pub mod pages;
 pub mod components;

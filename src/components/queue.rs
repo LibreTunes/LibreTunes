@@ -1,5 +1,5 @@
 use crate::models::backend::Artist;
-use crate::song::Song;
+use crate::components::song::Song;
 use crate::util::state::GlobalState;
 use leptos::ev::MouseEvent;
 use leptos::leptos_dom::*;
