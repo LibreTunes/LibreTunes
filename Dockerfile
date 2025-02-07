@@ -36,7 +36,7 @@ COPY Cargo.toml Cargo.lock /app/
 RUN mkdir /app/src && mkdir /app/style && mkdir /app/assets && \
 		echo "fn main() {}" | tee /app/src/build.rs > /app/src/main.rs && \
 		touch /app/src/lib.rs && \
-		touch /app/style/main.scss
+		touch /app/style/main.css
 
 # Prebuild dependencies
 RUN cargo-leptos build --release --precompress

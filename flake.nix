@@ -38,11 +38,11 @@
           (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
           cargo-leptos-build
           clang
-          sass
           openssl
           postgresql
           imagemagick
           pkg-config
+          tailwindcss
         ];
       in
       {
