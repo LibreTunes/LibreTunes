@@ -24,7 +24,7 @@
           name = "cargo-leptos";
           buildFeatures = ["no_downloads"];
           src = cargo-leptos; 
-          cargoHash = "sha256-ATfnMcwyOGlBDULi57VsLtLsL9n3K9TWbVPHX8N/BV0=";
+          cargoHash = "sha256-9Xvr3qbc7VdpQHie9vI7uwSLwwv6cvMvVmPDrnqPIpY=";
 
           nativeBuildInputs = with pkgs; [
             pkg-config
