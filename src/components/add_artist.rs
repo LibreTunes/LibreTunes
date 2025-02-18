@@ -44,7 +44,7 @@ pub fn AddArtist(open: RwSignal<bool>) -> impl IntoView {
                     <h1>Add Artist</h1>
                 </div>
                 <div class="close-button" on:click=close_dialog><Icon icon={icondata::IoClose} /></div>
-                <form class="create-artist-form" action="POST" on:submit=on_add_artist>
+                <form class="create-artist-form" on:submit=on_add_artist>
                     <div class="input-bx">
                         <input type="text" name="title" required class="text-input" 
                             prop:value=artist_name

@@ -74,7 +74,7 @@ pub fn Login() -> impl IntoView {
                 <div class="header">
                     <h1>LibreTunes</h1>
                 </div>
-                <form class="login-form" action="POST" on:submit=on_submit>
+                <form class="login-form" on:submit=on_submit>
                     <div class="input-box">
                         <input class="login-info" type="text" required
                         on:input = move |ev| {

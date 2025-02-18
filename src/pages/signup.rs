@@ -70,7 +70,7 @@ pub fn Signup() -> impl IntoView {
                 <div class="header">
                     <h1>LibreTunes</h1>
                 </div>
-                <form class="signup-form" action="POST" on:submit=on_submit>
+                <form class="signup-form" on:submit=on_submit>
                     <div class="input-box">
                         <input class="signup-email" type="text" required
                         on:input = move |ev| {
