@@ -1,5 +1,7 @@
 FROM rust:slim AS builder
 
+ENV LEPTOS_TAILWIND_VERSION=v4.0.6
+
 WORKDIR /app
 
 RUN rustup default nightly
