@@ -1,3 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #030303;
+  --color-accent: #4032a8;
+  --color-accent-light: #7851ed;
+}
