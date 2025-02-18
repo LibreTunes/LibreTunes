@@ -5,3 +5,12 @@
   --color-accent: #4032a8;
   --color-accent-light: #7851ed;
 }
+
+@layer utilities {
+  .hover-link {
+    @apply text-neutral-500;
+    @apply hover:text-neutral-800;
+    @apply underline;
+    @apply transition-colors;
+  }
+}

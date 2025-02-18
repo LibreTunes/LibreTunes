@@ -6,35 +6,26 @@ use leptos_icons::*;
 use leptos::task::spawn_local;
 use crate::api::users::UserCredentials;
 use crate::components::loading::Loading;
+use crate::components::fancy_input::*;
 
 #[component]
 pub fn Login() -> impl IntoView {
-    let (username_or_email, set_username_or_email) = signal("".to_string());
-    let (password, set_password) = signal("".to_string());
-
-    let (show_password, set_show_password) = signal(false);
+    let username_or_email = RwSignal::new("".to_string());
+    let password = RwSignal::new("".to_string());
 
     let loading = RwSignal::new(false);
     let error_msg = RwSignal::new(None);
 
-    let toggle_password = move |_| {
-        set_show_password.update(|show_password| *show_password = !*show_password);
-        log!("showing password");
-    };
-
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
-
-        let username_or_email1 = username_or_email.get();
-        let password1 = password.get();
 
         spawn_local(async move {
             loading.set(true);
             error_msg.set(None);
 
             let user_credentials = UserCredentials {
-                username_or_email: username_or_email1,
-                password: password1
+                username_or_email: username_or_email.get_untracked(),
+                password: password.get_untracked(),
             };
 
             let user = GlobalState::logged_in_user();
@@ -68,58 +59,36 @@ pub fn Login() -> impl IntoView {
     };
 
     view! {
-        <div class="auth-page-container">
-            <div class="login-container">
-                <a class="return" href="/"><Icon icon={icondata::IoReturnUpBackSharp} /></a>
-                <div class="header">
-                    <h1>LibreTunes</h1>
-                </div>
-                <form class="login-form" on:submit=on_submit>
-                    <div class="input-box">
-                        <input class="login-info" type="text" required
-                        on:input = move |ev| {
-                            set_username_or_email(event_target_value(&ev));
-                            log!("username/email changed to: {}", username_or_email.get());
-                        }
-                        prop:value=username_or_email
-                        />
-                        <span>Username/Email</span>
-                        <i></i>
+        <section class="bg-white dark:bg-black flex items-center justify-center h-screen">
+            <div class="rounded-lg shadow bg-white w-full p-12 max-w-md relative">
+                <a class="hover:bg-neutral-400 transition-all duration-500
+                    rounded-md absolute left-5 top-5 p-1" href="/">
+                    <Icon icon={icondata::IoReturnUpBackSharp} height="1.5rem" width="1.5rem"/>
+                </a>
+                <h1 class="text-5xl font-bold text-accent text-center p-1">"LibreTunes"</h1>
+                <form on:submit=on_submit>
+                    <FancyInput label="Username/Email" required=true value=username_or_email />
+                    <FancyInput label="Password" password=true required=true value=password />
+                    <a class="hover-link my-1">"Forgot Password?"</a>
+                    <div
+                        class="text-red-800 text-base"
+                        style="min-height: calc(var(--text-base--line-height) * var(--text-base));"
+                    >
+                        { move || error_msg.get() }
                     </div>
-                    <div class="input-box">
-                        <input class="login-password"  type={move || if show_password() { "text" } else { "password"} } required
-                        on:input = move |ev| {
-                            set_password(event_target_value(&ev));
-                            log!("password changed to: {}", password.get());
-                        }
-                        />
-                        <span>Password</span>
-                        <i></i>
-                        <Show
-                            when=move || {!show_password()}
-                            fallback=move || view!{ <button on:click=toggle_password class="login-password-visibility">
-                                                  <Icon icon={icondata::AiEyeInvisibleFilled} />
-                                               </button> /> }
-                        >
-                            <button on:click=toggle_password class="login-password-visibility">
-                                <Icon icon={icondata::AiEyeFilled} />
-                            </button>
-
-                        </Show>
-                    </div>
-                    <a href="" class="forgot-pw">Forgot Password?</a>
-                    <div class="error-msg" >{ move || error_msg.get() }</div>
                     <Show
                         when=move || !loading.get()
-                        fallback=move || view! { <Loading /> }
+                        fallback=move || view! { <div class="p-3 my-2"> <Loading /> </div> }
                     >
-                        <input type="submit" value="Login" />
+                        <input class="bg-accent rounded-md text-white text-base
+                            w-full p-3 my-2 font-semibold cursor-pointer" type="submit" value="Login" />
                     </Show>
-                    <span class="go-to-signup">
-                        New here? <a href="/signup">Create an Account</a>
+                    <span class="text-base text-neutral-500 my-1">
+                        "New here?"
+                        <a class="hover-link ml-2" href="/signup">"Create an Account"</a>
                     </span>
                 </form>
             </div>
-        </div>
+        </section>
     }
 }
