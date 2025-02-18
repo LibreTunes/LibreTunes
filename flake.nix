@@ -42,7 +42,7 @@
           postgresql
           imagemagick
           pkg-config
-          tailwindcss
+          tailwindcss_4
         ];
       in
       {
