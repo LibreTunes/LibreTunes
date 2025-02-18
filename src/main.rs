@@ -21,6 +21,7 @@ async fn main() {
     use libretunes::util::require_auth::require_auth_middleware;
     use libretunes::util::fileserv::{file_and_error_handler, get_asset_file, get_static_file, AssetType};
     use axum_login::tower_sessions::SessionManagerLayer;
+    use tower_sessions_redis_store::fred;
     use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
     use axum_login::AuthManagerLayerBuilder;
     use libretunes::util::auth_backend::AuthBackend;
@@ -42,8 +43,9 @@ async fn main() {
     debug!("Connecting to Redis...");
 
     let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL must be set");
-    let redis_config = RedisConfig::from_url(&redis_url).unwrap_or_else(|_| panic!("Unable to parse Redis URL: {}", redis_url));
-    let redis_pool = RedisPool::new(redis_config, None, None, None, 1).expect("Unable to create Redis pool");
+    let redis_config = fred::types::config::Config::from_url(&redis_url)
+        .unwrap_or_else(|_| panic!("Unable to parse Redis URL: {}", redis_url));
+    let redis_pool = fred::clients::Pool::new(redis_config, None, None, None, 1).expect("Unable to create Redis pool");
     redis_pool.connect();
     redis_pool.wait_for_connect().await.expect("Unable to connect to Redis");
 
