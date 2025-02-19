@@ -92,17 +92,21 @@ use crate::components::add_album::AddAlbum;
 #[component]
 fn HomePage(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add_album_open: RwSignal<bool>) -> impl IntoView {
     view! {
-        <div class="home-container">
+        <section class="bg-black h-screen flex">
             <Upload open=upload_open/>
             <AddArtist open=add_artist_open/>
             <AddAlbum open=add_album_open/>
             <Sidebar upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/>
             // This <Outlet /> will render the child route components
-            <Outlet />
+            <div class="flex flex-col flex-grow">
+                <div class="home-card">
+                    <Outlet />
+                </div>
+            </div>
             <Personal />
             <PlayBar />
             <Queue />
-        </div>
+        </section>
     }
 }
 
