@@ -26,4 +26,15 @@
     @apply active:text-controls-active;
     @apply text-base;
   }
+
+  .home-card {
+    @apply bg-bg-light;
+    @apply rounded-lg;
+    @apply m-0.75;
+    @apply p-4;
+    @apply text-white;
+    @apply last-of-type:grow;
+    @apply last-of-type:pb-[85px]; /* Hard-coded height of the playbar + 5px */
+    @apply overflow-scroll;
+  }
 }
