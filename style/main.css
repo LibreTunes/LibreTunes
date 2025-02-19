@@ -2,8 +2,14 @@
 
 @theme {
   --color-bg: #030303;
+  --color-bg-light: #212121;
   --color-accent: #4032a8;
   --color-accent-light: #7851ed;
+  --color-controls: #e0e0e0;
+  --color-controls-hover: #c0c0c0;
+  --color-controls-active: #a0a0a0;
+  --color-play-grad-start: #0a0533;
+  --color-play-grad-end: var(--color-accent);
 }
 
 @layer utilities {
@@ -12,5 +18,12 @@
     @apply hover:text-neutral-800;
     @apply underline;
     @apply transition-colors;
+  }
+
+  .control {
+    @apply text-controls;
+    @apply hover:text-controls-hover;
+    @apply active:text-controls-active;
+    @apply text-base;
   }
 }

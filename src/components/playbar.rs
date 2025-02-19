@@ -12,12 +12,12 @@ use leptos_use::{utils::Pausable, use_interval_fn};
 use leptos::task::spawn_local;
 
 /// Width and height of the forward/backward skip buttons
-const SKIP_BTN_SIZE: &str = "3.5em";
+const SKIP_BTN_SIZE: &str = "3em";
 /// Width and height of the play/pause button
-const PLAY_BTN_SIZE: &str = "5em";
+const PLAY_BTN_SIZE: &str = "4em";
 
 // Width and height of the queue button
-const QUEUE_BTN_SIZE: &str = "3.5em";
+const QUEUE_BTN_SIZE: &str = "2.5em";
 
 /// Threshold in seconds for skipping to the previous song instead of skipping to the start of the current song
 const MIN_SKIP_BACK_TIME: f64 = 5.0;
@@ -166,13 +166,6 @@ fn PlayControls() -> impl IntoView {
 		set_playing(!playing);
     };
 
-    // We use this to prevent the buttons from being focused when clicked
-    // If buttons were focused on clicks, then pressing space bar to play/pause would "click" the button
-    // and trigger unwanted behavior
-    let prevent_focus = move |e: MouseEvent| {
-        e.prevent_default();
-    };
-
     // Change the icon based on whether the song is playing or not
     let icon = Signal::derive(move || {
         status.with(|status| {
@@ -185,20 +178,18 @@ fn PlayControls() -> impl IntoView {
     });
 
     view! {
-        <div class="playcontrols" >
+        <div class="flex place-content-center">
+            <button class="control" on:click=skip_back>
+                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipStartFill} />
+            </button>
 
-        <button on:click=skip_back on:mousedown=prevent_focus>
-        <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipStartFill} {..} class="controlbtn" />
-        </button>
+            <button class="control" on:click=toggle_play>
+                <Icon width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon={icon} />
+            </button>
 
-        <button on:click=toggle_play on:mousedown=prevent_focus>
-        <Icon width=PLAY_BTN_SIZE height=PLAY_BTN_SIZE icon={icon} {..} class="controlbtn" />
-        </button>
-
-        <button on:click=skip_forward on:mousedown=prevent_focus>
-        <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipEndFill} {..} class="controlbtn" />
-        </button>
-
+            <button class="control" on:click=skip_forward>
+                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={icondata::BsSkipEndFill} />
+            </button>
         </div>
     }
 }
@@ -218,8 +209,8 @@ fn PlayDuration(elapsed_secs: Signal<i64>, total_secs: Signal<i64>) -> impl Into
     });
 
     view! {
-        <div class="playduration" >
-        {play_duration}
+        <div class="text-controls p-1">
+            {play_duration}
         </div>
     }
 }
@@ -256,8 +247,8 @@ fn MediaInfo() -> impl IntoView {
 	});
 
     view! {
-        <img class="media-info-img" src={image}/>
-        <div class="media-info-text">
+        <img class="w-[60px] p-1" src={image}/>
+        <div class="text-controls p-1">
             {name}
             <br/>
             {artist} - {album}
@@ -367,12 +358,12 @@ fn LikeDislike() -> impl IntoView {
     };
 
     view! {
-        <div class="like-dislike">
-            <button on:click=toggle_dislike>
-                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={dislike_icon} {..} class="controlbtn hmirror" />
+        <div class="flex">
+            <button class="control scale-x-[-1] p-1" on:click=toggle_dislike>
+                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={dislike_icon} />
             </button>
-            <button on:click=toggle_like>
-                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={like_icon} {..} class="controlbtn" />
+            <button class="control p-1" on:click=toggle_like>
+                <Icon width=SKIP_BTN_SIZE height=SKIP_BTN_SIZE icon={like_icon} />
             </button>
         </div>
     }
@@ -408,11 +399,13 @@ fn ProgressBar(percentage: Signal<f64>) -> impl IntoView {
     let bar_width_style = Signal::derive(move || format!("width: {}%;", percentage.get()));
 
     view! {
-        <div class="invisible-media-progress" node_ref=progress_bar_ref on:click=progress_jump> // Larger click area
-        <div class="media-progress"> // "Unfilled" progress bar
-        <div class="media-progress-solid" style=bar_width_style> // "Filled" progress bar
-		</div>
-        </div>
+        <div class="w-full h-[14px] translate-y-[50%] pt-[7px] cursor-pointer" node_ref=progress_bar_ref on:click=progress_jump> // Larger click area
+            <div class="bg-controls-active h-[3px]"> // "Unfilled" progress bar
+                <div class="from-play-grad-start to-play-grad-end bg-linear-90 h-[3px]"
+                    style=bar_width_style /> // "Filled" progress bar
+                <div class="from-play-grad-start to-play-grad-end bg-linear-90 h-[3px]
+                    translate-y-[-3px] blur-[3px]" style=bar_width_style /> // "Filled" progress bar blur
+            </div>
         </div>
     }
 }
@@ -424,20 +417,11 @@ fn QueueToggle() -> impl IntoView {
 		log!("queue button pressed, queue status: {:?}",
             GlobalState::play_status().with_untracked(|status| status.queue_open));
     };
-    
-	// We use this to prevent the buttons from being focused when clicked
-    // If buttons were focused on clicks, then pressing space bar to play/pause would "click" the button
-    // and trigger unwanted behavior
-    let prevent_focus = move |e: MouseEvent| {
-        e.prevent_default();
-    };
 
     view! {
-        <div class="queue-toggle">
-        <button on:click=update_queue on:mousedown=prevent_focus>
-        <Icon width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon={icondata::RiPlayListMediaFill} {..} class="controlbtn" />
+        <button class="control p-1" on:click=update_queue>
+            <Icon width=QUEUE_BTN_SIZE height=QUEUE_BTN_SIZE icon={icondata::RiPlayListMediaFill} />
         </button>
-        </div>
     }
 }
 
@@ -617,15 +601,21 @@ pub fn PlayBar() -> impl IntoView {
     view! {
         <audio node_ref=audio_ref on:play=on_play on:pause=on_pause
             on:timeupdate=on_time_update on:ended=on_end />
-        <div class="playbar">
-        <ProgressBar percentage=percentage.into() />
-        <div class="playbar-left-group">
-        <MediaInfo />
-        <LikeDislike />
-        </div>
-        <PlayControls />
-        <PlayDuration elapsed_secs=elapsed_secs.into() total_secs=total_secs.into() />
-        <QueueToggle />
+        <div class="fixed bottom-0 w-full">
+            <ProgressBar percentage=percentage.into() />
+            <div class="flex items-center w-full bg-bg-light">
+                <div class="flex-1 flex">
+                    <MediaInfo />
+                    <LikeDislike />
+                </div>
+                <div class="flex-1">
+                    <PlayControls />
+                </div>
+                <div class="flex-1 flex flex-col items-end">
+                    <PlayDuration elapsed_secs=elapsed_secs.into() total_secs=total_secs.into() />
+                    <QueueToggle />
+                </div>
+            </div>
         </div>
     }
 }
