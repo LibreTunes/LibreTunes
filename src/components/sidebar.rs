@@ -49,14 +49,14 @@ pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add
                     <h1>Search</h1>
                 </a>
             </div>
-            <Bottom />
+            <Playlists />
 
         </div>
     }
 }
 
 #[component]
-pub fn Bottom() -> impl IntoView {
+pub fn Playlists() -> impl IntoView {
     view! {
         <div class="home-card">
             <div class="flex">
