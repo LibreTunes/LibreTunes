@@ -8,6 +8,7 @@
   --color-controls: #e0e0e0;
   --color-controls-hover: #c0c0c0;
   --color-controls-active: #a0a0a0;
+  --color-menu-active: white;
   --color-play-grad-start: #0a0533;
   --color-play-grad-end: var(--color-accent);
 }
@@ -36,5 +37,15 @@
     @apply last-of-type:grow;
     @apply last-of-type:pb-[85px]; /* Hard-coded height of the playbar + 5px */
     @apply overflow-scroll;
+  }
+
+  .menu-btn {
+    @apply flex;
+    @apply items-center;
+    @apply text-base;
+    @apply mt-3;
+    @apply text-neutral-400;
+    @apply hover:text-neutral-500;
+    @apply active:text-neutral-600;
   }
 }

@@ -15,3 +15,4 @@ pub mod playbar;
 pub mod song;
 pub mod error_template;
 pub mod fancy_input;
+pub mod menu;
