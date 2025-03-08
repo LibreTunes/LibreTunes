@@ -8,7 +8,7 @@ use crate::util::state::GlobalState;
 #[component]
 pub fn Personal() -> impl IntoView {
     view! {
-        <div class=" personal-container">
+        <div class="home-card">
             <Profile />
         </div>
     }
