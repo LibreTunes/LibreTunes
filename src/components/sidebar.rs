@@ -58,8 +58,8 @@ pub fn Sidebar(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add
 #[component]
 pub fn Bottom() -> impl IntoView {
     view! {
-        <div class="sidebar-bottom-container">
-            <div class="heading">
+        <div class="home-card">
+            <div class="flex">
                 <h1 class="header">Playlists</h1>
                 <button class="add-playlist">
                     <div class="add-sign">
