@@ -81,27 +81,30 @@ pub fn DashboardRow(
 	});
 
 	view! {
-		<div class="dashboard-tile-row">
-			<div class="dashboard-tile-row-title-row">
-				<h2>{move || title.get()}</h2>
-				<div class="dashboard-tile-row-scroll-btn">
-					<button on:click=scroll_left tabindex=-1 style=scroll_left_hidden>
-						<Icon icon={icondata::FiChevronLeft} {..} class="dashboard-tile-row-scroll" />
+		<div>
+			<div class="flex">
+				<h2 class="text-xl font-bold">{move || title.get()}</h2>
+				<div class="m-auto mr-0">
+					<button class="control" on:click=scroll_left tabindex=-1 style=scroll_left_hidden>
+						<Icon icon={icondata::FiChevronLeft} {..} class="w-7 h-7" />
 					</button>
-					<button on:click=scroll_right tabindex=-1 style=scroll_right_hidden>
-						<Icon icon={icondata::FiChevronRight} {..} class="dashboard-tile-row-scroll" />
+					<button class="control" on:click=scroll_right tabindex=-1 style=scroll_right_hidden>
+						<Icon icon={icondata::FiChevronRight} {..} class="w-7 h-7" />
 					</button>
 				</div>
 			</div>
-			<ul node_ref={list_ref}>
+			<ul class="flex overflow-x-hidden scroll-smooth ps-0"
+				style="mask-image: linear-gradient(90deg, black, 95%, transparent);
+				-webkit-mask-image: linear-gradient(90deg, black, 95%, transparent);" node_ref={list_ref}>
 			{tiles.into_iter().map(|tile| {
 				view! {
 					<li>
-						<div class="dashboard-tile">
+						<div class="mr-2.5">
 							<a href={move || tile.link.get()}>
-								<img src={move || tile.image_path.get()} alt="dashboard-tile" />
-								<p class="dashboard-tile-title">{move || tile.title.get()}</p>
-								<p class="dashboard-tile-description">
+								<img class="w-50 h-50 max-w-none rounded-md mr-5"
+									src={move || tile.image_path.get()} alt="dashboard-tile" />
+								<p class="text-lg font-semibold">{move || tile.title.get()}</p>
+								<p>
 									{move || tile.description.as_ref().map(|desc| desc.get())}
 								</p>
 							</a>
