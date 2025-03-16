@@ -62,7 +62,7 @@ fn SongListInner<T>(_songs: Vec<(frontend::Song, T)>, _show_extra: bool) -> impl
 	});
 
 	view! {
-		<table class="song-list">
+		<table class="w-full">
 			<tbody>
 			{
 				songs_2.iter().enumerate().map(|(list_index, (song, extra))| {
@@ -95,19 +95,20 @@ pub fn SongListItem<T>(song: frontend::Song, song_playing: Signal<bool>, extra: 
 	let disliked = RwSignal::new(song.like_dislike.map(|(_, disliked)| disliked).unwrap_or(false));
 	
 	view! {
-		<tr class="song-list-item">
-			<td class="song-image"><SongImage image_path=song.image_path song_playing
+		<tr class="group border-b border-t border-neutral-600 last-of-type:border-b-0
+			first-of-type:border-t-0 hover:bg-neutral-700 [&>*]:px-2">
+			<td class="relative w-13 h-13"><SongImage image_path=song.image_path song_playing
 				list_index do_queue_remaining /></td>
-			<td class="song-title"><p>{song.title}</p></td>
-			<td class="song-list-spacer"></td>
-			<td class="song-artists"><SongArtists artists=song.artists /></td>
-			<td class="song-list-spacer"></td>
-			<td class="song-album"><SongAlbum album=song.album /></td>
-			<td class="song-list-spacer-big"></td>
-			<td class="song-like-dislike"><SongLikeDislike song_id=song.id liked disliked/></td>
+			<td><p>{song.title}</p></td>
+			<td></td>
+			<td><SongArtists artists=song.artists /></td>
+			<td></td>
+			<td><SongAlbum album=song.album /></td>
+			<td></td>
+			<td><SongLikeDislike song_id=song.id liked disliked/></td>
 			<td>{format!("{}:{:02}", song.duration / 60, song.duration % 60)}</td>
 			{extra.map(|extra| view! {
-				<td class="song-list-spacer"></td>
+				<td></td>
 				<td>{extra}</td>
 			})}
 		</tr>
@@ -131,13 +132,13 @@ pub fn SongImage(image_path: String, song_playing: Signal<bool>, list_index: usi
 	};
 
 	view! {
-		<img class="song-image" src={image_path}/>
+		<img class="group-hover:brightness-45" src={image_path}/>
 		{move || if song_playing.get() {
 			Either::Left(view! { <Icon icon={icondata::BsPauseFill} on:click={pause_song}
-					{..} class="song-image-overlay song-playing-overlay" /> })
+					{..} class="w-6 h-6 absolute top-1/2 left-1/2 translate-[-50%]" /> })
 		} else {
 			Either::Right(view! { <Icon icon={icondata::BsPlayFill} on:click={play_song}
-				{..} class="song-image-overlay hide-until-hover" /> })
+				{..} class="w-6 h-6 opacity-0 group-hover:opacity-100 absolute top-1/2 left-1/2 translate-[-50%]" /> })
 		}}
 	}
 }
@@ -153,7 +154,8 @@ pub fn SongArtists(artists: Vec<Artist>) -> impl IntoView {
 		view! {
 			{
 				if let Some(id) = artist.id {
-					Either::Left(view! { <a href={format!("/artist/{}", id)}>{artist.name.clone()}</a> })
+					Either::Left(view! { <a class="hover:underline active:text-controls-active"
+						href={format!("/artist/{}", id)}>{artist.name.clone()}</a> })
 				} else {
 					Either::Right(view! { <span>{artist.name.clone()}</span> })
 				}
@@ -179,7 +181,8 @@ pub fn SongAlbum(album: Option<Album>) -> impl IntoView {
 			<span>
 				{
 					if let Some(id) = album.id {
-						Either::Left(view! { <a href={format!("/album/{}", id)}>{album.title.clone()}</a> })
+						Either::Left(view! { <a class="hover:underline active:text-controls-active"
+							href={format!("/album/{}", id)}>{album.title.clone()}</a> })
 					} else {
 						Either::Right(view! { <span>{album.title.clone()}</span> })
 					}
@@ -215,17 +218,17 @@ pub fn SongLikeDislike(
 
 	let like_class = Signal::derive(move || {
 		if liked.get() {
-			"controlbtn"
+			""
 		} else {
-			"controlbtn hide-until-hover"
+			"opacity-0 group-hover:opacity-100"
 		}
 	});
 
 	let dislike_class = Signal::derive(move || {
 		if disliked.get() {
-			"controlbtn hmirror"
+			""
 		} else {
-			"controlbtn hmirror hide-until-hover"
+			"opacity-0 group-hover:opacity-100"
 		}
 	});
 
@@ -271,10 +274,10 @@ pub fn SongLikeDislike(
 	};
 
 	view! {
-		<button on:click=toggle_dislike>
+		<button class="control scale-x-[-1]" on:click=toggle_dislike>
 			<Icon width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon={dislike_icon} {..} class=dislike_class />
 		</button>
-		<button on:click=toggle_like>
+		<button class="control" on:click=toggle_like>
 			<Icon width=LIKE_DISLIKE_BTN_SIZE height=LIKE_DISLIKE_BTN_SIZE icon={like_icon} {..} class=like_class />
 		</button>
 	}
