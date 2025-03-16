@@ -17,31 +17,29 @@ pub fn ArtistPage() -> impl IntoView {
     let params = use_params_map();
 
     view! {
-        <div class="artist-container home-component">
-            {move || params.with(|params| {
-                match params.get("id").map(|id| id.parse::<i32>()) {
-                    Some(Ok(id)) => {
-                        Either::Left(view! { <ArtistIdProfile id /> })
-                    },
-                    Some(Err(e)) => {
-                        Either::Right(view! {
-                            <Error<String>
-                                title="Invalid Artist ID"
-                                error=e.to_string()
-                            />
-                        })
-                    },
-                    None => {
-                        Either::Right(view! {
-                            <Error<String>
-                                title="No Artist ID"
-                                message="You must specify an artist ID to view their page."
-                            />
-                        })
-                    }
+        {move || params.with(|params| {
+            match params.get("id").map(|id| id.parse::<i32>()) {
+                Some(Ok(id)) => {
+                    Either::Left(view! { <ArtistIdProfile id /> })
+                },
+                Some(Err(e)) => {
+                    Either::Right(view! {
+                        <Error<String>
+                            title="Invalid Artist ID"
+                            error=e.to_string()
+                        />
+                    })
+                },
+                None => {
+                    Either::Right(view! {
+                        <Error<String>
+                            title="No Artist ID"
+                            message="You must specify an artist ID to view their page."
+                        />
+                    })
                 }
-            })}
-        </div>
+            }
+        })}
     }
 }
 
@@ -93,11 +91,11 @@ fn ArtistProfile(artist: Artist) -> impl IntoView {
     leptos::logging::log!("Artist name: {}", artist.name);
 
     view! {
-        <div class="artist-header">
-            <object class="artist-image" data={profile_image_path.clone()} type="image/webp">
+        <div class="flex">
+            <object class="w-35 h-35 rounded-full p-5" data={profile_image_path.clone()} type="image/webp">
                 <Icon icon={icondata::CgProfile} width="100" height="100" {..} class="artist-image" />
             </object>
-            <h1>{artist.name}</h1>
+            <h1 class="text-4xl self-center">{artist.name}</h1>
         </div>
     }
 }
@@ -121,7 +119,7 @@ fn TopSongsByArtist(#[prop(into)] artist_id: Signal<i32>) -> impl IntoView {
     });
 
     view! {
-        <h2>"Top Songs"</h2>
+        <h2 class="text-xl font-bold">"Top Songs"</h2>
         <Transition
             fallback=move || view! { <Loading /> }
         >
