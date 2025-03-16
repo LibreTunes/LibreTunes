@@ -98,7 +98,7 @@ fn HomePage(upload_open: RwSignal<bool>, add_artist_open: RwSignal<bool>, add_al
             <AddAlbum open=add_album_open/>
             <Sidebar upload_open=upload_open add_artist_open=add_artist_open add_album_open=add_album_open/>
             // This <Outlet /> will render the child route components
-            <div class="flex flex-col flex-grow">
+            <div class="flex flex-col flex-grow min-w-0">
                 <div class="home-card">
                     <Outlet />
                 </div>
