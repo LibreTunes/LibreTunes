@@ -9,7 +9,6 @@ pub mod add_album;
 pub mod song_list;
 pub mod loading;
 pub mod error;
-pub mod album_info;
 pub mod queue;
 pub mod playbar;
 pub mod song;

@@ -4,7 +4,7 @@ use leptos_router::params::Params;
 use leptos_router::hooks::use_params;
 use crate::components::song_list::*;
 use crate::api::album::*;
-use crate::components::album_info::*;
+use crate::models::frontend;
 
 
 #[derive(Params, PartialEq)]
@@ -86,3 +86,23 @@ pub fn AlbumPage() -> impl IntoView {
     }
 }
 
+#[component]
+pub fn AlbumInfo(albumdata: frontend::Album) -> impl IntoView {
+	view! {
+		<div class="album-info">
+			<img class="album-image" src={albumdata.image_path} alt="dashboard-tile" />
+			<div class="album-body">
+				<p class="album-title">{albumdata.title}</p>
+				<div class="album-artists">
+					{
+						albumdata.artists.iter().map(|artist| {
+							view! {
+								<a class="album-artist" href={format!("/artist/{}", artist.id.unwrap())}>{artist.name.clone()}</a>
+							}
+						}).collect::<Vec<_>>()
+					}
+				</div>
+			</div>
+		</div>
+	}.into_view()
+}
