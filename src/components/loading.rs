@@ -6,7 +6,7 @@ pub fn Loading() -> impl IntoView {
 	let dots_style = "h-2 w-2 bg-accent rounded-full animate-pulse";
 
 	view! {
-		<div class="flex space-x-1 justify-center items-center bg-white my-2">
+		<div class="flex space-x-1 justify-center items-center my-2">
 			<span class="sr-only">"Loading..."</span>
 			<div class=dots_style style="animation-duration: 900ms; animation-delay: 0ms;" />
 			<div class=dots_style style="animation-duration: 900ms; animation-delay: 300ms"/>
