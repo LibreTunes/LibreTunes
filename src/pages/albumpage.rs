@@ -1,108 +1,117 @@
 use leptos::prelude::*;
 use leptos::either::*;
-use leptos_router::params::Params;
-use leptos_router::hooks::use_params;
+use leptos_router::hooks::use_params_map;
+use server_fn::error::NoCustomError;
 use crate::components::song_list::*;
+use crate::components::loading::*;
+use crate::components::error::*;
 use crate::api::album::*;
 use crate::models::frontend;
 
-
-#[derive(Params, PartialEq)]
-struct AlbumParams {
-    id: i32
-}
-
 #[component]
 pub fn AlbumPage() -> impl IntoView {
-    let params = use_params::<AlbumParams>();
-
-    let id = move || {params.with(|params| {
-            params.as_ref()
-                .map(|params| params.id)
-                .map_err(|e| e.clone())
-        })
-    };
-
-    let song_list = Resource::new(
-        id,
-        |value| async move {
-            match value {
-                Ok(v) => {get_songs(v).await},
-                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e)))},
-            }
-        },
-    );
-
-    let albumdata = Resource::new(
-        id,
-        |value| async move {
-            match value {
-                Ok(v) => {get_album(v).await},
-                Err(e) => {Err(ServerFnError::Request(format!("Error getting song data: {}", e)))},
-            }
-        },
-    );
+    let params = use_params_map();
 
     view! {
-        <div class="album-page-container">
-            <div class="album-header">
-                <Suspense
-                    fallback=move || view! { <p class="loading">"Loading..."</p> }
-                >
-                    {move || {
-                        albumdata.with( |albumdata| {
-                            match albumdata {
-                                Some(Ok(s)) => {
-                                    EitherOf3::A(view! { <AlbumInfo albumdata=(*s).clone() /> })
-                                },
-                                Some(Err(e)) => {
-                                    EitherOf3::B(view! { <div class="error">{format!("Error loading album : {}",e)}</div> })
-                                },
-                                None => {EitherOf3::C(view! { })}
-                            }
-                        })
-                    }}
-                </Suspense>
-            </div>
-        
-            <Suspense
-                fallback=move || view! { <p class="loading">"Loading..."</p> }
-            >
-                {move || {
-                    song_list.with( |song_list| {
-                        match song_list {
-                            Some(Ok(s)) => {
-                                EitherOf3::A(view! { <SongList songs=(*s).clone()/> })
-                            },
-                            Some(Err(e)) => {
-                                EitherOf3::B(view! { <div class="error">{format!("Error loading albums: : {}",e)}</div> })
-                            },
-                            None => {EitherOf3::C(view! { })}
-                        }
+        {move || params.with(|params| {
+            match params.get("id").map(|id| id.parse::<i32>()) {
+                Some(Ok(id)) => {
+                    Either::Left(view! { <AlbumIdPage id /> })
+                },
+                Some(Err(e)) => {
+                    Either::Right(view! {
+                        <Error<String>
+                            title="Invalid Album ID"
+                            error=e.to_string()
+                        />
                     })
-                }}
-            </Suspense>
-        </div>
+                },
+                None => {
+                    Either::Right(view! {
+                        <Error<String>
+                            title="No Album ID"
+                            message="You must specify an album ID to view its page."
+                        />
+                    })
+                }
+            }
+        })}
     }
 }
 
 #[component]
-pub fn AlbumInfo(albumdata: frontend::Album) -> impl IntoView {
+fn AlbumIdPage(#[prop(into)] id: Signal<i32>) -> impl IntoView {
+    let album = Resource::new(id, get_album);
+
+    let show_songs = RwSignal::new(false);
+
+    view! {
+        <Transition
+            fallback=move || view! { <Loading /> }
+        >
+            {move || album.get().map(|album| {
+                match album {
+                    Ok(Some(album)) => {
+                        show_songs.set(true);
+                        EitherOf3::A(view! { <AlbumInfo album /> })
+                    },
+                    Ok(None) => EitherOf3::B(view! {
+                        <Error<String>
+                            title="Album Not Found"
+                            message=format!("Album with ID {} not found", id.get())
+                        />
+                    }),
+                    Err(error) => EitherOf3::C(view! {
+                        <ServerError<NoCustomError>
+                            title="Error Getting Album"
+                            error
+                        />
+                    }),
+                }
+            })}
+        </Transition>
+        <Show when=show_songs>
+            <AlbumSongs id />
+        </Show>
+    }
+}
+
+#[component]
+fn AlbumInfo(album: frontend::Album) -> impl IntoView {
 	view! {
-		<div class="album-info">
-			<img class="album-image" src={albumdata.image_path} alt="dashboard-tile" />
-			<div class="album-body">
-				<p class="album-title">{albumdata.title}</p>
-				<div class="album-artists">
-					{
-						albumdata.artists.iter().map(|artist| {
-							view! {
-								<a class="album-artist" href={format!("/artist/{}", artist.id.unwrap())}>{artist.name.clone()}</a>
-							}
-						}).collect::<Vec<_>>()
-					}
-				</div>
+		<div class="flex">
+			<img class="w-70 h-70 p-5" src={album.image_path} alt="Album Cover" />
+			<div class="self-center">
+				<h1 class="text-4xl">{album.title}</h1>
+                <SongArtists artists=album.artists />
 			</div>
 		</div>
 	}.into_view()
+}
+
+#[component]
+fn AlbumSongs(#[prop(into)] id: Signal<i32>) -> impl IntoView {
+    let songs = Resource::new(id, get_songs);
+
+    view! {
+        <Transition
+            fallback= move || view! { <Loading /> }
+        >
+            <ErrorBoundary
+                fallback=|errors| view! {
+                    {move || errors.get()
+                        .into_iter()
+                        .map(|(_, e)| view! { <p>{e.to_string()}</p> })
+                        .collect_view()
+                    }
+                }
+            >
+                {move || songs.get().map(|songs| {
+                    songs.map(|songs| {
+                        view! { <SongList songs=songs /> }
+                    })
+                })}
+            </ErrorBoundary>
+        </Transition>
+    }
 }
