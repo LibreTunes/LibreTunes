@@ -34,10 +34,10 @@ pub fn Error<E: Display + 'static>(
 	error: Option<E>,
 ) -> impl IntoView {
 	view! {
-		<div class="error-container">
-			<div class="error-header">
-				<Icon icon={icondata::BiErrorSolid} />
-				<h1>{move || title.get()}</h1>
+		<div class="text-red-800">
+			<div class="grid grid-cols-[max-content_1fr] gap-1">
+				<Icon icon={icondata::BiErrorSolid} {..} class="self-center" />
+				<h1 class="self-center">{move || title.get()}</h1>
 			</div>
 			<p>{move || message.get()}</p>
 			<p>{error.map(|error| format!("{}", error))}</p>
