@@ -48,4 +48,14 @@
     @apply hover:text-neutral-500;
     @apply active:text-neutral-600;
   }
+
+  .auth-button {
+    @apply text-controls;
+    @apply bg-neutral-700;
+    @apply hover:bg-neutral-800;
+    @apply active:bg-neutral-900;
+    @apply rounded-lg;
+    @apply p-2;
+    @apply m-1;
+  }
 }
